@@ -1,0 +1,8 @@
+{
+  "name": "flutter_crudapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/hiromu73/Flutter_CRUDApp.git",
+  "author": "hiromu73 <hiromu.camera@gmail.com>",
+  "license": "MIT"
+}
