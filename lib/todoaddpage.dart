@@ -1,15 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/searchPage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_place/google_place.dart';
 import 'setgooglemap.dart';
 import './todoapp.dart';
-
-// メールアドレスの状態管理
-final mailAdress = StateProvider.autoDispose((ref) => "");
-
-// パスワードの状態管理
-final password = StateProvider.autoDispose((ref) => "");
 
 // Textの状態管理
 final infoTextProvider = StateProvider.autoDispose((ref) => "");
@@ -24,8 +21,8 @@ final makerProvider = StateProvider.autoDispose((ref) => "");
 final userProvider =
     StateProvider.autoDispose((ref) => FirebaseAuth.instance.currentUser);
 
-// 投稿内容の状態管理
-final messageProvider = StateProvider.autoDispose((ref) => "");
+// メモ内容の状態管理
+final memoProvider = StateProvider.autoDispose((ref) => "");
 
 // StreamProviderを使うことでStreamも扱うことができる
 // ※ autoDisposeを付けることで自動的に値をリセットできます
@@ -37,9 +34,19 @@ class TodoAddPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider.notifier).state!;
-    final messageText = ref.watch(messageProvider.notifier).state;
+    final messageText = ref.watch(memoProvider.notifier).state;
     final postLocation = ref.watch(locationProvider.notifier).state;
     final postMaker = ref.watch(makerProvider.notifier).state;
+
+    final apiKey = Api.apiKey;
+
+    // 検索結果を格納
+    List<AutocompletePrediction> predictions = [];
+
+    @override
+    void initState() {
+      GooglePlace googlePlace = GooglePlace(apiKey);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -64,32 +71,28 @@ class TodoAddPage extends ConsumerWidget {
                 keyboardType: TextInputType.multiline,
                 decoration: const InputDecoration(
                     hintText: "メモ内容",
+                    hintStyle:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
                     prefixIcon: Icon(Icons.mms_outlined),
                     border: OutlineInputBorder()),
                 textAlign: TextAlign.left,
                 onChanged: (String value) {
-                  ref.read(messageProvider.notifier).state = value;
+                  ref.read(memoProvider.notifier).state = value;
                 },
               ),
               const SizedBox(height: 8),
-              ElevatedButton.icon(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.blue)),
-                  icon: Icon(Icons.pin_drop, color: Colors.red[100]),
-                  label: const Text("位置情報の取得"),
+              ElevatedButton(
+                  child: const Text("場所の検索"),
                   onPressed: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
-                      return MapSample();
+                      return const SerachPage();
                     }));
-                    // 位置情報の取得
-                    // ref.read(postProvider.notifier).state = value;
                   }),
               const SizedBox(height: 8),
               Text(postLocation),
-              const SizedBox(height: 8),
               ElevatedButton(
-                  child: const Text("投稿"),
+                  child: const Text("登録"),
                   onPressed: () async {
                     final date = DateTime.now().toLocal().toIso8601String();
                     final email = user.email;
@@ -97,7 +100,7 @@ class TodoAddPage extends ConsumerWidget {
                         .collection('post')
                         .doc()
                         .set({
-                      'text': ref.watch(messageProvider.notifier).state,
+                      'text': ref.watch(memoProvider.notifier).state,
                       'email': email,
                       // 位置情報
                       // 'point': ref.watch(postProvider.notifier).state,
