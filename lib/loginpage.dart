@@ -35,6 +35,8 @@ final postQueryProvider = StreamProvider.autoDispose((ref) =>
     FirebaseFirestore.instance.collection('post').orderBy('date').snapshots());
 
 class LoginPage extends ConsumerWidget {
+  const LoginPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //password
@@ -45,7 +47,7 @@ class LoginPage extends ConsumerWidget {
     return Scaffold(
       body: Center(
         child: Container(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -69,10 +71,13 @@ class LoginPage extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 8),
-                Container(
+                // SizedBoxとContainerの違い
+                // width,heightを設定しコンパイル定数として定義できる。
+                // Containerはpadding, transformなど他のレイアウトの制約も設定することが出来る。
+                SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                      child: Text("新規登録"),
+                      child: const Text("新規登録"),
                       onPressed: () async {
                         try {
                           final UserCredential credentialUser =
@@ -94,10 +99,10 @@ class LoginPage extends ConsumerWidget {
                         }
                       }),
                 ),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
-                      child: Text("ログイン"),
+                      child: const Text("ログイン"),
                       onPressed: () async {
                         try {
                           final FirebaseAuth auth = FirebaseAuth.instance;
@@ -116,9 +121,9 @@ class LoginPage extends ConsumerWidget {
                         }
                       }),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Text(infoText),
                 ),
               ],

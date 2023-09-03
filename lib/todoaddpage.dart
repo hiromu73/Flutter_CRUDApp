@@ -1,13 +1,7 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'firebase_options.dart';
 import 'setgooglemap.dart';
 import './todoapp.dart';
 
@@ -49,17 +43,17 @@ class TodoAddPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("投稿画面"),
+        title: const Text("投稿画面"),
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.of(context).pop(ToDoApp());
+              Navigator.of(context).pop(const ToDoApp());
             }),
       ),
       body: Center(
         child: Container(
           color: Colors.yellow[100],
-          padding: EdgeInsets.all(32),
+          padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -95,7 +89,7 @@ class TodoAddPage extends ConsumerWidget {
               Text(postLocation),
               const SizedBox(height: 8),
               ElevatedButton(
-                  child: Text("投稿"),
+                  child: const Text("投稿"),
                   onPressed: () async {
                     final date = DateTime.now().toLocal().toIso8601String();
                     final email = user.email;
@@ -116,7 +110,7 @@ class TodoAddPage extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.map),
+          child: const Icon(Icons.map),
           onPressed: () {
             // mapへ移動する
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {

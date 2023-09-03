@@ -8,11 +8,14 @@ import './main.dart';
 
 // StreamProviderを使うことでStreamも扱うことができる
 // ※ autoDisposeを付けることで自動的に値をリセットできます
+// StreamProviderを使うことでref.watchできる
 final postQueryProvider = StreamProvider.autoDispose((ref) =>
     FirebaseFirestore.instance.collection('post').orderBy('date').snapshots());
 
 // Todoの一覧を表示
 class ToDoApp extends ConsumerWidget {
+  const ToDoApp({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Providerから値を受け取る
@@ -31,16 +34,16 @@ class ToDoApp extends ConsumerWidget {
               // ログアウトする
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
-                await Navigator.of(context)
+                Navigator.of(context)
                     .pushReplacement(MaterialPageRoute(builder: (context) {
                   return MyApp();
                 }));
               },
-              icon: Icon(Icons.logout))),
+              icon: const Icon(Icons.logout))),
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: Text("ログインユーザー: ${user.email}"),
           ),
           Expanded(
@@ -52,65 +55,58 @@ class ToDoApp extends ConsumerWidget {
                   children: query.docs.map((DocumentSnapshot document) {
                     return Card(
                       child: ListTile(
+                        // ここを変える
                         title: Text(document['text']),
                         subtitle: Text(document['email']),
-                        trailing: document['email'] == user.email
-                            ? IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () async {
-                                  // ダイアログ(削除確認を行う)
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return CupertinoAlertDialog(
-                                          title: const Text("このメモを削除しても良いですか？"),
-                                          actions: [
-                                            CupertinoDialogAction(
-                                                child: const Text('OK'),
-                                                isDefaultAction: true,
-                                                onPressed: () async {
-                                                  try {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection('post')
-                                                        .doc(document.id)
-                                                        .delete();
-                                                    Navigator.pop(context);
-                                                  } catch (e) {
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return CupertinoAlertDialog(
-                                                            content: Text(
-                                                                "削除できませんでした。${e.toString()}"),
-                                                          );
-                                                        });
-                                                  }
-                                                }),
-                                            CupertinoDialogAction(
-                                                child: Text('NO'),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                }),
-                                          ],
-                                        );
-                                      });
-                                },
-                              )
-                            : IconButton(
-                                icon: Icon(Icons.question_mark_rounded),
-                                onPressed: () async {
-                                  // ログインユーザーが違う確認ダイアログを出す。
-                                },
-                              ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () async {
+                            // ダイアログ(削除確認を行う)
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return CupertinoAlertDialog(
+                                    title: const Text("このメモを削除しますか？"),
+                                    actions: [
+                                      CupertinoDialogAction(
+                                          isDefaultAction: true,
+                                          onPressed: () async {
+                                            try {
+                                              await FirebaseFirestore.instance
+                                                  .collection('post')
+                                                  .doc(document.id)
+                                                  .delete();
+                                              Navigator.pop(context);
+                                            } catch (e) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return CupertinoAlertDialog(
+                                                      content: Text(
+                                                          "削除できませんでした。${e.toString()}"),
+                                                    );
+                                                  });
+                                            }
+                                          },
+                                          child: const Text('OK')),
+                                      CupertinoDialogAction(
+                                          child: const Text('NO'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          }),
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
                       ),
                     );
                   }).toList(),
                 );
               },
               loading: () {
-                return Center(
-                  child: Text("now Loading...."),
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
               },
               error: (e, stackTrace) {
@@ -124,7 +120,7 @@ class ToDoApp extends ConsumerWidget {
       ),
       // 投稿ページに遷移する
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
               return TodoAddPage();
