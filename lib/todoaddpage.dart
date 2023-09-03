@@ -86,7 +86,7 @@ class TodoAddPage extends ConsumerWidget {
                   onPressed: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
-                      return const SerachPage();
+                      return SerachPage();
                     }));
                   }),
               const SizedBox(height: 8),
