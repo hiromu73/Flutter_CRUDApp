@@ -26,15 +26,6 @@ class _MyHomePageState extends State<MapSample> {
     return LatLng(position.latitude, position.longitude);
   }
 
-// 初期位置
-  // final CameraPosition _kGooglePlex = const CameraPosition(
-  //   target: LatLng(35, 135),
-  //   zoom: 11,
-  // );
-
-// 初期のマーカー位置
-  // LatLng _location = LatLng(35, 135);
-
   final LocationSettings locationSettings = const LocationSettings(
     // 正確性：highはAndroid(0-100m),iOS(10m)
     accuracy: LocationAccuracy.high,

@@ -73,7 +73,7 @@ class TodoAddPage extends ConsumerWidget {
                     hintText: "メモ内容",
                     hintStyle:
                         TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
-                    prefixIcon: Icon(Icons.mms_outlined),
+                    prefixIcon: Icon(Icons.create),
                     border: OutlineInputBorder()),
                 textAlign: TextAlign.left,
                 onChanged: (String value) {
@@ -86,7 +86,7 @@ class TodoAddPage extends ConsumerWidget {
                   onPressed: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
-                      return SerachPage();
+                      return const SerachPage();
                     }));
                   }),
               const SizedBox(height: 8),

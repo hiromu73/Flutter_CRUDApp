@@ -12,6 +12,10 @@ import './main.dart';
 final postQueryProvider = StreamProvider.autoDispose((ref) =>
     FirebaseFirestore.instance.collection('post').orderBy('date').snapshots());
 
+    // ユーザー情報の状態管理
+final userProvider =
+    StateProvider.autoDispose((ref) => FirebaseAuth.instance.currentUser);
+
 // Todoの一覧を表示
 class ToDoApp extends ConsumerWidget {
   const ToDoApp({super.key});
