@@ -69,27 +69,46 @@ class _MyHomePageState extends State<MapSample> {
     // 画面の幅と高さを決定する
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    //ドロップダウンの選択
+    var _value = "選択してください";
 
     return Container(
       height: height,
       width: width,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('位置情報を取得'),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () => {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return SerachPage();
-                })).then((value) async {
-                  await searchLocation(value);
-                })
-              },
-            )
+            title: DropdownButton(
+          value: _value,
+          onChanged: (String? value) {
+            setState(() => _value = value ?? " ");
+          },
+          items: const [
+            DropdownMenuItem(
+              value: "スーパー",
+              child: Text("スーパー"),
+            ),
+            DropdownMenuItem(
+              value: "薬局",
+              child: Text("薬局"),
+            ),
+            DropdownMenuItem(
+              value: "レストラン",
+              child: Text("レストラン"),
+            ),
+            DropdownMenuItem(
+              value: "ファーストフード",
+              child: Text("ファーストフード"),
+            ),
+            DropdownMenuItem(
+              value: "カフェ",
+              child: Text("カフェ"),
+            ),
+            DropdownMenuItem(
+              value: "本屋",
+              child: Text("本屋"),
+            ),
           ],
-        ),
+        )),
         body: Stack(
           children: <Widget>[
             GoogleMap(
