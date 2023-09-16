@@ -93,7 +93,13 @@ class _SerachPage extends State<SerachPage> {
                       child: ListTile(
                         title: Text(predictions[index].description.toString()),
                         onTap: () async {
-                          List? locations = await locationFromAddress
+                          List? locations = await locationFromAddress(
+                              predictions[index].description.toString());
+                          setState(() {
+                            LatLng.add(locations.first.latitude);
+                            LatLng.add(locations.first.longitude);
+                          });
+                          Navigator.pop(context, LatLng);
                         },
                       ),
                     );

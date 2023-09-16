@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/searchPage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'setgooglemap.dart';
 import './todoapp.dart';
@@ -37,7 +40,12 @@ class TodoAddPage extends ConsumerWidget {
     final messageText = ref.watch(memoProvider.notifier).state;
     final postLocation = ref.watch(locationProvider.notifier).state;
     final postMaker = ref.watch(makerProvider.notifier).state;
-
+    Completer _controller = Completer();
+    final CameraPosition _initialCameraPosition = CameraPosition(
+      // 最初に描画される位置を指定
+      target: LatLng(35.17176088096857, 136.88817886263607),
+      zoom: 14.4746,
+    );
     final apiKey = Api.apiKey;
 
     // 検索結果を格納
@@ -82,13 +90,17 @@ class TodoAddPage extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               ElevatedButton(
-                  child: const Text("場所の検索"),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return const SerachPage();
-                    }));
-                  }),
+                child: const Text("場所の検索"),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MapSample();
+                      },
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 8),
               Text(postLocation),
               ElevatedButton(
