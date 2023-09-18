@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/selectmap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_place/google_place.dart';
 import 'searchPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // GoogleMapの表示
 class MapSample extends StatefulWidget {
@@ -16,6 +21,18 @@ class _MyHomePageState extends State<MapSample> {
   late GoogleMapController _controller;
   late StreamSubscription<Position> positionStream;
   final Completer _conpleter = Completer();
+  final apiKey = Api.apiKey;
+  String? isSelectMenu = "";
+  Uri? mapURL;
+  bool? isExist;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // initState()はFutureできないのでメソッドを格納。
+    initialize();
+  }
 
   // 現在位置の取得
   // デバイスの現在の場所を照会するには、単に getCurrentPosition メソッド
@@ -59,56 +76,72 @@ class _MyHomePageState extends State<MapSample> {
       strokeWidth: 1,
     )
   };
+
   static final _cameraPosition = CameraPosition(
     target: LatLng(34.758663, 135.4971856623888),
     zoom: 16,
   );
+
   LatLng _location = LatLng(34.758663, 135.4971856623888);
+
   @override
   Widget build(BuildContext context) {
     // 画面の幅と高さを決定する
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     //ドロップダウンの選択
-    var _value = "選択してください";
 
     return Container(
       height: height,
       width: width,
       child: Scaffold(
         appBar: AppBar(
-            title: DropdownButton(
-          value: _value,
-          onChanged: (String? value) {
-            setState(() => _value = value ?? " ");
-          },
-          items: const [
-            DropdownMenuItem(
-              value: "スーパー",
-              child: Text("スーパー"),
-            ),
-            DropdownMenuItem(
-              value: "薬局",
-              child: Text("薬局"),
-            ),
-            DropdownMenuItem(
-              value: "レストラン",
-              child: Text("レストラン"),
-            ),
-            DropdownMenuItem(
-              value: "ファーストフード",
-              child: Text("ファーストフード"),
-            ),
-            DropdownMenuItem(
-              value: "カフェ",
-              child: Text("カフェ"),
-            ),
-            DropdownMenuItem(
-              value: "本屋",
-              child: Text("本屋"),
-            ),
+          actions: [
+            Icon(Icons.search),
+            DropdownButton(
+              items: const <DropdownMenuItem<String>>[
+                DropdownMenuItem(
+                  value: "",
+                  child: Text(""),
+                ),
+                DropdownMenuItem(
+                  value: "スーパー",
+                  child: Text("スーパー"),
+                ),
+                DropdownMenuItem(
+                  value: "薬局",
+                  child: Text("薬局"),
+                ),
+                DropdownMenuItem(
+                  value: "レストラン",
+                  child: Text("レストラン"),
+                ),
+                DropdownMenuItem(
+                  value: "ファーストフード",
+                  child: Text("ファーストフード"),
+                ),
+                DropdownMenuItem(
+                  value: "カフェ",
+                  child: Text("カフェ"),
+                ),
+                DropdownMenuItem(
+                  value: "本屋",
+                  child: Text("本屋"),
+                ),
+              ],
+              borderRadius: BorderRadius.circular(20),
+              onChanged: (String? value) {
+                setState(() {
+                  isSelectMenu = value!;
+                });
+                if (mapURL != null) {
+                  launchUrl(mapURL!);
+                }
+              },
+              value: isSelectMenu,
+            )
           ],
-        )),
+        ),
         body: Stack(
           children: <Widget>[
             GoogleMap(
@@ -149,5 +182,92 @@ class _MyHomePageState extends State<MapSample> {
             label: Text("位置情報を登録する")),
       ),
     );
+  }
+
+  // 現在位置を取得するメソッド
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('ロケーションサービスが無効です。');
+    }
+
+    // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      // デバイスの場所へのアクセス許可をリクエストする
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('デバイスの場所を取得するための許可がされていません。');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('デバイスの場所を取得するための許可してください');
+    }
+    // デバイスの現在の場所を返す。
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  Future initialize() async {
+    // 現在位置を取得するメソッドの結果を取得する。
+    final _position = await _determinePosition();
+    print(_position);
+    final _latitude = _position.latitude;
+    final _longitude = _position.longitude;
+
+    // googlemapと同じAPIキーを指定
+    final googlePlace = GooglePlace(apiKey);
+
+    // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
+    final response = await googlePlace.search.getNearBySearch(
+        Location(lat: _latitude, lng: _longitude), 1000,
+        language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
+
+    //!マークをつけるとnullが入った場合、エラーとなる。
+    final results = response!.results;
+    // nullの場合はfalseを代入
+    //?マークはnull許容型
+    final isExist = results?.isNotEmpty ?? false;
+    setState(() {
+      this.isExist = isExist;
+    });
+
+    if (!isExist) {
+      return;
+    }
+
+    final firstResult = results?.first;
+    final selectLocation = firstResult?.geometry?.location;
+    final selectLocationLatitude = selectLocation?.lat;
+    final selectLocationLongitude = selectLocation?.lng;
+
+    String urlString = '';
+    if (Platform.isAndroid) {
+      urlString =
+          'https://www.google.co.jp/maps/dir/$_latitude,$_longitude/$selectLocationLatitude,$selectLocationLongitude';
+    } else if (Platform.isIOS) {
+      urlString =
+          'comgooglemaps://?saddr=$_latitude,$_longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=transit';
+    }
+
+    mapURL = Uri.parse(urlString);
+
+    // mounted 。Stateful Widgetのオブジェクトが、現在のWidgetツリー内に存在するか否かを示すbool型のプロパティ
+    // （存在しなければ、既に別のWidgetツリーに移っている＝画面遷移している、ということだろう）
+    // if (firstResult != null && mounted) {
+    //   setState(() {
+    //     final photoReference = firstResult.photos?.first.photoReference;
+    //     selectmap = SelectMap(
+    //         firstResult.name,
+    //         'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400 &photo_reference=$photoReference&key=APi.apikey',
+    //         selectLocation);
+    //   });
+    // }
   }
 }

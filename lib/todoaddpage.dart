@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_crudapp/api.dart';
@@ -106,19 +107,29 @@ class TodoAddPage extends ConsumerWidget {
               ElevatedButton(
                   child: const Text("登録"),
                   onPressed: () async {
-                    final date = DateTime.now().toLocal().toIso8601String();
-                    final email = user.email;
-                    await FirebaseFirestore.instance
-                        .collection('post')
-                        .doc()
-                        .set({
-                      'text': ref.watch(memoProvider.notifier).state,
-                      'email': email,
-                      // 位置情報
-                      // 'point': ref.watch(postProvider.notifier).state,
-                      'date': date,
-                    });
-                    Navigator.of(context).pop();
+                    if (messageText != "") {
+                      final date = DateTime.now().toLocal().toIso8601String();
+                      final email = user.email;
+                      await FirebaseFirestore.instance
+                          .collection('post')
+                          .doc()
+                          .set({
+                        'text': ref.watch(memoProvider.notifier).state,
+                        'email': email,
+                        // 位置情報
+                        // 'point': ref.watch(postProvider.notifier).state,
+                        'date': date,
+                      });
+                      Navigator.of(context).pop();
+                    } else {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return CupertinoAlertDialog(
+                              content: Text("memo内容がありません。"),
+                            );
+                          });
+                    }
                   })
             ],
           ),
