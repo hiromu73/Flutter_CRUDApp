@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/selectmap.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
 import 'searchPage.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 // GoogleMapの表示
 class MapSample extends StatefulWidget {
@@ -26,9 +29,10 @@ class _MyHomePageState extends State<MapSample> {
   Uri? mapURL;
   bool? isExist;
 
+  bool _notificationsEnabled = false;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // initState()はFutureできないのでメソッドを格納。
     initialize();
@@ -234,6 +238,7 @@ class _MyHomePageState extends State<MapSample> {
     // nullの場合はfalseを代入
     //?マークはnull許容型
     final isExist = results?.isNotEmpty ?? false;
+
     setState(() {
       this.isExist = isExist;
     });

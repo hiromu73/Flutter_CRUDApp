@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'loginpage.dart';
 
+
 // メールアドレスの状態管理
 final mailAdress = StateProvider.autoDispose((ref) => "");
 

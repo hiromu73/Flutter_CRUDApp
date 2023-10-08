@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'setgooglemap.dart';
 import './todoapp.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // Textの状態管理
 final infoTextProvider = StateProvider.autoDispose((ref) => "");
@@ -55,6 +56,11 @@ class TodoAddPage extends ConsumerWidget {
     @override
     void initState() {
       GooglePlace googlePlace = GooglePlace(apiKey);
+
+      // _isAndroidPermissionGranted();
+      // _requestPermissions();
+      // _configureDidReceiveLocalNotificationSubject();
+      // _configureSelectNotificationSubject();
     }
 
     return Scaffold(
@@ -96,7 +102,8 @@ class TodoAddPage extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) {
-                        return MapSample();
+                        //return MapSample();
+                        return SerachPage();
                       },
                     ),
                   );
@@ -107,29 +114,29 @@ class TodoAddPage extends ConsumerWidget {
               ElevatedButton(
                   child: const Text("登録"),
                   onPressed: () async {
-                    if (messageText != "") {
-                      final date = DateTime.now().toLocal().toIso8601String();
-                      final email = user.email;
-                      await FirebaseFirestore.instance
-                          .collection('post')
-                          .doc()
-                          .set({
-                        'text': ref.watch(memoProvider.notifier).state,
-                        'email': email,
-                        // 位置情報
-                        // 'point': ref.watch(postProvider.notifier).state,
-                        'date': date,
-                      });
-                      Navigator.of(context).pop();
-                    } else {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return CupertinoAlertDialog(
-                              content: Text("memo内容がありません。"),
-                            );
-                          });
-                    }
+                    // if (messageText != "") {
+                    final date = DateTime.now().toLocal().toIso8601String();
+                    final email = user.email;
+                    await FirebaseFirestore.instance
+                        .collection('post')
+                        .doc()
+                        .set({
+                      'text': ref.watch(memoProvider.notifier).state,
+                      'email': email,
+                      // 位置情報
+                      // 'point': ref.watch(postProvider.notifier).state,
+                      'date': date,
+                    });
+                    Navigator.of(context).pop();
+                    // } else {
+                    //   showDialog(
+                    //       context: context,
+                    //       builder: (context) {
+                    //         return CupertinoAlertDialog(
+                    //           content: Text("memo内容がありません。"),
+                    //         );
+                    //       });
+                    // }
                   })
             ],
           ),
