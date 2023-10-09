@@ -2,18 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
-import 'package:flutter_crudapp/selectmap.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
-import 'searchPage.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 // GoogleMapの表示
 class MapSample extends StatefulWidget {
+  const MapSample({super.key});
+
   @override
   State<MapSample> createState() => _MyHomePageState();
 }
@@ -29,7 +26,7 @@ class _MyHomePageState extends State<MapSample> {
   Uri? mapURL;
   bool? isExist;
 
-  bool _notificationsEnabled = false;
+  final bool _notificationsEnabled = false;
 
   @override
   void initState() {
@@ -74,19 +71,19 @@ class _MyHomePageState extends State<MapSample> {
   // サークルの詳細
   final circles = <Circle>{
     Circle(
-      circleId: CircleId('CircleId1'),
+      circleId: const CircleId('CircleId1'),
       fillColor: Colors.lightBlue.withOpacity(0.1),
       radius: 100,
       strokeWidth: 1,
     )
   };
 
-  static final _cameraPosition = CameraPosition(
+  static const _cameraPosition = CameraPosition(
     target: LatLng(34.758663, 135.4971856623888),
     zoom: 16,
   );
 
-  LatLng _location = LatLng(34.758663, 135.4971856623888);
+  LatLng _location = const LatLng(34.758663, 135.4971856623888);
 
   @override
   Widget build(BuildContext context) {
@@ -95,13 +92,13 @@ class _MyHomePageState extends State<MapSample> {
     var width = MediaQuery.of(context).size.width;
     //ドロップダウンの選択
 
-    return Container(
+    return SizedBox(
       height: height,
       width: width,
       child: Scaffold(
         appBar: AppBar(
           actions: [
-            Icon(Icons.search),
+            const Icon(Icons.search),
             DropdownButton(
               items: const <DropdownMenuItem<String>>[
                 DropdownMenuItem(
@@ -183,7 +180,7 @@ class _MyHomePageState extends State<MapSample> {
                   // 位置情報を取得し登録を行う。
                 },
             icon: const Icon(Icons.add),
-            label: Text("位置情報を登録する")),
+            label: const Text("位置情報を登録する")),
       ),
     );
   }
@@ -220,17 +217,17 @@ class _MyHomePageState extends State<MapSample> {
 
   Future initialize() async {
     // 現在位置を取得するメソッドの結果を取得する。
-    final _position = await _determinePosition();
-    print(_position);
-    final _latitude = _position.latitude;
-    final _longitude = _position.longitude;
+    final position = await _determinePosition();
+    print(position);
+    final latitude = position.latitude;
+    final longitude = position.longitude;
 
     // googlemapと同じAPIキーを指定
     final googlePlace = GooglePlace(apiKey);
 
     // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
     final response = await googlePlace.search.getNearBySearch(
-        Location(lat: _latitude, lng: _longitude), 1000,
+        Location(lat: latitude, lng: longitude), 1000,
         language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
 
     //!マークをつけるとnullが入った場合、エラーとなる。
@@ -255,10 +252,10 @@ class _MyHomePageState extends State<MapSample> {
     String urlString = '';
     if (Platform.isAndroid) {
       urlString =
-          'https://www.google.co.jp/maps/dir/$_latitude,$_longitude/$selectLocationLatitude,$selectLocationLongitude';
+          'https://www.google.co.jp/maps/dir/$latitude,$longitude/$selectLocationLatitude,$selectLocationLongitude';
     } else if (Platform.isIOS) {
       urlString =
-          'comgooglemaps://?saddr=$_latitude,$_longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=transit';
+          'comgooglemaps://?saddr=$latitude,$longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=transit';
     }
 
     mapURL = Uri.parse(urlString);

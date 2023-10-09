@@ -1,17 +1,13 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_crudapp/api.dart';
-import 'package:flutter_crudapp/searchPage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import 'setgooglemap.dart';
 import './todoapp.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // Textの状態管理
 final infoTextProvider = StateProvider.autoDispose((ref) => "");
@@ -36,14 +32,16 @@ final postQueryProvider = StreamProvider.autoDispose((ref) =>
 
 // 投稿ページ
 class TodoAddPage extends ConsumerWidget {
+  const TodoAddPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider.notifier).state!;
     final messageText = ref.watch(memoProvider.notifier).state;
     final postLocation = ref.watch(locationProvider.notifier).state;
     final postMaker = ref.watch(makerProvider.notifier).state;
-    Completer _controller = Completer();
-    final CameraPosition _initialCameraPosition = CameraPosition(
+    Completer controller = Completer();
+    const CameraPosition initialCameraPosition = CameraPosition(
       // 最初に描画される位置を指定
       target: LatLng(35.17176088096857, 136.88817886263607),
       zoom: 14.4746,
@@ -56,11 +54,6 @@ class TodoAddPage extends ConsumerWidget {
     @override
     void initState() {
       GooglePlace googlePlace = GooglePlace(apiKey);
-
-      // _isAndroidPermissionGranted();
-      // _requestPermissions();
-      // _configureDidReceiveLocalNotificationSubject();
-      // _configureSelectNotificationSubject();
     }
 
     return Scaffold(
@@ -102,8 +95,8 @@ class TodoAddPage extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) {
-                        //return MapSample();
-                        return SerachPage();
+                        return const MapSample();
+                        // return SerachPage();
                       },
                     ),
                   );
@@ -147,7 +140,7 @@ class TodoAddPage extends ConsumerWidget {
           onPressed: () {
             // mapへ移動する
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return MapSample();
+              return const MapSample();
             }));
           }),
     );

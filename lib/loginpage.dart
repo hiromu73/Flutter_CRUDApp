@@ -27,12 +27,12 @@ class LoginPage extends ConsumerWidget {
         child: Container(
             padding: const EdgeInsets.all(24),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 // メールアドレスの入力
                 TextField(
                   decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: "メールアドレス"),
+                      border: InputBorder.none, hintText: "E-mail"),
                   onChanged: (String value) {
                     ref.read(mailAdress.notifier).state = value;
                   },
@@ -41,9 +41,12 @@ class LoginPage extends ConsumerWidget {
                 // パスワードの入力
                 TextField(
                   decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: "パスワード"),
+                    border: InputBorder.none,
+                    hintText: "Password",
+                  ),
                   // 見えない様にする
                   obscureText: true,
+                  obscuringCharacter: '*',
                   onChanged: (String value) {
                     ref.read(password.notifier).state = value;
                   },
@@ -52,53 +55,63 @@ class LoginPage extends ConsumerWidget {
                 // SizedBoxとContainerの違い
                 // width,heightを設定しコンパイル定数として定義できる。
                 // Containerはpadding, transformなど他のレイアウトの制約も設定することが出来る。
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                      child: const Text("新規登録"),
-                      onPressed: () async {
-                        try {
-                          final UserCredential credentialUser =
-                              await FirebaseAuth.instance
-                                  .createUserWithEmailAndPassword(
-                            email: newMailAdress,
-                            password: newPassword,
-                          );
-                          // ユーザー情報の更新
-                          ref.read(userProvider.notifier).state =
-                              credentialUser.user;
-                          await Navigator.of(context).pushReplacement(
+                Wrap(
+                  spacing: 16,
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          shape: const StadiumBorder(),
+                        ),
+                        onPressed: () async {
+                          try {
+                            final UserCredential credentialUser =
+                                await FirebaseAuth.instance
+                                    .createUserWithEmailAndPassword(
+                              email: newMailAdress,
+                              password: newPassword,
+                            );
+                            // ユーザー情報の更新
+                            ref.read(userProvider.notifier).state =
+                                credentialUser.user;
+                            await Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (context) {
+                              return const ToDoApp();
+                            }));
+                          } catch (e) {
+                            ref.read(infoTextProvider.notifier).state =
+                                "新規登録できません。原因は${e.toString()}";
+                          }
+                        },
+                        child: const Text("新規登録")),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          shape: const StadiumBorder(),
+                        ),
+                        onPressed: () async {
+                          try {
+                            final FirebaseAuth auth = FirebaseAuth.instance;
+                            await auth.signInWithEmailAndPassword(
+                              email: newMailAdress,
+                              password: newPassword,
+                            );
+                            await Navigator.of(context).pushReplacement(
                               MaterialPageRoute(builder: (context) {
-                            return ToDoApp();
-                          }));
-                        } catch (e) {
-                          ref.read(infoTextProvider.notifier).state =
-                              "新規登録できません。原因は${e.toString()}";
-                        }
-                      }),
+                                return const ToDoApp();
+                              }),
+                            );
+                          } catch (e) {
+                            ref.read(infoTextProvider.notifier).state =
+                                "Not Login。原因は${e.toString()}";
+                          }
+                        },
+                        child: const Text("ログイン")),
+                  ],
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                      child: const Text("ログイン"),
-                      onPressed: () async {
-                        try {
-                          final FirebaseAuth auth = FirebaseAuth.instance;
-                          await auth.signInWithEmailAndPassword(
-                            email: newMailAdress,
-                            password: newPassword,
-                          );
-                          await Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) {
-                              return ToDoApp();
-                            }),
-                          );
-                        } catch (e) {
-                          ref.read(infoTextProvider.notifier).state =
-                              "Not Login。原因は${e.toString()}";
-                        }
-                      }),
-                ),
+
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(8),
