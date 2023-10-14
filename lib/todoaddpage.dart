@@ -25,6 +25,12 @@ final userProvider =
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
 
+// メモ内容の状態管理
+final latitudeProvider = StateProvider.autoDispose((ref) => "");
+
+// メモ内容の状態管理
+final longitudeProvider = StateProvider.autoDispose((ref) => "");
+
 // StreamProviderを使うことでStreamも扱うことができる
 // ※ autoDisposeを付けることで自動的に値をリセットできます
 final postQueryProvider = StreamProvider.autoDispose((ref) =>
@@ -37,9 +43,10 @@ class TodoAddPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider.notifier).state!;
-    final messageText = ref.watch(memoProvider.notifier).state;
     final postLocation = ref.watch(locationProvider.notifier).state;
-    final postMaker = ref.watch(makerProvider.notifier).state;
+    final latitudeLocation = ref.watch(latitudeProvider.notifier).state;
+    final longitudeLocation = ref.watch(longitudeProvider.notifier).state;
+
     Completer controller = Completer();
     const CameraPosition initialCameraPosition = CameraPosition(
       // 最初に描画される位置を指定
@@ -107,7 +114,6 @@ class TodoAddPage extends ConsumerWidget {
               ElevatedButton(
                   child: const Text("登録"),
                   onPressed: () async {
-                    // if (messageText != "") {
                     final date = DateTime.now().toLocal().toIso8601String();
                     final email = user.email;
                     await FirebaseFirestore.instance
@@ -116,20 +122,12 @@ class TodoAddPage extends ConsumerWidget {
                         .set({
                       'text': ref.watch(memoProvider.notifier).state,
                       'email': email,
-                      // 位置情報
-                      // 'point': ref.watch(postProvider.notifier).state,
+                      // 経度緯度を表示
+                      // 'latitude' : ref.watch(latitudeLocation.notifier).state,:
+                      // 'longitude : ref.watch(longitudeLocation.notifier).state,'
                       'date': date,
                     });
                     Navigator.of(context).pop();
-                    // } else {
-                    //   showDialog(
-                    //       context: context,
-                    //       builder: (context) {
-                    //         return CupertinoAlertDialog(
-                    //           content: Text("memo内容がありません。"),
-                    //         );
-                    //       });
-                    // }
                   })
             ],
           ),
