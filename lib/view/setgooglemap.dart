@@ -135,12 +135,9 @@ class _MyHomePageState extends State<MapSample> {
         body: Stack(
           children: <Widget>[
             GoogleMap(
-              // mapが作成される時にonMapCreatedでGoogleMapControllerのインスタンスを格納
               onMapCreated: (GoogleMapController controller) {},
               mapType: MapType.normal,
-              //  マップの初期の位置(必須)
               initialCameraPosition: _cameraPosition,
-              // マーカーを表示
               markers: _createMaker(_location, 'Marker1'),
               myLocationEnabled: true,
               // タップした場所の緯度と軽度が返される。
@@ -150,7 +147,6 @@ class _MyHomePageState extends State<MapSample> {
                   _createMaker(_location, 'Marker1');
                 });
               },
-              // マップ上に円を表示
               circles: circles,
             ),
           ],

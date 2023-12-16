@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/constants/string.dart';
 import 'package:google_place/google_place.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -75,7 +76,7 @@ class _SerachPage extends State<SerachPage> with WidgetsBindingObserver {
                                 // Navigator.pop(context);
                               },
                             ),
-                            hintText: "検索したい場所を入力",
+                            hintText: serachPosition,
                             hintStyle: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w100),
                           ),
