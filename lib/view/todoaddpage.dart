@@ -32,8 +32,8 @@ final latitudeProvider = StateProvider.autoDispose((ref) => "");
 // メモ内容の状態管理
 final longitudeProvider = StateProvider.autoDispose((ref) => "");
 
-// StreamProviderを使うことでStreamも扱うことができる
-// ※ autoDisposeを付けることで自動的に値をリセットできます
+// // StreamProviderを使うことでStreamも扱うことができる
+// // ※ autoDisposeを付けることで自動的に値をリセットできます
 final postQueryProvider = StreamProvider.autoDispose((ref) =>
     FirebaseFirestore.instance.collection('post').orderBy('date').snapshots());
 
@@ -53,7 +53,7 @@ class TodoAddPage extends ConsumerWidget {
       target: LatLng(35.17176088096857, 136.88817886263607),
       zoom: 14.4746,
     );
-    
+
     final apiKey = Api.apiKey;
 
     // 検索結果を格納
@@ -66,7 +66,7 @@ class TodoAddPage extends ConsumerWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("投稿画面"),
+          title: const Text(addPage),
           leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
@@ -75,7 +75,7 @@ class TodoAddPage extends ConsumerWidget {
         ),
         body: Center(
           child: Container(
-            color: Colors.yellow[100],
+            color: Colors.yellow[50],
             padding: const EdgeInsets.all(32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -104,19 +104,21 @@ class TodoAddPage extends ConsumerWidget {
                 ElevatedButton(
                     child: const Text(registration),
                     onPressed: () async {
-                      final date = DateTime.now().toLocal().toIso8601String();
-                      await FirebaseFirestore.instance
-                          .collection('post')
-                          .doc()
-                          .set({
-                        'text': ref.watch(memoProvider.notifier).state,
-                        // 経度緯度を表示
-                        // 'latitude' : ref.watch(latitudeLocation.notifier).state,
-                        // 'longitude' : ref.watch(longitudeLocation.notifier).state,
-                        'date': date,
-                        'alert': true,
-                      });
-                      Navigator.of(context).pop();
+                      if (ref.watch(memoProvider.notifier) != null) {
+                        final date = DateTime.now().toLocal().toIso8601String();
+                        await FirebaseFirestore.instance
+                            .collection('post')
+                            .doc()
+                            .set({
+                          'text': ref.watch(memoProvider.notifier).state,
+                          // 経度緯度を表示
+                          // 'latitude' : ref.watch(latitudeLocation.notifier).state,
+                          // 'longitude' : ref.watch(longitudeLocation.notifier).state,
+                          'date': date,
+                          'alert': true,
+                        });
+                        Navigator.of(context).pop();
+                      }
                     })
               ],
             ),

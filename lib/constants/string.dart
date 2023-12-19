@@ -11,5 +11,6 @@ const String deleteMemo = "このメモを削除しますか？";
 const String loginPassword = "Password";
 const String login = "Login";
 const String newRegistration = "新規登録";
+const String addPage = "AddPage";
 
 const String serachPosition = "検索したい場所を入力";

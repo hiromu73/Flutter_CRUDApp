@@ -20,65 +20,76 @@ class FirebaseCollection extends ConsumerWidget {
         return ListView(
           children: query.docs.map((DocumentSnapshot document) {
             return Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                child: ListTile(
-                  leading: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () async {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return CupertinoAlertDialog(
-                              title: const Text(deleteMemo),
-                              actions: [
-                                CupertinoDialogAction(
-                                    isDefaultAction: true,
-                                    onPressed: () async {
-                                      try {
-                                        String docId = document.id;
-                                        await FirebaseFirestore.instance
-                                            .collection('post')
-                                            .doc(docId)
-                                            .delete();
-                                        Navigator.pop(context);
-                                      } catch (e) {
-                                        return Navigator.pop(context);
-                                      }
-                                    },
-                                    child: const Text(ok)),
-                                CupertinoDialogAction(
-                                    child: const Text(no),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    }),
-                              ],
-                            );
-                          });
-                    },
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(document['text']),
+                    trailing: CupertinoSwitch(
+                        activeColor: Colors.amber,
+                        trackColor: Colors.grey,
+                        value: document['alert'],
+                        onChanged: (value) async {
+                          try {
+                            String docId = document.id;
+                            await FirebaseFirestore.instance
+                                .collection('post')
+                                .doc(docId)
+                                .update({
+                              'alert': value,
+                            });
+                          } catch (e) {
+                            print(e);
+                          }
+                        }),
                   ),
-                  title: Text(document['text']),
-                  trailing: CupertinoSwitch(
-                      activeColor: Colors.amber,
-                      trackColor: Colors.grey,
-                      value: document['alert'],
-                      onChanged: (value) async {
-                        try {
-                          String docId = document.id;
-                          await FirebaseFirestore.instance
-                              .collection('post')
-                              .doc(docId)
-                              .update({
-                            'alert': value,
-                          });
-                        } catch (e) {
-                          print(e);
-                        }
-                      }),
-                ));
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        color: Colors.grey,
+                        icon: const Icon(Icons.delete),
+                        onPressed: () async {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return CupertinoAlertDialog(
+                                  title: const Text(deleteMemo),
+                                  actions: [
+                                    CupertinoDialogAction(
+                                        isDefaultAction: true,
+                                        onPressed: () async {
+                                          try {
+                                            String docId = document.id;
+                                            await FirebaseFirestore.instance
+                                                .collection('post')
+                                                .doc(docId)
+                                                .delete();
+                                            Navigator.pop(context);
+                                          } catch (e) {
+                                            return Navigator.pop(context);
+                                          }
+                                        },
+                                        child: const Text(ok)),
+                                    CupertinoDialogAction(
+                                        child: const Text(no),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        }),
+                                  ],
+                                );
+                              });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
           }).toList(),
         );
       },
