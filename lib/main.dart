@@ -1,15 +1,11 @@
 // flutter
 import 'package:flutter/material.dart';
 // package
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_crudapp/view/firebase_options.dart';
 import 'package:flutter_crudapp/view/todoapp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// constants
-import 'package:flutter_crudapp/constants/routes.dart' as routes;
-// models
+import 'package:flutter/src/material/colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +26,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter CrudApp',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primaryColor:  MaterialColor(
+        0xFFFFFFFF,
+        <int, Color>{
+          500: Color(0xFFFFFFFF),
+        },
+      )),
       home: const ToDoApp(),
     );
   }

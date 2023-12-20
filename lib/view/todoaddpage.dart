@@ -47,13 +47,6 @@ class TodoAddPage extends ConsumerWidget {
     final latitudeLocation = ref.watch(latitudeProvider.notifier).state;
     final longitudeLocation = ref.watch(longitudeProvider.notifier).state;
 
-    Completer controller = Completer();
-    const CameraPosition initialCameraPosition = CameraPosition(
-      // 最初に描画される位置を指定
-      target: LatLng(35.17176088096857, 136.88817886263607),
-      zoom: 14.4746,
-    );
-
     final apiKey = Api.apiKey;
 
     // 検索結果を格納
@@ -65,67 +58,104 @@ class TodoAddPage extends ConsumerWidget {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(addPage),
-          leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.of(context).pop(const ToDoApp());
-              }),
+      appBar: AppBar(
+        title: const Text(
+          addPage,
+          style: TextStyle(color: Colors.black54),
         ),
-        body: Center(
-          child: Container(
-            color: Colors.yellow[50],
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextFormField(
-                  maxLength: null,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(
-                      hintText: memo,
-                      hintStyle:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
-                      prefixIcon: Icon(Icons.create),
-                      border: OutlineInputBorder()),
-                  textAlign: TextAlign.left,
-                  onChanged: (String value) async {
-                    ref.read(memoProvider.notifier).state = value;
-                  },
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                    child: const Text(positionSearch),
-                    onPressed: () => routes.mapSamplePage(context: context)),
-                const SizedBox(height: 8),
-                Text(postLocation),
-                ElevatedButton(
-                    child: const Text(registration),
-                    onPressed: () async {
-                      if (ref.watch(memoProvider.notifier) != null) {
-                        final date = DateTime.now().toLocal().toIso8601String();
-                        await FirebaseFirestore.instance
-                            .collection('post')
-                            .doc()
-                            .set({
-                          'text': ref.watch(memoProvider.notifier).state,
-                          // 経度緯度を表示
-                          // 'latitude' : ref.watch(latitudeLocation.notifier).state,
-                          // 'longitude' : ref.watch(longitudeLocation.notifier).state,
-                          'date': date,
-                          'alert': true,
-                        });
-                        Navigator.of(context).pop();
-                      }
-                    })
-              ],
+        backgroundColor: const MaterialColor(
+          0xFFFFFFFF,
+          <int, Color>{
+            500: Color(0xFFFFFFFF),
+          },
+        ),
+        leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black54,
             ),
+            onPressed: () {
+              Navigator.of(context).pop(const ToDoApp());
+            }),
+      ),
+      body: Center(
+        child: Container(
+          color: Colors.yellow[50],
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                maxLength: null,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey[100],
+                  filled: true,
+                  isDense: true,
+                  hintText: memo,
+                  hintStyle: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w100),
+                  prefixIcon: const Icon(Icons.create),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(32),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                textAlign: TextAlign.left,
+                onChanged: (String value) async {
+                  ref.read(memoProvider.notifier).state = value;
+                },
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                  child: const Text(positionSearch),
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  onPressed: () => routes.mapSamplePage(context: context)),
+              const SizedBox(height: 8),
+              Text(postLocation), // 位置の名前の表示?
+              ElevatedButton(
+                  child: const Text(registration),
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  onPressed: () async {
+                    if (ref.watch(memoProvider.notifier) != null) {
+                      final date = DateTime.now().toLocal().toIso8601String();
+                      await FirebaseFirestore.instance
+                          .collection('post')
+                          .doc()
+                          .set({
+                        'text': ref.watch(memoProvider.notifier).state,
+                        // 経度緯度を表示
+                        // 'latitude' : ref.watch(latitudeLocation.notifier).state,
+                        // 'longitude' : ref.watch(longitudeLocation.notifier).state,
+                        'date': date,
+                        'alert': true,
+                      });
+                      Navigator.of(context).pop();
+                    }
+                  })
+            ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.map),
-            onPressed: () => routes.mapSamplePage(context: context)));
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+              child: const Icon(Icons.photo),
+              onPressed: () => {}), //写真を選択して保存ができる。
+          const SizedBox(
+            width: 10,
+          ),
+          FloatingActionButton(
+              child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
+              onPressed: () => {}),
+        ],
+      ),
+    );
   }
 }
