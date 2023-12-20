@@ -104,6 +104,7 @@ class TodoAddPage extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.left,
                 onChanged: (String value) async {
+                  print(value);
                   ref.read(memoProvider.notifier).state = value;
                 },
               ),
