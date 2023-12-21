@@ -147,12 +147,14 @@ class TodoAddPage extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
+              heroTag: "hero2",
               child: const Icon(Icons.photo),
               onPressed: () => {}), //写真を選択して保存ができる。
           const SizedBox(
             width: 10,
           ),
           FloatingActionButton(
+              heroTag: "hero3",
               child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
               onPressed: () => {}),
         ],

@@ -78,62 +78,63 @@ class _MyHomePageState extends State<MapSample> {
       height: height,
       width: width,
       child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            const Icon(Icons.search),
-            DropdownButton(
-              items: const <DropdownMenuItem<String>>[
-                DropdownMenuItem(
-                  value: "",
-                  child: Text(""),
-                ),
-                DropdownMenuItem(
-                  value: "スーパー",
-                  child: Text("スーパー"),
-                ),
-                DropdownMenuItem(
-                  value: "薬局",
-                  child: Text("薬局"),
-                ),
-                DropdownMenuItem(
-                  value: "レストラン",
-                  child: Text("レストラン"),
-                ),
-                DropdownMenuItem(
-                  value: "ファーストフード",
-                  child: Text("ファーストフード"),
-                ),
-                DropdownMenuItem(
-                  value: "カフェ",
-                  child: Text("カフェ"),
-                ),
-                DropdownMenuItem(
-                  value: "本屋",
-                  child: Text("本屋"),
-                ),
-                DropdownMenuItem(
-                  value: "病院",
-                  child: Text("病院"),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(20),
-              onChanged: (String? value) async {
-                setState(() {
-                  isSelectMenu = value!;
-                });
-                if (isSelectMenu != "") {
-                  await initialize();
-                }
-                if (value != "") {
-                  launchUrl(mapURL!);
-                }
-              },
-              value: isSelectMenu,
-            )
-          ],
-        ),
         body: Stack(
           children: <Widget>[
+            Align(
+              alignment: const Alignment(0.1, 1.0),
+              child: Container(
+                margin: new EdgeInsets.only(bottom: 30.0),
+                child: DropdownButton(
+                  items: const <DropdownMenuItem<String>>[
+                    DropdownMenuItem(
+                      value: "",
+                      child: Text(""),
+                    ),
+                    DropdownMenuItem(
+                      value: "スーパー",
+                      child: Text("スーパー"),
+                    ),
+                    DropdownMenuItem(
+                      value: "薬局",
+                      child: Text("薬局"),
+                    ),
+                    DropdownMenuItem(
+                      value: "レストラン",
+                      child: Text("レストラン"),
+                    ),
+                    DropdownMenuItem(
+                      value: "ファーストフード",
+                      child: Text("ファーストフード"),
+                    ),
+                    DropdownMenuItem(
+                      value: "カフェ",
+                      child: Text("カフェ"),
+                    ),
+                    DropdownMenuItem(
+                      value: "本屋",
+                      child: Text("本屋"),
+                    ),
+                    DropdownMenuItem(
+                      value: "病院",
+                      child: Text("病院"),
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(20),
+                  onChanged: (String? value) async {
+                    setState(() {
+                      isSelectMenu = value!;
+                    });
+                    if (isSelectMenu != "") {
+                      await initialize();
+                    }
+                    if (value != "") {
+                      launchUrl(mapURL!);
+                    }
+                  },
+                  value: isSelectMenu,
+                ),
+              ),
+            ),
             GoogleMap(
               onMapCreated: (GoogleMapController controller) {},
               mapType: MapType.normal,
@@ -149,6 +150,10 @@ class _MyHomePageState extends State<MapSample> {
               },
               circles: circles,
             ),
+            Align(
+                alignment: new Alignment(0.94, 0.8),
+                child: FloatingActionButton(
+                    child: Icon(Icons.add), onPressed: () => {}))
           ],
         ),
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

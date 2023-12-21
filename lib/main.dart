@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_crudapp/view/firebase_options.dart';
 import 'package:flutter_crudapp/view/todoapp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/src/material/colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

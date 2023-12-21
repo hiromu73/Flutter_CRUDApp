@@ -5,7 +5,6 @@ import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/firebase_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // constants
-import 'package:flutter_crudapp/constants/routes.dart' as routes;
 
 class FirebaseCollection extends ConsumerWidget {
   const FirebaseCollection({super.key});
@@ -20,9 +19,9 @@ class FirebaseCollection extends ConsumerWidget {
         return ListView(
           children: query.docs.map((DocumentSnapshot document) {
             return Card(
-              elevation: 3,
+              elevation: 8,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(30),
               ),
               clipBehavior: Clip.hardEdge,
               child: Column(
