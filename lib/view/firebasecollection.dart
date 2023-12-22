@@ -19,7 +19,7 @@ class FirebaseCollection extends ConsumerWidget {
         return ListView(
           children: query.docs.map((DocumentSnapshot document) {
             return Card(
-              elevation: 8,
+              elevation: 5,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),

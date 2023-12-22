@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
@@ -29,6 +29,8 @@ class _MyHomePageState extends State<MapSample> {
   final selectLocationLatitude = "";
   final selectLocationLongitude = "";
 
+  // final LatLng = StateProvider.autoDispose((ref) => "");
+
   @override
   void initState() {
     super.initState();
@@ -36,9 +38,10 @@ class _MyHomePageState extends State<MapSample> {
     // initialize();
   }
 
+  // 初期位置
   static const _cameraPosition = CameraPosition(
     target: LatLng(34.758663, 135.4971856623888),
-    zoom: 16,
+    zoom: 14,
   );
 
   Future<void> searchLocation(List result) async {
@@ -80,61 +83,6 @@ class _MyHomePageState extends State<MapSample> {
       child: Scaffold(
         body: Stack(
           children: <Widget>[
-            Align(
-              alignment: const Alignment(0.1, 1.0),
-              child: Container(
-                margin: new EdgeInsets.only(bottom: 30.0),
-                child: DropdownButton(
-                  items: const <DropdownMenuItem<String>>[
-                    DropdownMenuItem(
-                      value: "",
-                      child: Text(""),
-                    ),
-                    DropdownMenuItem(
-                      value: "スーパー",
-                      child: Text("スーパー"),
-                    ),
-                    DropdownMenuItem(
-                      value: "薬局",
-                      child: Text("薬局"),
-                    ),
-                    DropdownMenuItem(
-                      value: "レストラン",
-                      child: Text("レストラン"),
-                    ),
-                    DropdownMenuItem(
-                      value: "ファーストフード",
-                      child: Text("ファーストフード"),
-                    ),
-                    DropdownMenuItem(
-                      value: "カフェ",
-                      child: Text("カフェ"),
-                    ),
-                    DropdownMenuItem(
-                      value: "本屋",
-                      child: Text("本屋"),
-                    ),
-                    DropdownMenuItem(
-                      value: "病院",
-                      child: Text("病院"),
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(20),
-                  onChanged: (String? value) async {
-                    setState(() {
-                      isSelectMenu = value!;
-                    });
-                    if (isSelectMenu != "") {
-                      await initialize();
-                    }
-                    if (value != "") {
-                      launchUrl(mapURL!);
-                    }
-                  },
-                  value: isSelectMenu,
-                ),
-              ),
-            ),
             GoogleMap(
               onMapCreated: (GoogleMapController controller) {},
               mapType: MapType.normal,
@@ -151,9 +99,40 @@ class _MyHomePageState extends State<MapSample> {
               circles: circles,
             ),
             Align(
-                alignment: new Alignment(0.94, 0.8),
+                alignment: const Alignment(-0.6, -0.85),
+                child: SizedBox(
+                    width: 200,
+                    height: 40,
+                    child: TextFormField(
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      decoration: InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10),
+                        iconColor: Colors.white,
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        hintText: "検索したい場所",
+                        hintStyle: const TextStyle(
+                          color: Colors.white,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(color: Colors.white),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        fillColor: Colors.black,
+                        filled: true,
+                      ),
+                    ))),
+            Align(
+                alignment: const Alignment(0.94, 0.8),
                 child: FloatingActionButton(
-                    child: Icon(Icons.add), onPressed: () => {}))
+                    child: const Icon(Icons.add), onPressed: () => {}))
           ],
         ),
         // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

@@ -1,14 +1,9 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_crudapp/api.dart';
-import 'package:flutter_crudapp/constants/routes.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
-import 'setgooglemap.dart';
 import './todoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
@@ -104,8 +99,9 @@ class TodoAddPage extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.left,
                 onChanged: (String value) async {
-                  print(value);
+                  print("入力値${value}");
                   ref.read(memoProvider.notifier).state = value;
+                  print("ref.watch(${ref.watch(memoProvider.notifier).state})");
                 },
               ),
               const SizedBox(height: 8),
@@ -123,21 +119,19 @@ class TodoAddPage extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   onPressed: () async {
-                    if (ref.watch(memoProvider.notifier) != null) {
-                      final date = DateTime.now().toLocal().toIso8601String();
-                      await FirebaseFirestore.instance
-                          .collection('post')
-                          .doc()
-                          .set({
-                        'text': ref.watch(memoProvider.notifier).state,
-                        // 経度緯度を表示
-                        // 'latitude' : ref.watch(latitudeLocation.notifier).state,
-                        // 'longitude' : ref.watch(longitudeLocation.notifier).state,
-                        'date': date,
-                        'alert': true,
-                      });
-                      Navigator.of(context).pop();
-                    }
+                    final date = DateTime.now().toLocal().toIso8601String();
+                    print(ref.watch(memoProvider.notifier).state);
+                    await FirebaseFirestore.instance
+                        .collection('post')
+                        .doc()
+                        .set({
+                      'text': ref.watch(memoProvider.notifier).state,
+                      // 'latitude' : ref.watch(latitudeLocation.notifier).state,
+                      // 'longitude' : ref.watch(longitudeLocation.notifier).state,
+                      'date': date,
+                      'alert': true,
+                    });
+                    Navigator.of(context).pop();
                   })
             ],
           ),
