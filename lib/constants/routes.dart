@@ -13,5 +13,5 @@ void AddPage({required BuildContext context}) => Navigator.push(
 
 void mapSamplePage({required BuildContext context}) =>
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return const MapSample();
+      return  MapSample();
     }));

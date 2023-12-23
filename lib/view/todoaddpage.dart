@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_place/google_place.dart';
 import './todoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
@@ -39,18 +37,6 @@ class TodoAddPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final postLocation = ref.watch(locationProvider.notifier).state;
-    final latitudeLocation = ref.watch(latitudeProvider.notifier).state;
-    final longitudeLocation = ref.watch(longitudeProvider.notifier).state;
-
-    final apiKey = Api.apiKey;
-
-    // 検索結果を格納
-    List<AutocompletePrediction> predictions = [];
-
-    @override
-    void initState() {
-      GooglePlace googlePlace = GooglePlace(apiKey);
-    }
 
     return Scaffold(
       appBar: AppBar(

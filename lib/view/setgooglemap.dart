@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,47 +10,27 @@ import 'package:google_place/google_place.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // GoogleMapの表示
-class MapSample extends StatefulWidget {
-  const MapSample({super.key});
+class MapSample extends ConsumerWidget {
+  MapSample({super.key});
 
-  @override
-  State<MapSample> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MapSample> {
   Position? currentPosition;
-  // GoogleMapControllerのインスタンス作成
-  late StreamSubscription<Position> positionStream;
-  final Completer _conpleter = Completer();
   final apiKey = Api.apiKey;
+  final _placeController = TextEditingController();
   String? isSelectMenu = "";
   Uri? mapURL;
   bool? isExist;
-  LatLng _location = const LatLng(34.758663, 135.4971856623888);
-  final selectLocationLatitude = "";
-  final selectLocationLongitude = "";
-
-  // final LatLng = StateProvider.autoDispose((ref) => "");
 
   @override
   void initState() {
-    super.initState();
     // initState()はFutureできないのでメソッドを格納。
-    // initialize();
+    initialize();
   }
 
   // 初期位置
   static const _cameraPosition = CameraPosition(
     target: LatLng(34.758663, 135.4971856623888),
-    zoom: 14,
+    zoom: 15,
   );
-
-  Future<void> searchLocation(List result) async {
-    final GoogleMapController controller = await _conpleter.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: LatLng(result[0], result[1]),
-    )));
-  }
 
   // 位置情報とマーカーIDを指定してマーカーを表示する関数
   Set<Marker> _createMaker(LatLng latLng, String markerId) {
@@ -61,18 +42,9 @@ class _MyHomePageState extends State<MapSample> {
     };
   }
 
-  // サークルの詳細
-  final circles = <Circle>{
-    Circle(
-      circleId: const CircleId('CircleId1'),
-      fillColor: Colors.lightBlue.withOpacity(0.1),
-      radius: 100,
-      strokeWidth: 1,
-    )
-  };
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mapPosition = ref.watch(googlemapModelProvider);
     // 画面の幅と高さを決定する
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -87,16 +59,14 @@ class _MyHomePageState extends State<MapSample> {
               onMapCreated: (GoogleMapController controller) {},
               mapType: MapType.normal,
               initialCameraPosition: _cameraPosition,
-              markers: _createMaker(_location, 'Marker1'),
+              markers: _createMaker(mapPosition, 'Marker1'),
               myLocationEnabled: true,
-              // タップした場所の緯度と軽度が返される。
               onTap: (LatLng latLang) {
-                setState(() {
-                  _location = latLang;
-                  _createMaker(_location, 'Marker1');
-                });
+                ref
+                    .read(googlemapModelProvider.notifier)
+                    .changePosition(latLang);
+                _createMaker(ref.watch(googlemapModelProvider), 'Marker1');
               },
-              circles: circles,
             ),
             Align(
                 alignment: const Alignment(-0.6, -0.85),
@@ -105,6 +75,7 @@ class _MyHomePageState extends State<MapSample> {
                     height: 40,
                     child: TextFormField(
                       style: const TextStyle(color: Colors.white, fontSize: 14),
+                      controller: _placeController,
                       decoration: InputDecoration(
                         contentPadding:
                             const EdgeInsets.symmetric(vertical: 10),
@@ -119,7 +90,7 @@ class _MyHomePageState extends State<MapSample> {
                           color: Colors.white,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                          borderRadius: BorderRadius.circular(30),
                           borderSide: const BorderSide(color: Colors.white),
                         ),
                         border: OutlineInputBorder(
@@ -135,17 +106,6 @@ class _MyHomePageState extends State<MapSample> {
                     child: const Icon(Icons.add), onPressed: () => {}))
           ],
         ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        // floatingActionButton: FloatingActionButton.extended(
-        //     onPressed: () async {
-        //       await FirebaseFirestore.instance.collection('post').doc().set({
-        //         'latitude': _location.latitude,
-        //         'longitude': _location.longitude,
-        //       });
-        //       Navigator.of(context).pop();
-        //     },
-        //     icon: const Icon(Icons.add),
-        //     label: const Text("位置情報を登録する")),
       ),
     );
   }
@@ -194,13 +154,9 @@ class _MyHomePageState extends State<MapSample> {
         Location(lat: latitude, lng: longitude), 1000,
         language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
 
+    print(response);
     final results = response!.results;
     final isExist = results?.isNotEmpty ?? false;
-
-    setState(() {
-      _location = LatLng(latitude, longitude);
-      this.isExist = isExist;
-    });
 
     if (!isExist) {
       return;
