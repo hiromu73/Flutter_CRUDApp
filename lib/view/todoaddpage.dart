@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import './todoapp.dart';
 // constants
@@ -37,6 +38,7 @@ class TodoAddPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final postLocation = ref.watch(locationProvider.notifier).state;
+    final mapPosition = ref.watch(googlemapModelProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -87,7 +89,7 @@ class TodoAddPage extends ConsumerWidget {
                 onChanged: (String value) async {
                   print("入力値${value}");
                   ref.read(memoProvider.notifier).state = value;
-                  print("ref.watch(${ref.watch(memoProvider.notifier).state})");
+                  print("更新後(${ref.watch(memoProvider.notifier).state})");
                 },
               ),
               const SizedBox(height: 8),
@@ -107,13 +109,13 @@ class TodoAddPage extends ConsumerWidget {
                   onPressed: () async {
                     final date = DateTime.now().toLocal().toIso8601String();
                     print(ref.watch(memoProvider.notifier).state);
+                    print(mapPosition);
                     await FirebaseFirestore.instance
                         .collection('post')
                         .doc()
                         .set({
                       'text': ref.watch(memoProvider.notifier).state,
-                      // 'latitude' : ref.watch(latitudeLocation.notifier).state,
-                      // 'longitude' : ref.watch(longitudeLocation.notifier).state,
+                      'latlng': mapPosition.toString().split(','),
                       'date': date,
                       'alert': true,
                     });

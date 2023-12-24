@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
@@ -15,7 +14,7 @@ final mapInitLongitudePosition =
     StateProvider.autoDispose<double>((ref) => 0.0);
 final cameraPositionProvider = StateProvider<CameraPosition>((ref) {
   return const CameraPosition(
-    target: LatLng(0.0, 0.0),
+    target: LatLng(34.702809862535936, 135.49666833132505),
     zoom: 15.0,
   );
 });
@@ -42,7 +41,12 @@ class MapSample extends ConsumerWidget {
         body: Stack(
           children: <Widget>[
             GoogleMap(
-              onMapCreated: (GoogleMapController controller) {},
+              onMapCreated: (GoogleMapController controller) {
+                // 初回にマップが作成されたときに初期位置を設定する
+                controller.moveCamera(CameraUpdate.newCameraPosition(
+                  ref.watch(cameraPositionProvider),
+                ));
+              },
               mapType: MapType.normal,
               initialCameraPosition: ref.watch(cameraPositionProvider),
               markers: ref
@@ -53,6 +57,7 @@ class MapSample extends ConsumerWidget {
                 ref
                     .read(googlemapModelProvider.notifier)
                     .changePosition(latLang);
+                print(ref.watch(googlemapModelProvider));
               },
             ),
             Align(
@@ -138,7 +143,6 @@ class MapSample extends ConsumerWidget {
       final newCameraPosition =
           CameraPosition(target: initCameraPosition, zoom: 15.0);
       ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
-      print(ref.read(cameraPositionProvider.notifier).state);
       ref.read(mapInitializedModelProvider.notifier).changeInit();
     }
   }
