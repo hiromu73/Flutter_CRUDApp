@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,45 +10,30 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+final mapInitLatitudePosition = StateProvider.autoDispose<double>((ref) => 0.0);
+final mapInitLongitudePosition =
+    StateProvider.autoDispose<double>((ref) => 0.0);
+final cameraPositionProvider = StateProvider<CameraPosition>((ref) {
+  return const CameraPosition(
+    target: LatLng(0.0, 0.0),
+    zoom: 15.0,
+  );
+});
+
 // GoogleMapの表示
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
-
-  Position? currentPosition;
   final apiKey = Api.apiKey;
   final _placeController = TextEditingController();
-  String? isSelectMenu = "";
-  Uri? mapURL;
-  bool? isExist;
-
-  @override
-  void initState() {
-    // initState()はFutureできないのでメソッドを格納。
-    initialize();
-  }
-
-  // 初期位置
-  static const _cameraPosition = CameraPosition(
-    target: LatLng(34.758663, 135.4971856623888),
-    zoom: 15,
-  );
-
-  // 位置情報とマーカーIDを指定してマーカーを表示する関数
-  Set<Marker> _createMaker(LatLng latLng, String markerId) {
-    return {
-      Marker(
-        markerId: MarkerId(markerId),
-        position: latLng,
-      ),
-    };
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mapPosition = ref.watch(googlemapModelProvider);
-    // 画面の幅と高さを決定する
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
+    // 初回のみ実行かどうか
+    _initializeOnes(ref);
 
     return SizedBox(
       height: height,
@@ -58,14 +44,15 @@ class MapSample extends ConsumerWidget {
             GoogleMap(
               onMapCreated: (GoogleMapController controller) {},
               mapType: MapType.normal,
-              initialCameraPosition: _cameraPosition,
-              markers: _createMaker(mapPosition, 'Marker1'),
+              initialCameraPosition: ref.watch(cameraPositionProvider),
+              markers: ref
+                  .read(googlemapModelProvider.notifier)
+                  .createMaker(ref.watch(googlemapModelProvider), 'Marker1'),
               myLocationEnabled: true,
               onTap: (LatLng latLang) {
                 ref
                     .read(googlemapModelProvider.notifier)
                     .changePosition(latLang);
-                _createMaker(ref.watch(googlemapModelProvider), 'Marker1');
               },
             ),
             Align(
@@ -114,7 +101,6 @@ class MapSample extends ConsumerWidget {
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
-
     // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -136,46 +122,69 @@ class MapSample extends ConsumerWidget {
       return Future.error('デバイスの場所を取得するための許可してください');
     }
     // デバイスの現在の場所を返す。
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    return position;
   }
 
-  Future initialize() async {
-    // 現在位置を取得するメソッドの結果を取得する。
-    final position = await _determinePosition();
-    final latitude = position.latitude;
-    final longitude = position.longitude;
-
-    // googlemapと同じAPIキーを指定
-    final googlePlace = GooglePlace(apiKey);
-
-    // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
-    final response = await googlePlace.search.getNearBySearch(
-        Location(lat: latitude, lng: longitude), 1000,
-        language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
-
-    print(response);
-    final results = response!.results;
-    final isExist = results?.isNotEmpty ?? false;
-
-    if (!isExist) {
-      return;
+  Future _initializeOnes(WidgetRef ref) async {
+    // 初回のみ実行する非同期処理
+    if (ref.watch(mapInitializedModelProvider)) {
+      final position = await _determinePosition();
+      final latitude = position.latitude;
+      final longitude = position.longitude;
+      final initCameraPosition = LatLng(latitude, longitude);
+      final newCameraPosition =
+          CameraPosition(target: initCameraPosition, zoom: 15.0);
+      ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
+      print(ref.read(cameraPositionProvider.notifier).state);
+      ref.read(mapInitializedModelProvider.notifier).changeInit();
     }
-
-    final firstResult = results?.first;
-    final selectLocation = firstResult?.geometry?.location;
-    final selectLocationLatitude = selectLocation?.lat;
-    final selectLocationLongitude = selectLocation?.lng;
-
-    String urlString = '';
-    if (Platform.isAndroid) {
-      urlString =
-          'https://www.google.co.jp/maps/dir/$latitude,$longitude/$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
-    } else if (Platform.isIOS) {
-      urlString =
-          'comgooglemaps://?saddr=$latitude,$longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
-    }
-
-    mapURL = Uri.parse(urlString);
   }
+
+  // Future<CameraPosition> _initPosition(latitude, longitude) async {
+  //   // 現在位置を取得するメソッドの結果を取得する。
+  //   final cameraPosition = await CameraPosition(
+  //     target: LatLng(latitude, longitude),
+  //     zoom: 15,
+  //   );
+  //   return cameraPosition;
+  // }
+  //   final latitude = position.latitude;
+  //   final longitude = position.longitude;
+  //   String? isSelectMenu = "";
+  //   Uri? mapURL;
+
+  //   // googlemapと同じAPIキーを指定
+  //   final googlePlace = GooglePlace(apiKey);
+
+  //   // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
+  //   final response = await googlePlace.search.getNearBySearch(
+  //       Location(lat: latitude, lng: longitude), 1000,
+  //       language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
+
+  //   final results = response!.results;
+  //   final isExist = results?.isNotEmpty ?? false;
+
+  //   if (isExist) {
+  //     return;
+  //   }
+
+  //   final firstResult = results?.first;
+  //   final selectLocation = firstResult?.geometry?.location;
+  //   final selectLocationLatitude = selectLocation?.lat;
+  //   final selectLocationLongitude = selectLocation?.lng;
+
+  //   String urlString = '';
+  //   if (Platform.isAndroid) {
+  //     urlString =
+  //         'https://www.google.co.jp/maps/dir/$latitude,$longitude/$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
+  //   } else if (Platform.isIOS) {
+  //     urlString =
+  //         'comgooglemaps://?saddr=$latitude,$longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
+  //   }
+
+  //   mapURL = Uri.parse(urlString);
+  // }
 }

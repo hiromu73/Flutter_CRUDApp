@@ -98,7 +98,7 @@ class TodoAddPage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(30))),
                   onPressed: () => routes.mapSamplePage(context: context)),
               const SizedBox(height: 8),
-              Text(postLocation), // 位置の名前の表示?
+              Text(postLocation),
               ElevatedButton(
                   child: const Text(registration),
                   style: ElevatedButton.styleFrom(

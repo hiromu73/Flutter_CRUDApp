@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'googlemap_model.dart';
+part of 'mapinitialized_model.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$googlemapModelHash() => r'602f4b1051ad9c848eb3bb9d43cfcdbc182ae96e';
+String _$mapInitializedModelHash() =>
+    r'5b055a33f233ad40e7d5d6fc3b4dae1734ef1daa';
 
-/// See also [GooglemapModel].
-@ProviderFor(GooglemapModel)
-final googlemapModelProvider =
-    AutoDisposeNotifierProvider<GooglemapModel, LatLng>.internal(
-  GooglemapModel.new,
-  name: r'googlemapModelProvider',
+/// See also [MapInitializedModel].
+@ProviderFor(MapInitializedModel)
+final mapInitializedModelProvider =
+    AutoDisposeNotifierProvider<MapInitializedModel, bool>.internal(
+  MapInitializedModel.new,
+  name: r'mapInitializedModelProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$googlemapModelHash,
+      : _$mapInitializedModelHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$GooglemapModel = AutoDisposeNotifier<LatLng>;
+typedef _$MapInitializedModel = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
