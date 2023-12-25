@@ -4,6 +4,7 @@ import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
+import 'package:flutter_crudapp/view/dropdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -62,11 +63,23 @@ class MapSample extends ConsumerWidget {
             ),
             Align(
               alignment: const Alignment(0.8, -0.85),
-              child: Container(
-                  color: Colors.black,
+              child: InkWell(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   width: 50,
                   height: 40,
-                  child: Icon(Icons.dehaze_rounded)),
+                  child: const Icon(
+                    Icons.dehaze_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                onTap: (() => const DropdownButtonMenu()),
+              ),
             ),
             Align(
                 alignment: const Alignment(-0.6, -0.85),
