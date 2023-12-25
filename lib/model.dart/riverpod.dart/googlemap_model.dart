@@ -17,7 +17,8 @@ Completer controller = Completer();
 class GooglemapModel extends _$GooglemapModel {
   // LatLng _location = const LatLng(34.758663, 135.4971856623888);
   @override
-  LatLng build() => LatLng(0.0, 0.0);
+  LatLng build() => const LatLng(0.0, 0.0);
+
   void changePosition(LatLng latLng) {
     state = latLng;
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 final mapInitLatitudePosition = StateProvider.autoDispose<double>((ref) => 0.0);
 final mapInitLongitudePosition =
     StateProvider.autoDispose<double>((ref) => 0.0);
+final _googlePlace = GooglePlace(Api.apiKey);
 final cameraPositionProvider = StateProvider<CameraPosition>((ref) {
   return const CameraPosition(
     target: LatLng(34.702809862535936, 135.49666833132505),
@@ -19,7 +21,6 @@ final cameraPositionProvider = StateProvider<CameraPosition>((ref) {
   );
 });
 
-// GoogleMapの表示
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
   final apiKey = Api.apiKey;
@@ -27,7 +28,6 @@ class MapSample extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mapPosition = ref.watch(googlemapModelProvider);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
@@ -61,6 +61,14 @@ class MapSample extends ConsumerWidget {
               },
             ),
             Align(
+              alignment: const Alignment(0.8, -0.85),
+              child: Container(
+                  color: Colors.black,
+                  width: 50,
+                  height: 40,
+                  child: Icon(Icons.dehaze_rounded)),
+            ),
+            Align(
                 alignment: const Alignment(-0.6, -0.85),
                 child: SizedBox(
                     width: 200,
@@ -91,6 +99,9 @@ class MapSample extends ConsumerWidget {
                         fillColor: Colors.black,
                         filled: true,
                       ),
+                      onChanged: (value) {
+                        updatePredictions(value, ref);
+                      },
                     ))),
             Align(
                 alignment: const Alignment(0.94, 0.8),
@@ -147,6 +158,19 @@ class MapSample extends ConsumerWidget {
     }
   }
 
+  void updatePredictions(String value, WidgetRef ref) async {
+    if (value.isEmpty) {
+      ref.read(textPredictionsProvider.notifier).noneList();
+      return;
+    }
+
+    final response = await _googlePlace.autocomplete.get(value);
+    if (response != null && response.predictions != null) {
+      ref
+          .read(textPredictionsProvider.notifier)
+          .changeList(response.predictions!);
+    }
+  }
   // Future<CameraPosition> _initPosition(latitude, longitude) async {
   //   // 現在位置を取得するメソッドの結果を取得する。
   //   final cameraPosition = await CameraPosition(
