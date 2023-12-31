@@ -1,33 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import './todoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
 
-// Textの状態管理
-final infoTextProvider = StateProvider.autoDispose(
-    (ref) => FirebaseFirestore.instance.collection('post'));
-
 // 位置の状態管理
 final locationProvider = StateProvider.autoDispose((ref) => "");
-
-// 位置マーカーの状態管理
-final makerProvider = StateProvider.autoDispose((ref) => "");
-
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
-
-// メモ内容の状態管理
-final latitudeProvider = StateProvider.autoDispose((ref) => "");
-
-// メモ内容の状態管理
-final longitudeProvider = StateProvider.autoDispose((ref) => "");
-
-// // StreamProviderを使うことでStreamも扱うことができる
-// // ※ autoDisposeを付けることで自動的に値をリセットできます
+// コレクション一覧
 final postQueryProvider = StreamProvider.autoDispose((ref) =>
     FirebaseFirestore.instance.collection('post').orderBy('date').snapshots());
 
@@ -38,7 +22,7 @@ class TodoAddPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final postLocation = ref.watch(locationProvider.notifier).state;
-    final mapPosition = ref.watch(googlemapModelProvider);
+    // final mapPosition = ref.watch(googlemapModelProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -108,14 +92,13 @@ class TodoAddPage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(30))),
                   onPressed: () async {
                     final date = DateTime.now().toLocal().toIso8601String();
-                    print(ref.watch(memoProvider.notifier).state);
-                    print(mapPosition);
                     await FirebaseFirestore.instance
                         .collection('post')
                         .doc()
                         .set({
                       'text': ref.watch(memoProvider.notifier).state,
-                      'latlng': mapPosition.toString().split(','),
+                      //'latitude': mapPosition.toString().split(','),
+                      //'longitude': mapPosition.toString().split(','),
                       'date': date,
                       'alert': true,
                     });

@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 // 命名規則ファイル名.g.dart
@@ -15,6 +13,6 @@ class TextPredictions extends _$TextPredictions {
   }
 
   void changeList(value) {
-    state = value;
+    state?.add(value);
   }
 }

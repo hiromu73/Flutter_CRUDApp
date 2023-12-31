@@ -12,7 +12,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const ProviderScope(
-    child: MyApp(),
+    child: MaterialApp(home: MyApp()),
   ));
 }
 
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter CrudApp',
       theme: ThemeData(
-          primaryColor:  MaterialColor(
+          primaryColor: MaterialColor(
         0xFFFFFFFF,
         <int, Color>{
           500: Color(0xFFFFFFFF),

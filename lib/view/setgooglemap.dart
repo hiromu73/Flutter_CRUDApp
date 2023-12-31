@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/googlemap_model.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
-import 'package:flutter_crudapp/view/dropdown.dart';
+import 'package:flutter_crudapp/view/predictionslist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,6 +23,8 @@ final cameraPositionProvider = StateProvider<CameraPosition>((ref) {
     zoom: 15.0,
   );
 });
+final selectedGenreProvider = StateProvider<String?>((ref) => null);
+final isSelectItem = StateProvider<List<String?>>((ref) => []);
 
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
@@ -32,9 +36,6 @@ class MapSample extends ConsumerWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
-    // 初回のみ実行かどうか
-    _initializeOnes(ref);
-
     return SizedBox(
       height: height,
       width: width,
@@ -43,22 +44,23 @@ class MapSample extends ConsumerWidget {
           children: <Widget>[
             GoogleMap(
               onMapCreated: (GoogleMapController controller) {
+                // 初回のみ実行かどうか
+                _initializeOnes(ref);
                 // 初回にマップが作成されたときに初期位置を設定する
                 controller.moveCamera(CameraUpdate.newCameraPosition(
                   ref.watch(cameraPositionProvider),
                 ));
+                print(("1 ${ref.watch(cameraPositionProvider)}"));
               },
               mapType: MapType.normal,
               initialCameraPosition: ref.watch(cameraPositionProvider),
-              markers: ref
-                  .read(googlemapModelProvider.notifier)
-                  .createMaker(ref.watch(googlemapModelProvider), 'Marker1'),
+              // markers: buildMarkers(ref),
               myLocationEnabled: true,
               onTap: (LatLng latLang) {
-                ref
-                    .read(googlemapModelProvider.notifier)
-                    .changePosition(latLang);
-                print(ref.watch(googlemapModelProvider));
+                // ref
+                //     .read(googlemapModelProvider.notifier)
+                //     .changePosition(latLang.);
+                // print(ref.watch(googlemapModelProvider));
               },
             ),
             Align(
@@ -66,19 +68,28 @@ class MapSample extends ConsumerWidget {
               child: InkWell(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black,
-                    border: Border.all(color: Colors.black),
+                    color: Colors.white,
+                    border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  width: 50,
+                  width: 80,
                   height: 40,
                   child: const Icon(
                     Icons.dehaze_rounded,
-                    color: Colors.white,
+                    color: Colors.black,
                     size: 20,
                   ),
                 ),
-                onTap: (() => const DropdownButtonMenu()),
+                onTap: () => _showModal(context, ref),
+                //     .then((selectedGenre) {
+                //   ref.read(selectedGenreProvider.notifier).state =
+                //       selectedGenre;
+                //   if (selectedGenre != null) {
+                //     // ジャンルに対応するマーカーを追加
+                //     _addMarker(selectedGenre, ref);
+                //   }
+                // });
+                // }),
               ),
             ),
             Align(
@@ -87,20 +98,20 @@ class MapSample extends ConsumerWidget {
                     width: 200,
                     height: 40,
                     child: TextFormField(
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
                       controller: _placeController,
                       decoration: InputDecoration(
                         contentPadding:
                             const EdgeInsets.symmetric(vertical: 10),
-                        iconColor: Colors.white,
+                        iconColor: Colors.grey,
                         prefixIcon: const Icon(
                           Icons.search,
-                          color: Colors.white,
+                          color: Colors.grey,
                           size: 20,
                         ),
                         hintText: "検索したい場所",
                         hintStyle: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.grey,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -109,17 +120,20 @@ class MapSample extends ConsumerWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        fillColor: Colors.black,
+                        fillColor: Colors.white,
                         filled: true,
                       ),
                       onChanged: (value) {
                         updatePredictions(value, ref);
                       },
                     ))),
+            // 候補の一覧表示
+            PredictionsList(ref),
             Align(
                 alignment: const Alignment(0.94, 0.8),
                 child: FloatingActionButton(
-                    child: const Icon(Icons.add), onPressed: () => {}))
+                    child: const Icon(Icons.add),
+                    onPressed: () => {Navigator.pop(context)}))
           ],
         ),
       ),
@@ -166,24 +180,146 @@ class MapSample extends ConsumerWidget {
       final initCameraPosition = LatLng(latitude, longitude);
       final newCameraPosition =
           CameraPosition(target: initCameraPosition, zoom: 15.0);
-      ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
+      ref.watch(cameraPositionProvider.notifier).state = newCameraPosition;
       ref.read(mapInitializedModelProvider.notifier).changeInit();
     }
   }
 
-  void updatePredictions(String value, WidgetRef ref) async {
-    if (value.isEmpty) {
-      ref.read(textPredictionsProvider.notifier).noneList();
-      return;
-    }
+  // Set<Marker> buildMarkers(WidgetRef ref) {
+  //   final markers = <Marker>{};
 
-    final response = await _googlePlace.autocomplete.get(value);
-    if (response != null && response.predictions != null) {
-      ref
-          .read(textPredictionsProvider.notifier)
-          .changeList(response.predictions!);
-    }
+  //   // 現在地のマーカー
+  //   markers.add(Marker(
+  //     markerId: MarkerId('currentLocation'),
+  //     position: LatLng(
+  //       ref.watch(latitudeProvider),
+  //       ref.watch(longitudeProvider),
+  //     ),
+  //     infoWindow: InfoWindow(title: 'Current Location'),
+  //   ));
+
+  // 選択された場所のマーカー
+  // final selectedPlace = ref.watch(selectedPlaceProvider);
+  // if (selectedPlace != "") {
+  //   markers.add(Marker(
+  //     markerId: MarkerId(selectedPlace),
+  //     position: LatLng(
+  //       selectedPlace.location.lat,
+  //       selectedPlace.geometry.location.lng,
+  //     ),
+  //     infoWindow: InfoWindow(title: selectedPlace.name),
+  //   ));
+  // }
+
+  // return markers;
+}
+
+Future<void> _addMarker(String genre, WidgetRef ref) async {
+  // 選択された場所の座標を取得
+  // final place = await _getLocationForGenre(genre);
+  final details = await _googlePlace.details.get(genre);
+  final location = details?.result?.geometry?.location;
+  if (location != null) {
+    final newCameraPosition = CameraPosition(
+      target: LatLng(10.0, 10.0),
+      zoom: 15.0,
+    );
+    ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
+
+    // マーカーを追加
+    //ref.read(googlemapModelProvider.notifier).addMarker(place.name, location);
   }
+}
+
+// Future<void> _addMarkerForGenre(String genre, WidgetRef ref) async {
+//   // ジャンルに対応する位置情報の取得
+//   final location = await _getLocationForGenre(genre);
+//   if (location != null) {
+//     // マーカーを追加
+//     ref.read(googlemapModelProvider.notifier).addMarker(genre, location);
+//   }
+// }
+
+Future<void> _getLocationForGenre(String genre) async {
+  await _googlePlace.autocomplete.get(genre);
+}
+
+void updatePredictions(String value, WidgetRef ref) async {
+  if (value.isEmpty) {
+    ref.read(textPredictionsProvider.notifier).noneList();
+    return;
+  }
+
+  final response = await _googlePlace.autocomplete.get(value);
+  if (response != null && response.predictions != null) {
+    ref
+        .read(textPredictionsProvider.notifier)
+        .changeList(response.predictions!);
+  }
+}
+
+void _showModal(BuildContext context, WidgetRef ref) {
+  showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(10),
+          color: Colors.white,
+          height: 250,
+          child: Column(
+            children: [
+              Wrap(
+                runSpacing: 16,
+                spacing: 16,
+                children: items.map((item) {
+                  final isSelected = ref.watch(isSelectItem).contains(item);
+                  return InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(32)),
+                    onTap: () {
+                      if (isSelected) {
+                        ref.watch(isSelectItem).remove(item);
+                      } else {
+                        ref.watch(isSelectItem).add(item);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 500),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(32)),
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                        color: isSelected ? Colors.blue : null,
+                      ),
+                      child: Text(
+                        item,
+                        style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              Expanded(
+                  child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(onPressed: () {}, child: Text('Clear')),
+                    const SizedBox(width: 20),
+                    ElevatedButton(onPressed: () {}, child: Text('Done'))
+                  ],
+                ),
+              ))
+            ],
+          ),
+        );
+      });
+}
   // Future<CameraPosition> _initPosition(latitude, longitude) async {
   //   // 現在位置を取得するメソッドの結果を取得する。
   //   final cameraPosition = await CameraPosition(
@@ -228,4 +364,4 @@ class MapSample extends ConsumerWidget {
 
   //   mapURL = Uri.parse(urlString);
   // }
-}
+// }

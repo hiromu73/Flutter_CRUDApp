@@ -11,17 +11,6 @@ class ToDoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-          title: const Text(
-            "TodoList",
-            style: TextStyle(color: Colors.black54),
-          ),
-          backgroundColor: const MaterialColor(
-            0xFFFFFFFF,
-            <int, Color>{
-              500: Color(0xFFFFFFFF),
-            },
-          )),
       body: Container(
         color: Colors.yellow[50],
         child: const Column(
