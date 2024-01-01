@@ -5,6 +5,8 @@ import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/select_button_color.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/select_text_button_color.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_crudapp/view/predictionslist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,7 +52,6 @@ class MapSample extends ConsumerWidget {
                 controller.moveCamera(CameraUpdate.newCameraPosition(
                   ref.watch(cameraPositionProvider),
                 ));
-                print(("1 ${ref.watch(cameraPositionProvider)}"));
               },
               mapType: MapType.normal,
               initialCameraPosition: ref.watch(cameraPositionProvider),
@@ -69,10 +70,10 @@ class MapSample extends ConsumerWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(color: Colors.white),
+                    border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  width: 80,
+                  width: 50,
                   height: 40,
                   child: const Icon(
                     Icons.dehaze_rounded,
@@ -81,15 +82,6 @@ class MapSample extends ConsumerWidget {
                   ),
                 ),
                 onTap: () => _showModal(context, ref),
-                //     .then((selectedGenre) {
-                //   ref.read(selectedGenreProvider.notifier).state =
-                //       selectedGenre;
-                //   if (selectedGenre != null) {
-                //     // ジャンルに対応するマーカーを追加
-                //     _addMarker(selectedGenre, ref);
-                //   }
-                // });
-                // }),
               ),
             ),
             Align(
@@ -259,11 +251,13 @@ void updatePredictions(String value, WidgetRef ref) async {
 }
 
 void _showModal(BuildContext context, WidgetRef ref) {
+  final Color buttonColor = ref.watch(selectButtonColorProvider);
+  final Color? buttonTextColor = ref.watch(selectTextButtonColorProvider);
   showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           color: Colors.white,
           height: 250,
           child: Column(
@@ -276,10 +270,32 @@ void _showModal(BuildContext context, WidgetRef ref) {
                   return InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(32)),
                     onTap: () {
+                      final currentSelection = ref.read(isSelectItem);
+                      print(isSelected);
                       if (isSelected) {
-                        ref.watch(isSelectItem).remove(item);
+                        ref.read(isSelectItem.notifier).state =
+                            List.from(currentSelection)..remove(item);
+                        ref
+                            .read(selectButtonColorProvider.notifier)
+                            .selectButtonChangeColor;
+                        ref
+                            .read(selectTextButtonColorProvider.notifier)
+                            .changeTextButtonColor;
+                        print(ref.watch(isSelectItem));
+                        print(buttonColor);
+                        print(buttonTextColor);
                       } else {
-                        ref.watch(isSelectItem).add(item);
+                        ref.read(isSelectItem.notifier).state =
+                            List.from(currentSelection)..add(item);
+                        ref
+                            .read(selectButtonColorProvider.notifier)
+                            .selectButtonChangeColor;
+                        ref
+                            .read(selectTextButtonColorProvider.notifier)
+                            .changeTextButtonColor;
+                        print(ref.watch(isSelectItem));
+                        print(buttonColor);
+                        print(buttonTextColor);
                       }
                     },
                     child: AnimatedContainer(
@@ -292,12 +308,12 @@ void _showModal(BuildContext context, WidgetRef ref) {
                         border: Border.all(
                           color: Colors.grey,
                         ),
-                        color: isSelected ? Colors.blue : null,
+                        color: buttonColor,
                       ),
                       child: Text(
                         item,
                         style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
+                            color: buttonTextColor,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -309,9 +325,21 @@ void _showModal(BuildContext context, WidgetRef ref) {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(onPressed: () {}, child: Text('Clear')),
-                    const SizedBox(width: 20),
-                    ElevatedButton(onPressed: () {}, child: Text('Done'))
+                    ElevatedButton(
+                      onPressed: () {
+                        ref.read(isSelectItem.notifier).state = [];
+                        ref
+                            .read(selectButtonColorProvider.notifier)
+                            .changeButtonDefalutColor;
+                        ref
+                            .read(selectTextButtonColorProvider.notifier)
+                            .defaltTextButtonColor;
+                      },
+                      child: const Text('Clear'),
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30))),
+                    ),
                   ],
                 ),
               ))

@@ -29,11 +29,10 @@ class PredictionsList extends ConsumerWidget {
           itemCount: ref.watch(textPredictionsProvider)?.length,
           itemBuilder: (context, index) {
             final prediction = ref.watch(textPredictionsProvider)?[index];
-            return ListTile(
-              title: Text(prediction!),
-              onTap: () {
-                // タップされたら何かしらの処理を実行
-              },
+            return Column(
+              children: [
+                Text(prediction as String),
+              ],
             );
           },
         ),
