@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/firebase_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// constants
 
 class FirebaseCollection extends ConsumerWidget {
   const FirebaseCollection({super.key});

@@ -7,13 +7,14 @@ part 'textpredictions.g.dart';
 @riverpod
 class TextPredictions extends _$TextPredictions {
   @override
-  List<AutocompletePrediction>? build() => [];
+  AutocompleteResponse? build() => null;
 
   void noneList() {
-    state = [];
+    state = null;
   }
 
   void changeList(value) {
-    state?.add(value);
+    print(value);
+    state = value;
   }
 }

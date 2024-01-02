@@ -26,12 +26,12 @@ class PredictionsList extends ConsumerWidget {
           ],
         ),
         child: ListView.builder(
-          itemCount: ref.watch(textPredictionsProvider)?.length,
+          itemCount: 10,
           itemBuilder: (context, index) {
-            final prediction = ref.watch(textPredictionsProvider)?[index];
+            final prediction = ref.watch(textPredictionsProvider);
             return Column(
               children: [
-                Text(prediction as String),
+                //Text(ref.watch(textPredictionsProvider)),
               ],
             );
           },

@@ -5,6 +5,7 @@ import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/select_button_color.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/select_text_button_color.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
@@ -37,6 +38,7 @@ class MapSample extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    final predictions = ref.watch(predictionsProvider);
 
     return SizedBox(
       height: height,
@@ -64,6 +66,7 @@ class MapSample extends ConsumerWidget {
                 // print(ref.watch(googlemapModelProvider));
               },
             ),
+            // モーダル表示
             Align(
               alignment: const Alignment(0.8, -0.85),
               child: InkWell(
@@ -81,46 +84,70 @@ class MapSample extends ConsumerWidget {
                     size: 20,
                   ),
                 ),
-                onTap: () => _showModal(context, ref),
+                onTap: () => showModal(context, ref),
               ),
             ),
+            //テキスト検索候補表示
             Align(
                 alignment: const Alignment(-0.6, -0.85),
                 child: SizedBox(
-                    width: 200,
-                    height: 40,
-                    child: TextFormField(
-                      style: const TextStyle(color: Colors.grey, fontSize: 14),
-                      controller: _placeController,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 10),
-                        iconColor: Colors.grey,
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Colors.grey,
-                          size: 20,
-                        ),
-                        hintText: "検索したい場所",
-                        hintStyle: const TextStyle(
-                          color: Colors.grey,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(color: Colors.white),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        fillColor: Colors.white,
-                        filled: true,
+                  width: 200,
+                  height: 40,
+                  child: TextFormField(
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    controller: _placeController,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      iconColor: Colors.grey,
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.grey,
+                        size: 20,
                       ),
-                      onChanged: (value) {
-                        updatePredictions(value, ref);
-                      },
-                    ))),
-            // 候補の一覧表示
-            PredictionsList(ref),
+                      hintText: "検索したい場所",
+                      hintStyle: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                    onChanged: (value) {
+                      //updatePredictions(value, ref);
+                      if (value.isNotEmpty) {
+                        ref
+                            .read(predictionsProvider.notifier)
+                            .autoCompleteSearch(value);
+                      } else {
+                        if (predictions.length > 0) {
+                          ref.read(predictionsProvider.notifier).state = [];
+                        }
+                      }
+                    },
+                  ),
+                )),
+            Flexible(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: predictions.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title:
+                              Text(predictions[index]!.description.toString()),
+                              onTap: () async {
+                                // タップした場所に視点を合わす。
+                              },
+                        ),
+                      );
+                    })),
+            // 登録ボタン
             Align(
                 alignment: const Alignment(0.94, 0.8),
                 child: FloatingActionButton(
@@ -177,6 +204,13 @@ class MapSample extends ConsumerWidget {
     }
   }
 
+// 検索処理
+  // void autoCompleteSearch(String value, WidgetRef ref) async {
+  //   final result = await _googlePlace.autocomplete.get(value);
+  //   if (result != null && result.predictions != null) {
+  //     ref.read(predictions).state = result.predictions!;
+  //   }
+  // }
   // Set<Marker> buildMarkers(WidgetRef ref) {
   //   final markers = <Marker>{};
 
@@ -206,7 +240,7 @@ class MapSample extends ConsumerWidget {
   // return markers;
 }
 
-Future<void> _addMarker(String genre, WidgetRef ref) async {
+Future<void> addMarker(String genre, WidgetRef ref) async {
   // 選択された場所の座標を取得
   // final place = await _getLocationForGenre(genre);
   final details = await _googlePlace.details.get(genre);
@@ -232,7 +266,7 @@ Future<void> _addMarker(String genre, WidgetRef ref) async {
 //   }
 // }
 
-Future<void> _getLocationForGenre(String genre) async {
+Future<void> getLocationForGenre(String genre) async {
   await _googlePlace.autocomplete.get(genre);
 }
 
@@ -243,14 +277,13 @@ void updatePredictions(String value, WidgetRef ref) async {
   }
 
   final response = await _googlePlace.autocomplete.get(value);
+  print(response);
   if (response != null && response.predictions != null) {
-    ref
-        .read(textPredictionsProvider.notifier)
-        .changeList(response.predictions!);
+    ref.read(textPredictionsProvider.notifier).changeList(response);
   }
 }
 
-void _showModal(BuildContext context, WidgetRef ref) {
+void showModal(BuildContext context, WidgetRef ref) {
   final Color buttonColor = ref.watch(selectButtonColorProvider);
   final Color? buttonTextColor = ref.watch(selectTextButtonColorProvider);
   showModalBottomSheet<void>(
