@@ -14,8 +14,9 @@ class Predictions extends _$Predictions {
   List<AutocompletePrediction?> build() => [];
 
   // 検索処理
-  void autoCompleteSearch(String value) async {
+  Future<void> autoCompleteSearch(String value) async {
     final result = await _googlePlace.autocomplete.get(value);
+    print(result);
     if (result != null && result.predictions != null) {
       state = result.predictions!;
     }

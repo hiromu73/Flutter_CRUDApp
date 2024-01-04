@@ -38,7 +38,6 @@ class MapSample extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    final predictions = ref.watch(predictionsProvider);
 
     return SizedBox(
       height: height,
@@ -65,6 +64,9 @@ class MapSample extends ConsumerWidget {
                 //     .changePosition(latLang.);
                 // print(ref.watch(googlemapModelProvider));
               },
+              zoomGesturesEnabled: true,
+              zoomControlsEnabled: false,
+              // markers: Marker(),
             ),
             // モーダル表示
             Align(
@@ -118,35 +120,11 @@ class MapSample extends ConsumerWidget {
                       fillColor: Colors.white,
                       filled: true,
                     ),
-                    onChanged: (value) {
-                      //updatePredictions(value, ref);
-                      if (value.isNotEmpty) {
-                        ref
-                            .read(predictionsProvider.notifier)
-                            .autoCompleteSearch(value);
-                      } else {
-                        if (predictions.length > 0) {
-                          ref.read(predictionsProvider.notifier).state = [];
-                        }
-                      }
+                    onTap: () {
+                      showTextModal(context, ref);
                     },
                   ),
                 )),
-            Flexible(
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: predictions.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        child: ListTile(
-                          title:
-                              Text(predictions[index]!.description.toString()),
-                              onTap: () async {
-                                // タップした場所に視点を合わす。
-                              },
-                        ),
-                      );
-                    })),
             // 登録ボタン
             Align(
                 alignment: const Alignment(0.94, 0.8),
@@ -158,104 +136,105 @@ class MapSample extends ConsumerWidget {
       ),
     );
   }
+}
 
-  // 現在位置を取得するメソッド
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('ロケーションサービスが無効です。');
-    }
+// 現在位置を取得するメソッド
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+  // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('ロケーションサービスが無効です。');
+  }
 
-    // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
-    permission = await Geolocator.checkPermission();
+  // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
+  permission = await Geolocator.checkPermission();
 
+  if (permission == LocationPermission.denied) {
+    // デバイスの場所へのアクセス許可をリクエストする
+    permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
-      // デバイスの場所へのアクセス許可をリクエストする
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('デバイスの場所を取得するための許可がされていません。');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error('デバイスの場所を取得するための許可してください');
-    }
-    // デバイスの現在の場所を返す。
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    return position;
-  }
-
-  Future _initializeOnes(WidgetRef ref) async {
-    // 初回のみ実行する非同期処理
-    if (ref.watch(mapInitializedModelProvider)) {
-      final position = await _determinePosition();
-      final latitude = position.latitude;
-      final longitude = position.longitude;
-      final initCameraPosition = LatLng(latitude, longitude);
-      final newCameraPosition =
-          CameraPosition(target: initCameraPosition, zoom: 15.0);
-      ref.watch(cameraPositionProvider.notifier).state = newCameraPosition;
-      ref.read(mapInitializedModelProvider.notifier).changeInit();
+      return Future.error('デバイスの場所を取得するための許可がされていません。');
     }
   }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error('デバイスの場所を取得するための許可してください');
+  }
+  // デバイスの現在の場所を返す。
+  Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return position;
+}
+
+Future _initializeOnes(WidgetRef ref) async {
+  // 初回のみ実行する非同期処理
+  if (ref.watch(mapInitializedModelProvider)) {
+    final position = await _determinePosition();
+    final latitude = position.latitude;
+    final longitude = position.longitude;
+    final initCameraPosition = LatLng(latitude, longitude);
+    final newCameraPosition =
+        CameraPosition(target: initCameraPosition, zoom: 15.0);
+    ref.watch(cameraPositionProvider.notifier).state = newCameraPosition;
+    ref.read(mapInitializedModelProvider.notifier).changeInit();
+    print(newCameraPosition);
+  }
+}
 
 // 検索処理
-  // void autoCompleteSearch(String value, WidgetRef ref) async {
-  //   final result = await _googlePlace.autocomplete.get(value);
-  //   if (result != null && result.predictions != null) {
-  //     ref.read(predictions).state = result.predictions!;
-  //   }
-  // }
-  // Set<Marker> buildMarkers(WidgetRef ref) {
-  //   final markers = <Marker>{};
+// void autoCompleteSearch(String value, WidgetRef ref) async {
+//   final result = await _googlePlace.autocomplete.get(value);
+//   if (result != null && result.predictions != null) {
+//     ref.read(predictions).state = result.predictions!;
+//   }
+// }
+// Set<Marker> buildMarkers(WidgetRef ref) {
+//   final markers = <Marker>{};
 
-  //   // 現在地のマーカー
-  //   markers.add(Marker(
-  //     markerId: MarkerId('currentLocation'),
-  //     position: LatLng(
-  //       ref.watch(latitudeProvider),
-  //       ref.watch(longitudeProvider),
-  //     ),
-  //     infoWindow: InfoWindow(title: 'Current Location'),
-  //   ));
+//   // 現在地のマーカー
+// markers.add(Marker(
+//   markerId: MarkerId('currentLocation'),
+//   position: LatLng(
+//     ref.watch(latitudeProvider),
+//     ref.watch(longitudeProvider),
+//   ),
+//   infoWindow: InfoWindow(title: 'Current Location'),
+// ));
 
-  // 選択された場所のマーカー
-  // final selectedPlace = ref.watch(selectedPlaceProvider);
-  // if (selectedPlace != "") {
-  //   markers.add(Marker(
-  //     markerId: MarkerId(selectedPlace),
-  //     position: LatLng(
-  //       selectedPlace.location.lat,
-  //       selectedPlace.geometry.location.lng,
-  //     ),
-  //     infoWindow: InfoWindow(title: selectedPlace.name),
-  //   ));
-  // }
+// 選択された場所のマーカー
+// final selectedPlace = ref.watch(selectedPlaceProvider);
+// if (selectedPlace != "") {
+//   markers.add(Marker(
+//     markerId: MarkerId(selectedPlace),
+//     position: LatLng(
+//       selectedPlace.location.lat,
+//       selectedPlace.geometry.location.lng,
+//     ),
+//     infoWindow: InfoWindow(title: selectedPlace.name),
+//   ));
+// }
 
-  // return markers;
-}
+// return markers;
 
-Future<void> addMarker(String genre, WidgetRef ref) async {
-  // 選択された場所の座標を取得
-  // final place = await _getLocationForGenre(genre);
-  final details = await _googlePlace.details.get(genre);
-  final location = details?.result?.geometry?.location;
-  if (location != null) {
-    final newCameraPosition = CameraPosition(
-      target: LatLng(10.0, 10.0),
-      zoom: 15.0,
-    );
-    ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
+// Future<void> addMarker(String genre, WidgetRef ref) async {
+//   // 選択された場所の座標を取得
+//   // final place = await _getLocationForGenre(genre);
+//   final details = await _googlePlace.details.get(genre);
+//   final location = details?.result?.geometry?.location;
+//   if (location != null) {
+//     final newCameraPosition = CameraPosition(
+//       target: LatLng(10.0, 10.0),
+//       zoom: 15.0,
+//     );
+//     ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
 
-    // マーカーを追加
-    //ref.read(googlemapModelProvider.notifier).addMarker(place.name, location);
-  }
-}
+//     // マーカーを追加
+//     //ref.read(googlemapModelProvider.notifier).addMarker(place.name, location);
+//   }
+// }
 
 // Future<void> _addMarkerForGenre(String genre, WidgetRef ref) async {
 //   // ジャンルに対応する位置情報の取得
@@ -281,6 +260,97 @@ void updatePredictions(String value, WidgetRef ref) async {
   if (response != null && response.predictions != null) {
     ref.read(textPredictionsProvider.notifier).changeList(response);
   }
+}
+
+void showTextModal(BuildContext context, WidgetRef ref) {
+  final textController = TextEditingController();
+  final predictions = ref.watch(predictionsProvider);
+  showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.white,
+          height: 600,
+          child: Column(
+            children: [
+              TextFormField(
+                style: const TextStyle(color: Colors.grey, fontSize: 14),
+                controller: textController,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  iconColor: Colors.grey,
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                  hintText: "検索したい場所",
+                  hintStyle: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(color: Colors.white),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  fillColor: Colors.white,
+                  filled: true,
+                ),
+                onChanged: (value) async {
+                  //updatePredictions(value, ref);
+                  if (value.isNotEmpty) {
+                    print('value=${value}');
+                    await ref
+                        .read(predictionsProvider.notifier)
+                        .autoCompleteSearch(value);
+                  } else {
+                    if (value.isEmpty) {
+                      ref.read(predictionsProvider.notifier).state = [];
+                    }
+                  }
+                },
+              ),
+              Container(
+                color: Colors.yellow,
+                width: 400,
+                height: 400,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: predictions.length,
+                    itemBuilder: (context, index) {
+                      return menuItem(
+                          predictions[index]!.description.toString());
+                    }),
+              ),
+            ],
+          ),
+        );
+      });
+}
+
+Widget menuItem(String title) {
+  return InkWell(
+    child: Container(
+        height: 100,
+        width: 100,
+        decoration: const BoxDecoration(
+            border:
+                Border(bottom: BorderSide(width: 1.0, color: Colors.black))),
+        child: Row(
+          children: <Widget>[
+            Text(
+              title,
+              style: const TextStyle(color: Colors.black, fontSize: 15.0),
+            ),
+          ],
+        )),
+    onTap: () {
+      print("onTap called.");
+    },
+  );
 }
 
 void showModal(BuildContext context, WidgetRef ref) {
