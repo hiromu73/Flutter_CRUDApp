@@ -8,6 +8,7 @@ import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/select_button_color.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/select_text_button_color.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_crudapp/view/predictionslist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,12 +33,12 @@ final isSelectItem = StateProvider<List<String?>>((ref) => []);
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
   final apiKey = Api.apiKey;
-  final _placeController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    final selectItems = ref.watch(selectItemsProvider);
 
     return SizedBox(
       height: height,
@@ -58,12 +59,7 @@ class MapSample extends ConsumerWidget {
               initialCameraPosition: ref.watch(cameraPositionProvider),
               // markers: buildMarkers(ref),
               myLocationEnabled: true,
-              onTap: (LatLng latLang) {
-                // ref
-                //     .read(googlemapModelProvider.notifier)
-                //     .changePosition(latLang.);
-                // print(ref.watch(googlemapModelProvider));
-              },
+              onTap: (LatLng latLang) {},
               zoomGesturesEnabled: true,
               zoomControlsEnabled: false,
               // markers: Marker(),
@@ -97,7 +93,7 @@ class MapSample extends ConsumerWidget {
                   height: 40,
                   child: TextFormField(
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
-                    controller: _placeController,
+                    controller: TextEditingController(text: selectItems),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
                       iconColor: Colors.grey,
@@ -122,6 +118,9 @@ class MapSample extends ConsumerWidget {
                     ),
                     onTap: () {
                       showTextModal(context, ref);
+                    },
+                    onChanged: (value) {
+                      print(value);
                     },
                   ),
                 )),
@@ -317,13 +316,13 @@ void showTextModal(BuildContext context, WidgetRef ref) {
                 color: Colors.yellow,
                 width: 400,
                 height: 400,
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: predictions.length,
-                    itemBuilder: (context, index) {
-                      return menuItem(
-                          predictions[index]!.description.toString());
-                    }),
+                // child: ListView.builder(
+                //     shrinkWrap: true,
+                //     itemCount: predictions.length,
+                //     itemBuilder: (context, index) {
+                //       return menuItem(
+                //           predictions[index]!.description.toString());
+                //     }),
               ),
             ],
           ),
@@ -356,6 +355,7 @@ Widget menuItem(String title) {
 void showModal(BuildContext context, WidgetRef ref) {
   final Color buttonColor = ref.watch(selectButtonColorProvider);
   final Color? buttonTextColor = ref.watch(selectTextButtonColorProvider);
+
   showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -369,37 +369,32 @@ void showModal(BuildContext context, WidgetRef ref) {
                 runSpacing: 16,
                 spacing: 16,
                 children: items.map((item) {
-                  final isSelected = ref.watch(isSelectItem).contains(item);
                   return InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(32)),
                     onTap: () {
-                      final currentSelection = ref.read(isSelectItem);
-                      print(isSelected);
-                      if (isSelected) {
-                        ref.read(isSelectItem.notifier).state =
-                            List.from(currentSelection)..remove(item);
-                        ref
-                            .read(selectButtonColorProvider.notifier)
-                            .selectButtonChangeColor;
-                        ref
-                            .read(selectTextButtonColorProvider.notifier)
-                            .changeTextButtonColor;
-                        print(ref.watch(isSelectItem));
-                        print(buttonColor);
-                        print(buttonTextColor);
-                      } else {
-                        ref.read(isSelectItem.notifier).state =
-                            List.from(currentSelection)..add(item);
-                        ref
-                            .read(selectButtonColorProvider.notifier)
-                            .selectButtonChangeColor;
-                        ref
-                            .read(selectTextButtonColorProvider.notifier)
-                            .changeTextButtonColor;
-                        print(ref.watch(isSelectItem));
-                        print(buttonColor);
-                        print(buttonTextColor);
-                      }
+                      print("選択=$item");
+                      ref.read(selectItemsProvider.notifier).Add(item);
+                      // if (predictionStrings.contains(item)) {
+                      //   ref.read(isSelectItem.notifier).state =
+                      //       List.from(selectItem)..remove(item);
+                      //   ref
+                      //       .read(selectButtonColorProvider.notifier)
+                      //       .selectButtonChangeColor;
+                      //   ref
+                      //       .read(selectTextButtonColorProvider.notifier)
+                      //       .changeTextButtonColor;
+                      // } else {
+                      //   print("含んでいない");
+                      //   ref.read(predictionsProvider.notifier).state =
+                      //       List.from(selectItem)..add(item);
+                      //   ref
+                      //       .read(selectButtonColorProvider.notifier)
+                      //       .selectButtonChangeColor;
+                      //   ref
+                      //       .read(selectTextButtonColorProvider.notifier)
+                      //       .changeTextButtonColor;
+                      //   print("addされた後=$predictions");
+                      // }
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 500),
@@ -430,6 +425,7 @@ void showModal(BuildContext context, WidgetRef ref) {
                   children: [
                     ElevatedButton(
                       onPressed: () {
+                        ref.read(selectItemsProvider.notifier).None();
                         ref.read(isSelectItem.notifier).state = [];
                         ref
                             .read(selectButtonColorProvider.notifier)
@@ -438,10 +434,10 @@ void showModal(BuildContext context, WidgetRef ref) {
                             .read(selectTextButtonColorProvider.notifier)
                             .defaltTextButtonColor;
                       },
-                      child: const Text('Clear'),
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
+                      child: const Text('Clear'),
                     ),
                   ],
                 ),
