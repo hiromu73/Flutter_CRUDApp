@@ -6,7 +6,7 @@ part of 'selectitem.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$selectItemsHash() => r'f7bb1c4876218b92367bfaa5400af6b6c6d08592';
+String _$selectItemsHash() => r'77145625968f6d738564e5621300b842301f1d4d';
 
 /// See also [SelectItems].
 @ProviderFor(SelectItems)

@@ -7,11 +7,18 @@ class SelectItems extends _$SelectItems {
   @override
   String build() => "";
 
-  Future<void> Add(String value) async {
+  Future<void> add(String value) async {
+    await Future.delayed(const Duration(milliseconds: 100));
     state += "$value,";
   }
 
-  Future<void> None() async {
+  Future<void> remove(String value) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    state = state.replaceAll("$value,", "");
+  }
+
+  Future<void> none() async {
+    await Future.delayed(const Duration(milliseconds: 100));
     state = "";
   }
 }

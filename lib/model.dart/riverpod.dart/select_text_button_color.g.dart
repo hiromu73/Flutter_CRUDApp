@@ -7,7 +7,7 @@ part of 'select_text_button_color.dart';
 // **************************************************************************
 
 String _$selectTextButtonColorHash() =>
-    r'0d355c1fc14f2b56b645af5edd7b8a2ddcde2fbf';
+    r'6c0ee37a4c4308ca23210d31a541dbae9c629308';
 
 /// See also [SelectTextButtonColor].
 @ProviderFor(SelectTextButtonColor)

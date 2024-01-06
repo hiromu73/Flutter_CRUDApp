@@ -371,30 +371,27 @@ void showModal(BuildContext context, WidgetRef ref) {
                 children: items.map((item) {
                   return InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(32)),
-                    onTap: () {
+                    onTap: () async {
                       print("選択=$item");
-                      ref.read(selectItemsProvider.notifier).Add(item);
-                      // if (predictionStrings.contains(item)) {
-                      //   ref.read(isSelectItem.notifier).state =
-                      //       List.from(selectItem)..remove(item);
-                      //   ref
-                      //       .read(selectButtonColorProvider.notifier)
-                      //       .selectButtonChangeColor;
-                      //   ref
-                      //       .read(selectTextButtonColorProvider.notifier)
-                      //       .changeTextButtonColor;
-                      // } else {
-                      //   print("含んでいない");
-                      //   ref.read(predictionsProvider.notifier).state =
-                      //       List.from(selectItem)..add(item);
-                      //   ref
-                      //       .read(selectButtonColorProvider.notifier)
-                      //       .selectButtonChangeColor;
-                      //   ref
-                      //       .read(selectTextButtonColorProvider.notifier)
-                      //       .changeTextButtonColor;
-                      //   print("addされた後=$predictions");
-                      // }
+                      if (ref.watch(selectItemsProvider).contains(item)) {
+                        await ref
+                            .read(selectItemsProvider.notifier)
+                            .remove(item);
+                        await ref
+                            .read(selectButtonColorProvider.notifier)
+                            .changeButtonDefalutColor();
+                        await ref
+                            .read(selectTextButtonColorProvider.notifier)
+                            .defaltTextButtonColor();
+                      } else {
+                        await ref.read(selectItemsProvider.notifier).add(item);
+                        await ref
+                            .read(selectButtonColorProvider.notifier)
+                            .buttonChangeSelectColor();
+                        await ref
+                            .read(selectTextButtonColorProvider.notifier)
+                            .changeTextButtonColor();
+                      }
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 500),
@@ -406,12 +403,12 @@ void showModal(BuildContext context, WidgetRef ref) {
                         border: Border.all(
                           color: Colors.grey,
                         ),
-                        color: buttonColor,
+                        color: ref.watch(selectButtonColorProvider),
                       ),
                       child: Text(
                         item,
                         style: TextStyle(
-                            color: buttonTextColor,
+                            color: ref.watch(selectTextButtonColorProvider),
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -425,14 +422,13 @@ void showModal(BuildContext context, WidgetRef ref) {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        ref.read(selectItemsProvider.notifier).None();
-                        ref.read(isSelectItem.notifier).state = [];
+                        ref.read(selectItemsProvider.notifier).none();
                         ref
                             .read(selectButtonColorProvider.notifier)
-                            .changeButtonDefalutColor;
+                            .changeButtonDefalutColor();
                         ref
                             .read(selectTextButtonColorProvider.notifier)
-                            .defaltTextButtonColor;
+                            .defaltTextButtonColor();
                       },
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(

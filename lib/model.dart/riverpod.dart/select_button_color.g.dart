@@ -6,7 +6,7 @@ part of 'select_button_color.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$selectButtonColorHash() => r'ec766c7223dce9e057e1e42e8a6b9352cd2e58e6';
+String _$selectButtonColorHash() => r'd969675b53fa53ee1a76dceaa4fb7e54f1b9909b';
 
 /// See also [SelectButtonColor].
 @ProviderFor(SelectButtonColor)

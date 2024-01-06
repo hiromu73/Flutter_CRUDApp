@@ -8,11 +8,15 @@ class SelectButtonColor extends _$SelectButtonColor {
   @override
   Color build() => Colors.white;
 
-  void selectButtonChangeColor() {
+  Future<void> buttonChangeSelectColor() async {
     state = Colors.blue;
+    print("buttonChangeSelectColor-blue");
+    print(state);
   }
 
-  void changeButtonDefalutColor() {
+  Future<void> changeButtonDefalutColor() async {
     state = Colors.white;
+    print("changeButtonDefalutColor-white");
+    print(state);
   }
 }
