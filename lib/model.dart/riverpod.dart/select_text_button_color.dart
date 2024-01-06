@@ -6,7 +6,7 @@ part 'select_text_button_color.g.dart';
 @riverpod
 class SelectTextButtonColor extends _$SelectTextButtonColor {
   @override
-  Color? build() => Colors.black;
+  Color build() => Colors.black;
 
   Future<void> changeTextButtonColor() async {
     state = Colors.white;

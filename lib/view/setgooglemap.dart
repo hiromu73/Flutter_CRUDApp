@@ -354,7 +354,7 @@ Widget menuItem(String title) {
 
 void showModal(BuildContext context, WidgetRef ref) {
   final Color buttonColor = ref.watch(selectButtonColorProvider);
-  final Color? buttonTextColor = ref.watch(selectTextButtonColorProvider);
+  final Color buttonTextColor = ref.watch(selectTextButtonColorProvider);
 
   showModalBottomSheet<void>(
       context: context,
@@ -394,7 +394,7 @@ void showModal(BuildContext context, WidgetRef ref) {
                       }
                     },
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
+                      duration: const Duration(milliseconds: 100),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
@@ -403,12 +403,12 @@ void showModal(BuildContext context, WidgetRef ref) {
                         border: Border.all(
                           color: Colors.grey,
                         ),
-                        color: ref.watch(selectButtonColorProvider),
+                        color: buttonColor,
                       ),
                       child: Text(
                         item,
                         style: TextStyle(
-                            color: ref.watch(selectTextButtonColorProvider),
+                            color: buttonTextColor,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
