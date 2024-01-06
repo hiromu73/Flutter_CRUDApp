@@ -268,23 +268,22 @@ void updatePredictions(String value, WidgetRef ref) async {
   }
 
   final response = await _googlePlace.autocomplete.get(value);
-  print(response);
   if (response != null && response.predictions != null) {
     ref.read(textPredictionsProvider.notifier).changeList(response);
   }
 }
 
 class ShowTextModal extends ConsumerWidget {
-  const ShowTextModal({super.key});
+  final TextEditingController textController = TextEditingController();
+  ShowTextModal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textController = TextEditingController();
     final predictions = ref.watch(predictionsProvider);
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.white,
-      height: 600,
+      height: 400,
       child: Column(
         children: [
           TextFormField(
@@ -313,7 +312,8 @@ class ShowTextModal extends ConsumerWidget {
               filled: true,
             ),
             onChanged: (value) async {
-              updatePredictions(value, ref);
+              // updatePredictions(value, ref);
+              print(value);
               if (value.isNotEmpty) {
                 await ref
                     .read(predictionsProvider.notifier)
@@ -325,7 +325,7 @@ class ShowTextModal extends ConsumerWidget {
               }
             },
           ),
-          Container(
+          SizedBox(
             width: 400,
             height: 400,
             child: ListView.builder(
@@ -344,7 +344,7 @@ class ShowTextModal extends ConsumerWidget {
 Widget menuItem(String title) {
   return InkWell(
     child: Container(
-        height: 100,
+        height: 50,
         width: 100,
         decoration: const BoxDecoration(
             border:
