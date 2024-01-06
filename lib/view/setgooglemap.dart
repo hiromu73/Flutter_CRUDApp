@@ -6,8 +6,6 @@ import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/select_button_color.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/select_text_button_color.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_crudapp/view/predictionslist.dart';
@@ -68,22 +66,31 @@ class MapSample extends ConsumerWidget {
             Align(
               alignment: const Alignment(0.8, -0.85),
               child: InkWell(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    width: 50,
+                    height: 40,
+                    child: const Icon(
+                      Icons.dehaze_rounded,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
-                  width: 50,
-                  height: 40,
-                  child: const Icon(
-                    Icons.dehaze_rounded,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                ),
-                onTap: () => showModal(context, ref),
-              ),
+                  onTap: () async {
+                    await showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        enableDrag: true,
+                        barrierColor: Colors.black.withOpacity(0.5),
+                        builder: (context) {
+                          return ShowModal();
+                        });
+                  }),
             ),
             //テキスト検索候補表示
             Align(
@@ -352,96 +359,79 @@ Widget menuItem(String title) {
   );
 }
 
-void showModal(BuildContext context, WidgetRef ref) {
-  final Color buttonColor = ref.watch(selectButtonColorProvider);
-  final Color buttonTextColor = ref.watch(selectTextButtonColorProvider);
+// 簡易検索モーダル
+class ShowModal extends ConsumerWidget {
+  const ShowModal({super.key});
 
-  showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(10),
-          color: Colors.white,
-          height: 250,
-          child: Column(
-            children: [
-              Wrap(
-                runSpacing: 16,
-                spacing: 16,
-                children: items.map((item) {
-                  return InkWell(
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectItem = ref.watch(selectItemsProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      color: Colors.white,
+      height: 250,
+      child: Column(
+        children: [
+          Wrap(
+            runSpacing: 16,
+            spacing: 16,
+            children: items.map((item) {
+              return InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(32)),
+                onTap: () async {
+                  print("選択=$item");
+                  if (ref.watch(selectItemsProvider).contains(item)) {
+                    await ref.read(selectItemsProvider.notifier).remove(item);
+                  } else {
+                    await ref.read(selectItemsProvider.notifier).add(item);
+                  }
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 100),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(32)),
-                    onTap: () async {
-                      print("選択=$item");
-                      if (ref.watch(selectItemsProvider).contains(item)) {
-                        await ref
-                            .read(selectItemsProvider.notifier)
-                            .remove(item);
-                        await ref
-                            .read(selectButtonColorProvider.notifier)
-                            .changeButtonDefalutColor();
-                        await ref
-                            .read(selectTextButtonColorProvider.notifier)
-                            .defaltTextButtonColor();
-                      } else {
-                        await ref.read(selectItemsProvider.notifier).add(item);
-                        await ref
-                            .read(selectButtonColorProvider.notifier)
-                            .buttonChangeSelectColor();
-                        await ref
-                            .read(selectTextButtonColorProvider.notifier)
-                            .changeTextButtonColor();
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 100),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(32)),
-                        border: Border.all(
-                          color: Colors.grey,
-                        ),
-                        color: buttonColor,
-                      ),
-                      child: Text(
-                        item,
-                        style: TextStyle(
-                            color: buttonTextColor,
-                            fontWeight: FontWeight.bold),
-                      ),
+                    border: Border.all(
+                      color: Colors.grey,
                     ),
-                  );
-                }).toList(),
-              ),
-              Expanded(
-                  child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        ref.read(selectItemsProvider.notifier).none();
-                        ref
-                            .read(selectButtonColorProvider.notifier)
-                            .changeButtonDefalutColor();
-                        ref
-                            .read(selectTextButtonColorProvider.notifier)
-                            .defaltTextButtonColor();
-                      },
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30))),
-                      child: const Text('Clear'),
-                    ),
-                  ],
+                    color:
+                        selectItem.contains(item) ? Colors.blue : Colors.white,
+                  ),
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                        color: selectItem.contains(item)
+                            ? Colors.white
+                            : Colors.black,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ))
-            ],
+              );
+            }).toList(),
           ),
-        );
-      });
+          Expanded(
+              child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(selectItemsProvider.notifier).none();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  child: const Text('Clear'),
+                ),
+              ],
+            ),
+          ))
+        ],
+      ),
+    );
+  }
 }
   // Future<CameraPosition> _initPosition(latitude, longitude) async {
   //   // 現在位置を取得するメソッドの結果を取得する。
