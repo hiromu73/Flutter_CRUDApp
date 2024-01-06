@@ -10,18 +10,18 @@ class Predictions extends _$Predictions {
   final _googlePlace = GooglePlace(Api.apiKey);
 
   @override
-  List<String> build() => [];
+  List<AutocompletePrediction> build() => [];
 
   // 検索処理
   Future<void> autoCompleteSearch(String value) async {
-    // final result = await _googlePlace.autocomplete.get(value);
-    // print(result);
-    // if (result != null && result.predictions != null) {
-    //   state = result.predictions!;
-    // }
+    final result = await _googlePlace.autocomplete.get(value);
+    print(result);
+    if (result != null && result.predictions != null) {
+      state = result.predictions!;
+    }
   }
 
-  Future<void> addList(String value) async {
-    state.add(value);
-  }
+  // Future<void> addList(String value) async {
+  //   state.add(value);
+  // }
 }

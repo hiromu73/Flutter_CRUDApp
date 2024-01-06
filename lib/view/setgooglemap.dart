@@ -84,9 +84,7 @@ class MapSample extends ConsumerWidget {
                     await showModalBottomSheet(
                         context: context,
                         backgroundColor: Colors.transparent,
-                        isScrollControlled: true,
-                        enableDrag: true,
-                        barrierColor: Colors.black.withOpacity(0.5),
+                        barrierColor: Colors.black.withOpacity(0.6),
                         builder: (context) {
                           return ShowModal();
                         });
@@ -123,8 +121,16 @@ class MapSample extends ConsumerWidget {
                       fillColor: Colors.white,
                       filled: true,
                     ),
-                    onTap: () {
-                      showTextModal(context, ref);
+                    onTap: () async {
+                      await showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          enableDrag: true,
+                          barrierColor: Colors.black.withOpacity(0.6),
+                          builder: (context) {
+                            return ShowTextModal();
+                          });
                     },
                     onChanged: (value) {
                       print(value);
@@ -268,73 +274,71 @@ void updatePredictions(String value, WidgetRef ref) async {
   }
 }
 
-void showTextModal(BuildContext context, WidgetRef ref) {
-  final textController = TextEditingController();
-  final predictions = ref.watch(predictionsProvider);
-  showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.white,
-          height: 600,
-          child: Column(
-            children: [
-              TextFormField(
-                style: const TextStyle(color: Colors.grey, fontSize: 14),
-                controller: textController,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  iconColor: Colors.grey,
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                  hintText: "検索したい場所",
-                  hintStyle: const TextStyle(
-                    color: Colors.grey,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: Colors.white),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  fillColor: Colors.white,
-                  filled: true,
-                ),
-                onChanged: (value) async {
-                  //updatePredictions(value, ref);
-                  if (value.isNotEmpty) {
-                    print('value=${value}');
-                    await ref
-                        .read(predictionsProvider.notifier)
-                        .autoCompleteSearch(value);
-                  } else {
-                    if (value.isEmpty) {
-                      ref.read(predictionsProvider.notifier).state = [];
-                    }
-                  }
-                },
+class ShowTextModal extends ConsumerWidget {
+  const ShowTextModal({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textController = TextEditingController();
+    final predictions = ref.watch(predictionsProvider);
+    return Container(
+      padding: const EdgeInsets.all(8),
+      color: Colors.white,
+      height: 600,
+      child: Column(
+        children: [
+          TextFormField(
+            style: const TextStyle(color: Colors.grey, fontSize: 14),
+            controller: textController,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              iconColor: Colors.grey,
+              prefixIcon: const Icon(
+                Icons.search,
+                color: Colors.grey,
+                size: 20,
               ),
-              Container(
-                color: Colors.yellow,
-                width: 400,
-                height: 400,
-                // child: ListView.builder(
-                //     shrinkWrap: true,
-                //     itemCount: predictions.length,
-                //     itemBuilder: (context, index) {
-                //       return menuItem(
-                //           predictions[index]!.description.toString());
-                //     }),
+              hintText: "検索したい場所",
+              hintStyle: const TextStyle(
+                color: Colors.grey,
               ),
-            ],
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: const BorderSide(color: Colors.white),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              fillColor: Colors.white,
+              filled: true,
+            ),
+            onChanged: (value) async {
+              updatePredictions(value, ref);
+              if (value.isNotEmpty) {
+                await ref
+                    .read(predictionsProvider.notifier)
+                    .autoCompleteSearch(value);
+              } else {
+                if (value.isEmpty) {
+                  ref.read(predictionsProvider.notifier).state = [];
+                }
+              }
+            },
           ),
-        );
-      });
+          Container(
+            width: 400,
+            height: 400,
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: predictions.length,
+                itemBuilder: (context, index) {
+                  return menuItem(predictions[index]!.description.toString());
+                }),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 Widget menuItem(String title) {
@@ -366,7 +370,6 @@ class ShowModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectItem = ref.watch(selectItemsProvider);
-
     return Container(
       padding: const EdgeInsets.all(10),
       color: Colors.white,
