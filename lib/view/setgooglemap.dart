@@ -283,7 +283,7 @@ class ShowTextModal extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.white,
-      height: 400,
+      height: 500,
       child: Column(
         children: [
           TextFormField(
@@ -326,8 +326,7 @@ class ShowTextModal extends ConsumerWidget {
             },
           ),
           SizedBox(
-            width: 400,
-            height: 400,
+            width: 350,
             child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: predictions.length,
@@ -344,21 +343,22 @@ class ShowTextModal extends ConsumerWidget {
 Widget menuItem(String title) {
   return InkWell(
     child: Container(
-        height: 50,
-        width: 100,
-        decoration: const BoxDecoration(
-            border:
-                Border(bottom: BorderSide(width: 1.0, color: Colors.black))),
-        child: Row(
-          children: <Widget>[
-            Text(
-              title,
-              style: const TextStyle(color: Colors.black, fontSize: 15.0),
+      padding: const EdgeInsets.all(8.0),
+      decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
+      child: Row(
+        children: <Widget>[
+          Flexible(
+            child: ListTile(
+              title: Text(title),
+              trailing: Text("距離"),
             ),
-          ],
-        )),
+          )
+        ],
+      ),
+    ),
     onTap: () {
-      print("onTap called.");
+      print(title);
     },
   );
 }
