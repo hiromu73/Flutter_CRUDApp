@@ -5,10 +5,9 @@ import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
-import 'package:flutter_crudapp/view/predictionslist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -279,11 +278,11 @@ class ShowTextModal extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final predictions = ref.watch(predictionsProvider);
+    final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.white,
-      height: 500,
+      height: 700,
       child: Column(
         children: [
           TextFormField(
@@ -316,11 +315,11 @@ class ShowTextModal extends ConsumerWidget {
               print(value);
               if (value.isNotEmpty) {
                 await ref
-                    .read(predictionsProvider.notifier)
-                    .autoCompleteSearch(value);
+                    .read(autoCompleteSearchProvider.notifier)
+                    .autoCompleteSearch(value, 34.758663, 135.497186);
               } else {
                 if (value.isEmpty) {
-                  ref.read(predictionsProvider.notifier).state = [];
+                  ref.read(autoCompleteSearchProvider.notifier).state = [];
                 }
               }
             },
@@ -329,9 +328,9 @@ class ShowTextModal extends ConsumerWidget {
             width: 350,
             child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: predictions.length,
+                itemCount: autoCompleteSearch.length,
                 itemBuilder: (context, index) {
-                  return menuItem(predictions[index]!.description.toString());
+                  return menuItem(autoCompleteSearch[index].toString());
                 }),
           ),
         ],

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import './todoapp.dart';
 // constants
@@ -11,18 +10,12 @@ import 'package:flutter_crudapp/constants/routes.dart' as routes;
 final locationProvider = StateProvider.autoDispose((ref) => "");
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
-// コレクション一覧
-final postQueryProvider = StreamProvider.autoDispose((ref) =>
-    FirebaseFirestore.instance.collection('post').orderBy('date').snapshots());
 
 class TodoAddPage extends ConsumerWidget {
   const TodoAddPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final postLocation = ref.watch(locationProvider.notifier).state;
-    // final mapPosition = ref.watch(googlemapModelProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -83,7 +76,6 @@ class TodoAddPage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(30))),
                   onPressed: () => routes.mapSamplePage(context: context)),
               const SizedBox(height: 8),
-              Text(postLocation),
               ElevatedButton(
                   child: const Text(registration),
                   style: ElevatedButton.styleFrom(

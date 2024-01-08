@@ -51,6 +51,7 @@ dependencies:
   flutter_app_badger: ^1.5.0
   flutter_native_timezone: ^2.0.0
   riverpod_annotation: ^2.3.3
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:
