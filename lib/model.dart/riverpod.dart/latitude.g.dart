@@ -6,12 +6,12 @@ part of 'latitude.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$latitudeHash() => r'f0de2d1aa924728b82487b58436cae808eb58da7';
+String _$latitudeHash() => r'c38f45345f28c7726477e722625d0d026884ee3c';
 
-/// See also [latitude].
-@ProviderFor(latitude)
-final latitudeProvider = AutoDisposeNotifierProvider<latitude, double>.internal(
-  latitude.new,
+/// See also [Latitude].
+@ProviderFor(Latitude)
+final latitudeProvider = AutoDisposeNotifierProvider<Latitude, double>.internal(
+  Latitude.new,
   name: r'latitudeProvider',
   debugGetCreateSourceHash:
       const bool.fromEnvironment('dart.vm.product') ? null : _$latitudeHash,
@@ -19,6 +19,6 @@ final latitudeProvider = AutoDisposeNotifierProvider<latitude, double>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef _$latitude = AutoDisposeNotifier<double>;
+typedef _$Latitude = AutoDisposeNotifier<double>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

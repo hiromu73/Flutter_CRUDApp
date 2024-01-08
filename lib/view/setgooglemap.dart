@@ -14,28 +14,23 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final mapInitLatitudePosition = StateProvider.autoDispose<double>((ref) => 0.0);
-final mapInitLongitudePosition =
-    StateProvider.autoDispose<double>((ref) => 0.0);
-final _googlePlace = GooglePlace(Api.apiKey);
-final cameraPositionProvider = StateProvider<CameraPosition>((ref) {
-  return const CameraPosition(
-    target: LatLng(34.702809862535936, 135.49666833132505),
-    zoom: 15.0,
-  );
-});
-final selectedGenreProvider = StateProvider<String?>((ref) => null);
-final isSelectItem = StateProvider<List<String?>>((ref) => []);
-
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
   final apiKey = Api.apiKey;
-
+  // マップビューの初期位置
+  CameraPosition initialLocation = const CameraPosition(
+    target: LatLng(34.702809862535936, 135.49666833132505),
+    zoom: 15.0,
+  );
+  late GoogleMapController mapController;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
+    _initializeOnes(ref);
 
     return SizedBox(
       height: height,
@@ -45,21 +40,14 @@ class MapSample extends ConsumerWidget {
           children: <Widget>[
             GoogleMap(
               onMapCreated: (GoogleMapController controller) {
-                // 初回のみ実行かどうか
-                _initializeOnes(ref);
-                // 初回にマップが作成されたときに初期位置を設定する
-                controller.moveCamera(CameraUpdate.newCameraPosition(
-                  ref.watch(cameraPositionProvider),
-                ));
+                mapController = controller;
               },
               mapType: MapType.normal,
-              initialCameraPosition: ref.watch(cameraPositionProvider),
-              // markers: buildMarkers(ref),
+              initialCameraPosition: initialLocation,
               myLocationEnabled: true,
               onTap: (LatLng latLang) {},
               zoomGesturesEnabled: true,
               zoomControlsEnabled: false,
-              // markers: Marker(),
             ),
             // モーダル表示
             Align(
@@ -181,18 +169,9 @@ Future<Position> _determinePosition() async {
 }
 
 Future _initializeOnes(WidgetRef ref) async {
-  // 初回のみ実行する非同期処理
-  if (ref.watch(mapInitializedModelProvider)) {
-    final position = await _determinePosition();
-    final latitude = position.latitude;
-    final longitude = position.longitude;
-    final initCameraPosition = LatLng(latitude, longitude);
-    final newCameraPosition =
-        CameraPosition(target: initCameraPosition, zoom: 15.0);
-    ref.watch(cameraPositionProvider.notifier).state = newCameraPosition;
-    ref.read(mapInitializedModelProvider.notifier).changeInit();
-    print(newCameraPosition);
-  }
+  final position = await _determinePosition();
+  ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
+  ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
 }
 
 // 検索処理
@@ -256,22 +235,6 @@ Future _initializeOnes(WidgetRef ref) async {
 //   }
 // }
 
-Future<void> getLocationForGenre(String genre) async {
-  await _googlePlace.autocomplete.get(genre);
-}
-
-void updatePredictions(String value, WidgetRef ref) async {
-  if (value.isEmpty) {
-    ref.read(textPredictionsProvider.notifier).noneList();
-    return;
-  }
-
-  final response = await _googlePlace.autocomplete.get(value);
-  if (response != null && response.predictions != null) {
-    ref.read(textPredictionsProvider.notifier).changeList(response);
-  }
-}
-
 class ShowTextModal extends ConsumerWidget {
   final TextEditingController textController = TextEditingController();
   ShowTextModal({Key? key}) : super(key: key);
@@ -311,9 +274,8 @@ class ShowTextModal extends ConsumerWidget {
               filled: true,
             ),
             onChanged: (value) async {
-              // updatePredictions(value, ref);
-              print(value);
               if (value.isNotEmpty) {
+                // 検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteSearch(value, 34.758663, 135.497186);

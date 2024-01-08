@@ -27,17 +27,14 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
 
       print(predictions);
       final places = predictions.map<String>((prediction) {
-        // 'description' がString型であるか確認してから取り出す
         if (prediction['description'] is String) {
           return prediction['description'] as String;
         } else {
-          // 'description' がString型でなければ、デフォルトの値などを返す
           return 'Unknown Place';
         }
       }).toList();
       state = places;
     } else {
-      // エラーが発生した場合の処理
       print('Error: ${response.statusCode}');
     }
   }
