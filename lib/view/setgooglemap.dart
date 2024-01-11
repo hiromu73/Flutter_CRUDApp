@@ -16,20 +16,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
-  final apiKey = Api.apiKey;
-  // マップビューの初期位置
+
+  // 初期位置
   CameraPosition initialLocation = const CameraPosition(
-    target: LatLng(34.702809862535936, 135.49666833132505),
+    target: LatLng(34.758663, 135.4971856623888),
     zoom: 15.0,
   );
+
   late GoogleMapController mapController;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
-    final latitude = ref.watch(latitudeProvider);
-    final longitude = ref.watch(longitudeProvider);
+    final selectItemeMakers = ref.watch(autoCompleteSearchProvider);
     _initializeOnes(ref);
 
     return SizedBox(
@@ -45,9 +45,11 @@ class MapSample extends ConsumerWidget {
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
+              myLocationButtonEnabled: true,
               onTap: (LatLng latLang) {},
               zoomGesturesEnabled: true,
-              zoomControlsEnabled: false,
+              zoomControlsEnabled: true,
+              // markers: ,
             ),
             // モーダル表示
             Align(
@@ -242,10 +244,14 @@ class ShowTextModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
+    _initializeOnes(ref);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
+
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.white,
-      height: 700,
+      height: 600,
       child: Column(
         children: [
           TextFormField(
@@ -278,11 +284,7 @@ class ShowTextModal extends ConsumerWidget {
                 // 検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
-                    .autoCompleteSearch(value, 34.758663, 135.497186);
-              } else {
-                if (value.isEmpty) {
-                  ref.read(autoCompleteSearchProvider.notifier).state = [];
-                }
+                    .autoCompleteSearch(value, latitude, longitude);
               }
             },
           ),
@@ -295,6 +297,13 @@ class ShowTextModal extends ConsumerWidget {
                   return menuItem(autoCompleteSearch[index].toString());
                 }),
           ),
+          ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30))),
+            child: const Text('On'),
+          )
         ],
       ),
     );
@@ -314,7 +323,7 @@ Widget menuItem(String title) {
               title: Text(title),
               trailing: Text("距離"),
             ),
-          )
+          ),
         ],
       ),
     ),
@@ -344,7 +353,6 @@ class ShowModal extends ConsumerWidget {
               return InkWell(
                 borderRadius: const BorderRadius.all(Radius.circular(32)),
                 onTap: () async {
-                  print("選択=$item");
                   if (ref.watch(selectItemsProvider).contains(item)) {
                     await ref.read(selectItemsProvider.notifier).remove(item);
                   } else {

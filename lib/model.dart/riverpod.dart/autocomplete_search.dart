@@ -24,8 +24,6 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     if (response.statusCode == 200) {
       final decodedResponse = json.decode(response.body);
       final predictions = decodedResponse['predictions'];
-
-      print(predictions);
       final places = predictions.map<String>((prediction) {
         if (prediction['description'] is String) {
           return prediction['description'] as String;

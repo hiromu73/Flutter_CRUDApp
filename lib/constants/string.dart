@@ -17,11 +17,20 @@ const String serachPosition = "検索したい場所を入力";
 final items = [
   'スーパー',
   'ドラッグストア',
-  '雑貨',
-  '100円ショップ',
-  '本屋',
+  '書店',
+  '家電量販店',
+  '雑貨屋',
   'カフェ',
-  'ファストフード',
-  'レストラン',
   'コンビニ',
 ];
+// book_store
+// cafe
+// convenience_store
+// drugstore
+// electrician
+// electronics_store
+// florist
+// home_goods_store
+// pharmacy
+// shopping_mall
+// supermarket
