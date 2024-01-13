@@ -41,7 +41,13 @@ class FirebaseCollection extends ConsumerWidget {
                               'alert': value,
                             });
                           } catch (e) {
-                            print(e);
+                            // エラーが発生した場合の処理
+                            // ここでエラー内容を画面に表示
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error: $e'),
+                              ),
+                            );
                           }
                         }),
                   ),

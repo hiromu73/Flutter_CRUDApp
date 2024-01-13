@@ -30,7 +30,9 @@ class MapSample extends ConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchProvider);
-    _initializeOnes(ref);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
+    //_initializeOnes(ref);
 
     return SizedBox(
       height: height,
@@ -112,14 +114,17 @@ class MapSample extends ConsumerWidget {
                     ),
                     onTap: () async {
                       await showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          isScrollControlled: true,
-                          enableDrag: true,
-                          barrierColor: Colors.black.withOpacity(0.6),
-                          builder: (context) {
-                            return ShowTextModal();
-                          });
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              enableDrag: true,
+                              barrierColor: Colors.black.withOpacity(0.6),
+                              builder: (context) {
+                                return ShowTextModal();
+                              })
+                          .whenComplete(() async => await ref
+                              .read(autoCompleteSearchProvider.notifier)
+                              .noneAutoCompleteSearch("", latitude, longitude));
                     },
                     onChanged: (value) {
                       print(value);
@@ -251,7 +256,7 @@ class ShowTextModal extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.white,
-      height: 600,
+      height: MediaQuery.of(context).size.height * 0.8,
       child: Column(
         children: [
           TextFormField(
@@ -285,16 +290,21 @@ class ShowTextModal extends ConsumerWidget {
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteSearch(value, latitude, longitude);
+              } else {
+                await ref
+                    .read(autoCompleteSearchProvider.notifier)
+                    .noneAutoCompleteSearch(value, latitude, longitude);
               }
             },
           ),
           SizedBox(
-            width: 350,
             child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: autoCompleteSearch.length,
                 itemBuilder: (context, index) {
-                  return menuItem(autoCompleteSearch[index].toString());
+                  return menuItem(
+                    autoCompleteSearch[index].toString(),
+                  );
                 }),
           ),
           ElevatedButton(
@@ -302,7 +312,7 @@ class ShowTextModal extends ConsumerWidget {
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
-            child: const Text('On'),
+            child: const Text('DONE'),
           )
         ],
       ),
@@ -320,6 +330,13 @@ Widget menuItem(String title) {
         children: <Widget>[
           Flexible(
             child: ListTile(
+              leading: Checkbox(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  value: true,
+                  onChanged: (bool? value) {
+                    value;
+                  }),
               title: Text(title),
               trailing: Text("距離"),
             ),
