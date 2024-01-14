@@ -22,14 +22,3 @@ final Map<String, String> itemNameMap = {
   'カフェ': 'cafe',
   'コンビニ': 'convenience_store',
 };
-// book_store
-// cafe
-// convenience_store
-// drugstore
-// electrician
-// electronics_store
-// florist
-// home_goods_store
-// pharmacy
-// shopping_mall
-// supermarket

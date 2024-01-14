@@ -17,10 +17,9 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     const apiUrl =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     for (String? type in types) {
-      print(type);
       final response = await http.get(
         Uri.parse(
-            '$apiUrl?input=&location=$currentLatitude,$currentLongitude&radius=5000&type=$type&key=$_apiKey'),
+            '$apiUrl?input=oasis&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=50&types=$type'),
       );
       if (response.statusCode == 200) {
         print(response);

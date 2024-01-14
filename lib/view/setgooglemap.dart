@@ -7,6 +7,7 @@ import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_typ
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +26,7 @@ class MapSample extends ConsumerWidget {
   );
 
   late GoogleMapController mapController;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
@@ -257,6 +259,8 @@ class ShowTextModal extends ConsumerWidget {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+    // final selectItem = ref.watch(selectItemsProvider);
+    // final preditons = ref.watch(predictionsProvider);
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -291,10 +295,21 @@ class ShowTextModal extends ConsumerWidget {
             ),
             onChanged: (value) async {
               if (value.isNotEmpty) {
+                List<String> japaneseNames =
+                    ref.watch(selectItemsProvider).split(',');
+                List<String> englishNames = [];
+                for (String japaneseName in japaneseNames) {
+                  String trimmedJapaneseName = japaneseName.trim();
+                  if (itemNameMap.containsKey(trimmedJapaneseName)) {
+                    englishNames.add(itemNameMap[trimmedJapaneseName]!);
+                  }
+                }
                 // 検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
-                    .autoCompleteSearch(value, latitude, longitude);
+                    .autoCompleteSearch(
+                        value, englishNames, latitude, longitude);
+                // await autoCompletePreditonsSearch(value, ref);
               } else {
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
@@ -340,7 +355,7 @@ Widget menuItem(String title) {
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   value: true,
                   onChanged: (bool? value) {
-                    value;
+                    value = value;
                   }),
               title: Text(title),
               trailing: Text("距離"),
@@ -402,7 +417,6 @@ class ShowModal extends ConsumerWidget {
                         englishNames.add(itemNameMap[trimmedJapaneseName]!);
                       }
                     }
-                    print(englishNames);
                     ref
                         .read(autoCompleteSearchTypeProvider.notifier)
                         .autoCompleteSearchType(
@@ -455,6 +469,18 @@ class ShowModal extends ConsumerWidget {
     );
   }
 }
+
+// 入力内容から自動補完した結果を取得する。
+// Future<void> autoCompletePreditonsSearch(String value, WidgetRef ref) async {
+//   late GooglePlace googlePlace;
+//   googlePlace = GooglePlace(Api.apiKey);
+//   final result = await googlePlace.autocomplete.get(value, language: "ja");
+//   if (result != null && result.predictions != null) {
+//     ref
+//         .read(predictionsProvider.notifier)
+//         .changePredictions(result.predictions!);
+//   }
+// }
   // Future<CameraPosition> _initPosition(latitude, longitude) async {
   //   // 現在位置を取得するメソッドの結果を取得する。
   //   final cameraPosition = await CameraPosition(

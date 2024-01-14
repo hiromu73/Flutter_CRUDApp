@@ -7,7 +7,7 @@ part of 'autocomplete_search.dart';
 // **************************************************************************
 
 String _$autoCompleteSearchHash() =>
-    r'43b67ccfc284dbb1ceb7191487ff67d8116f940b';
+    r'091977d93f59a4083eebc8395fdf71086e7cbf5d';
 
 /// See also [AutoCompleteSearch].
 @ProviderFor(AutoCompleteSearch)
