@@ -294,7 +294,7 @@ class ShowTextModal extends ConsumerWidget {
               filled: true,
             ),
             onChanged: (value) async {
-              if (value.isNotEmpty) {
+              if (value.isNotEmpty && ref.watch(selectItemsProvider) != "") {
                 List<String> japaneseNames =
                     ref.watch(selectItemsProvider).split(',');
                 List<String> englishNames = [];
@@ -304,12 +304,17 @@ class ShowTextModal extends ConsumerWidget {
                     englishNames.add(itemNameMap[trimmedJapaneseName]!);
                   }
                 }
-                // 検索処理
+                // タイプあり検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
-                    .autoCompleteSearch(
+                    .autoCompleteTypeSearch(
                         value, englishNames, latitude, longitude);
                 // await autoCompletePreditonsSearch(value, ref);
+              } else if (value.isNotEmpty) {
+                // タイプ無し検索処理
+                await ref
+                    .read(autoCompleteSearchProvider.notifier)
+                    .autoCompleteSearch(value, latitude, longitude);
               } else {
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
