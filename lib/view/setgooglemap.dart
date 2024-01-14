@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search.dart';
@@ -32,7 +33,11 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-    //_initializeOnes(ref);
+    _initializeOnes(ref);
+    // 画面が初期化された際にフォーカスを外す
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
 
     return SizedBox(
       height: height,
@@ -53,7 +58,7 @@ class MapSample extends ConsumerWidget {
               zoomControlsEnabled: true,
               // markers: ,
             ),
-            // モーダル表示
+            // 簡易選択モーダル表示
             Align(
               alignment: const Alignment(0.8, -0.85),
               child: InkWell(
@@ -81,13 +86,14 @@ class MapSample extends ConsumerWidget {
                         });
                   }),
             ),
-            //テキスト検索候補表示
+            //テキスト検索候モーダル
             Align(
                 alignment: const Alignment(-0.6, -0.85),
                 child: SizedBox(
                   width: 200,
                   height: 40,
                   child: TextFormField(
+                    autofocus: false,
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                     controller: TextEditingController(text: selectItems),
                     decoration: InputDecoration(
@@ -249,7 +255,6 @@ class ShowTextModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
-    _initializeOnes(ref);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
 
@@ -312,7 +317,7 @@ class ShowTextModal extends ConsumerWidget {
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))),
-            child: const Text('DONE'),
+            child: const Text(serach),
           )
         ],
       ),
@@ -357,6 +362,8 @@ class ShowModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectItem = ref.watch(selectItemsProvider);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
     return Container(
       padding: const EdgeInsets.all(10),
       color: Colors.white,
@@ -366,14 +373,40 @@ class ShowModal extends ConsumerWidget {
           Wrap(
             runSpacing: 16,
             spacing: 16,
-            children: items.map((item) {
+            children: itemNameMap.keys.map((item) {
               return InkWell(
                 borderRadius: const BorderRadius.all(Radius.circular(32)),
                 onTap: () async {
-                  if (ref.watch(selectItemsProvider).contains(item)) {
+                  if (selectItem.contains(item)) {
                     await ref.read(selectItemsProvider.notifier).remove(item);
+                    // ref
+                    //     .read(autoCompleteSearchTypeProvider.notifier)
+                    //     .autoCompleteSearchType(
+                    //         itemNameMap[ref
+                    //                     .watch(selectItemsProvider)
+                    //                     .split(",")] !=
+                    //                 ""
+                    //             ? itemNameMap[
+                    //                 ref.watch(selectItemsProvider).split(",")]
+                    //             : "",
+                    //         latitude,
+                    //         longitude);
                   } else {
                     await ref.read(selectItemsProvider.notifier).add(item);
+                    List<String> japaneseNames =
+                        ref.watch(selectItemsProvider).split(',');
+                    List<String> englishNames = [];
+                    for (String japaneseName in japaneseNames) {
+                      String trimmedJapaneseName = japaneseName.trim();
+                      if (itemNameMap.containsKey(trimmedJapaneseName)) {
+                        englishNames.add(itemNameMap[trimmedJapaneseName]!);
+                      }
+                    }
+                    print(englishNames);
+                    ref
+                        .read(autoCompleteSearchTypeProvider.notifier)
+                        .autoCompleteSearchType(
+                            englishNames, latitude, longitude);
                   }
                 },
                 child: AnimatedContainer(
