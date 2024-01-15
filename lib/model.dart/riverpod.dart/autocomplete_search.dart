@@ -14,8 +14,6 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
 
   Future<void> autoCompleteTypeSearch(String value, List<String?> types,
       double currentLatitude, double currentLongitude) async {
-    print(value);
-    print(types);
     const apiUrl =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     if (types != "") {
@@ -49,7 +47,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     final response = await http.get(
       Uri.parse(
-          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&&language=ja'),
+          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&language=ja'),
     );
     if (response.statusCode == 200) {
       final decodedResponse = json.decode(response.body);
@@ -61,7 +59,6 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
           return 'Unknown Place';
         }
       }).toList();
-      print(places);
       state = places;
     } else {
       print('Error: ${response.statusCode}');
@@ -74,8 +71,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     final response = await http.get(
       Uri.parse(
-          // radiusで半径を調整する。
-          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5000'),
+          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&&language=ja'),
     );
     if (response.statusCode == 200) {
       final decodedResponse = json.decode(response.body);

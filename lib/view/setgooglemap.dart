@@ -32,7 +32,8 @@ class MapSample extends ConsumerWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
-    final selectItemeMakers = ref.watch(autoCompleteSearchProvider);
+    final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
+    final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
     _initializeOnes(ref);
@@ -51,6 +52,15 @@ class MapSample extends ConsumerWidget {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
+              markers: Set<Marker>.of(
+                selectItemeMakers.map(
+                  (item) => Marker(
+                    markerId: MarkerId(item.uid),
+                    position: LatLng(item.latitude, item.longitude),
+                    infoWindow: InfoWindow(title: item.name),
+                  ),
+                ),
+              ),
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
@@ -88,7 +98,7 @@ class MapSample extends ConsumerWidget {
                         });
                   }),
             ),
-            //テキスト検索候モーダル
+            //テキスト検索モーダル
             Align(
                 alignment: const Alignment(-0.6, -0.85),
                 child: SizedBox(
