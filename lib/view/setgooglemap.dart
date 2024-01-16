@@ -67,8 +67,6 @@ class MapSample extends ConsumerWidget {
               myLocationButtonEnabled: true,
               onTap: (LatLng latLang) {},
               zoomGesturesEnabled: true,
-              zoomControlsEnabled: true,
-              // markers: ,
             ),
             // 簡易選択モーダル表示
             Align(
@@ -373,7 +371,7 @@ Widget menuItem(String title) {
                     value = value;
                   }),
               title: Text(title),
-              trailing: Text("距離"),
+              trailing: Text(title.),
             ),
           ),
         ],

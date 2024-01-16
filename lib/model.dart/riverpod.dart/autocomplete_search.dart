@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter_crudapp/api.dart';
+import 'package:flutter_crudapp/model.dart/place.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -10,33 +13,35 @@ part 'autocomplete_search.g.dart';
 class AutoCompleteSearch extends _$AutoCompleteSearch {
   final _apiKey = Api.apiKey;
   @override
-  List<String> build() => [];
+  List<Place> build() => [];
 
   Future<void> autoCompleteTypeSearch(String value, List<String?> types,
       double currentLatitude, double currentLongitude) async {
     const apiUrl =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-    if (types != "") {
-      for (String? type in types) {
-        final response = await http.get(
-          Uri.parse(
-              '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&types=$type&language=ja'),
-        );
-        if (response.statusCode == 200) {
-          final decodedResponse = json.decode(response.body);
-          final predictions = decodedResponse['predictions'];
-          final places = predictions.map<String>((prediction) {
-            if (prediction['description'] is String) {
-              return prediction['description'] as String;
-            } else {
-              return 'Unknown Place';
+    for (String? type in types) {
+      final response = await http.get(
+        Uri.parse(
+            '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&types=$type&language=ja'),
+      );
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(response.body);
+        final predictions = decodedResponse['predictions'];
+
+        List<Place> places = [];
+
+        for (var prediction in predictions) {
+          if (prediction['place_id'] is String) {
+            final placeId = prediction['place_id'] as String;
+            final placeDetails = await getPlaceDetails(placeId);
+            if (placeDetails != null) {
+              places.add(placeDetails);
             }
-          }).toList();
-          print(places);
-          state = places;
-        } else {
-          print('Error: ${response.statusCode}');
+          }
         }
+        state = places;
+      } else {
+        print('Error: ${response.statusCode}');
       }
     }
   }
@@ -59,6 +64,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
           return 'Unknown Place';
         }
       }).toList();
+      print(places);
       state = places;
     } else {
       print('Error: ${response.statusCode}');
@@ -86,6 +92,36 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
       state = places;
     } else {
       print('Error: ${response.statusCode}');
+    }
+  }
+
+  Future<Place?> getPlaceDetails(String placeId) async {
+    const detailsUrl =
+        'https://maps.googleapis.com/maps/api/place/details/json';
+    final detailsResponse = await http.get(
+      Uri.parse('$detailsUrl?place_id=$placeId&key=$_apiKey&language=ja'),
+    );
+
+    if (detailsResponse.statusCode == 200) {
+      final detailsDecodedResponse = json.decode(detailsResponse.body);
+      final result = detailsDecodedResponse['result'];
+
+      if (result is Map<String, dynamic>) {
+        final geometry = result['geometry'];
+        final location = geometry['location'];
+        final latitude = location['lat'];
+        final longitude = location['lng'];
+        final name = result['name'];
+        final uid =
+            '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
+
+        return Place(
+          name: name,
+          latitude: latitude,
+          longitude: longitude,
+          uid: uid,
+        );
+      }
     }
   }
 }
