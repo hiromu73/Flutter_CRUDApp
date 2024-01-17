@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
+import 'package:flutter_crudapp/model.dart/place.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
@@ -317,7 +318,6 @@ class ShowTextModal extends ConsumerWidget {
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteTypeSearch(
                         value, englishNames, latitude, longitude);
-                // await autoCompletePreditonsSearch(value, ref);
               } else if (value.isNotEmpty) {
                 // タイプ無し検索処理
                 await ref
@@ -336,7 +336,9 @@ class ShowTextModal extends ConsumerWidget {
                 itemCount: autoCompleteSearch.length,
                 itemBuilder: (context, index) {
                   return menuItem(
-                    autoCompleteSearch[index].toString(),
+                    autoCompleteSearch[index],
+                    latitude,
+                    longitude,
                   );
                 }),
           ),
@@ -353,7 +355,17 @@ class ShowTextModal extends ConsumerWidget {
   }
 }
 
-Widget menuItem(String title) {
+Widget menuItem(Place place, double currentLatitude, double currentLongitude) {
+  // 現在地からの距離を計算する
+  double distanceInMeters = Geolocator.distanceBetween(
+    currentLatitude,
+    currentLongitude,
+    place.latitude,
+    place.longitude,
+  );
+  // 距離をキロメートルに変換
+  double distanceInKm = distanceInMeters;
+
   return InkWell(
     child: Container(
       padding: const EdgeInsets.all(8.0),
@@ -365,20 +377,20 @@ Widget menuItem(String title) {
             child: ListTile(
               leading: Checkbox(
                   shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
                   value: true,
                   onChanged: (bool? value) {
                     value = value;
                   }),
-              title: Text(title),
-              trailing: Text(title.),
+              title: Text(place.name),
+              trailing: Text('現在地から${distanceInMeters.toStringAsFixed(0)} km'),
             ),
           ),
         ],
       ),
     ),
     onTap: () {
-      print(title);
+      print(place.name);
     },
   );
 }

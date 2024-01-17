@@ -36,10 +36,8 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
             final latitude = location['lat'];
             final longitude = location['lng'];
             final name = result['name'];
-
             final uid =
                 '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
-
             final place = Place(
               name: name,
               latitude: latitude,

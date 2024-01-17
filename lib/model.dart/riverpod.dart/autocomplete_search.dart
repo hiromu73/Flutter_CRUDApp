@@ -15,6 +15,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
   @override
   List<Place> build() => [];
 
+// Typeありテキスト検索
   Future<void> autoCompleteTypeSearch(String value, List<String?> types,
       double currentLatitude, double currentLongitude) async {
     const apiUrl =
@@ -46,25 +47,30 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     }
   }
 
+// Type無しテキスト検索
   Future<void> autoCompleteSearch(
       String value, double currentLatitude, double currentLongitude) async {
     const apiUrl =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     final response = await http.get(
       Uri.parse(
-          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&language=ja'),
+          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5000&&language=ja'),
     );
     if (response.statusCode == 200) {
       final decodedResponse = json.decode(response.body);
       final predictions = decodedResponse['predictions'];
-      final places = predictions.map<String>((prediction) {
-        if (prediction['description'] is String) {
-          return prediction['description'] as String;
-        } else {
-          return 'Unknown Place';
+
+      List<Place> places = [];
+
+      for (var prediction in predictions) {
+        if (prediction['place_id'] is String) {
+          final placeId = prediction['place_id'] as String;
+          final placeDetails = await getPlaceDetails(placeId);
+          if (placeDetails != null) {
+            places.add(placeDetails);
+          }
         }
-      }).toList();
-      print(places);
+      }
       state = places;
     } else {
       print('Error: ${response.statusCode}');
@@ -77,18 +83,23 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     final response = await http.get(
       Uri.parse(
-          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5&&language=ja'),
+          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5000&language=ja'),
     );
     if (response.statusCode == 200) {
       final decodedResponse = json.decode(response.body);
       final predictions = decodedResponse['predictions'];
-      final places = predictions.map<String>((prediction) {
-        if (prediction['description'] is String) {
-          return prediction['description'] as String;
-        } else {
-          return 'Unknown Place';
+
+      List<Place> places = [];
+
+      for (var prediction in predictions) {
+        if (prediction['place_id'] is String) {
+          final placeId = prediction['place_id'] as String;
+          final placeDetails = await getPlaceDetails(placeId);
+          if (placeDetails != null) {
+            places.add(placeDetails);
+          }
         }
-      }).toList();
+      }
       state = places;
     } else {
       print('Error: ${response.statusCode}');

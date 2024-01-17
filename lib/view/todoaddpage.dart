@@ -63,9 +63,7 @@ class TodoAddPage extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.left,
                 onChanged: (String value) async {
-                  print("入力値${value}");
                   ref.read(memoProvider.notifier).state = value;
-                  print("更新後(${ref.watch(memoProvider.notifier).state})");
                 },
               ),
               const SizedBox(height: 8),
@@ -99,22 +97,23 @@ class TodoAddPage extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-              heroTag: "hero2",
-              child: const Icon(Icons.photo),
-              onPressed: () => {}), //写真を選択して保存ができる。
-          const SizedBox(
-            width: 10,
-          ),
-          FloatingActionButton(
-              heroTag: "hero3",
-              child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
-              onPressed: () => {}),
-        ],
-      ),
+      // 今後つけたい機能？
+      // floatingActionButton: Row(
+      //   mainAxisAlignment: MainAxisAlignment.end,
+      //   children: [
+      //     FloatingActionButton(
+      //         heroTag: "hero2",
+      //         child: const Icon(Icons.photo),
+      //         onPressed: () => {}), //写真を選択して保存ができる。
+      //     const SizedBox(
+      //       width: 10,
+      //     ),
+      //     FloatingActionButton(
+      //         heroTag: "hero3",
+      //         child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
+      //         onPressed: () => {}),
+      //   ],
+      // ),
     );
   }
 }
