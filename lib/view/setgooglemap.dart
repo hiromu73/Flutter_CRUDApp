@@ -198,67 +198,6 @@ Future _initializeOnes(WidgetRef ref) async {
   ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
 }
 
-// 検索処理
-// void autoCompleteSearch(String value, WidgetRef ref) async {
-//   final result = await _googlePlace.autocomplete.get(value);
-//   if (result != null && result.predictions != null) {
-//     ref.read(predictions).state = result.predictions!;
-//   }
-// }
-// Set<Marker> buildMarkers(WidgetRef ref) {
-//   final markers = <Marker>{};
-
-//   // 現在地のマーカー
-// markers.add(Marker(
-//   markerId: MarkerId('currentLocation'),
-//   position: LatLng(
-//     ref.watch(latitudeProvider),
-//     ref.watch(longitudeProvider),
-//   ),
-//   infoWindow: InfoWindow(title: 'Current Location'),
-// ));
-
-// 選択された場所のマーカー
-// final selectedPlace = ref.watch(selectedPlaceProvider);
-// if (selectedPlace != "") {
-//   markers.add(Marker(
-//     markerId: MarkerId(selectedPlace),
-//     position: LatLng(
-//       selectedPlace.location.lat,
-//       selectedPlace.geometry.location.lng,
-//     ),
-//     infoWindow: InfoWindow(title: selectedPlace.name),
-//   ));
-// }
-
-// return markers;
-
-// Future<void> addMarker(String genre, WidgetRef ref) async {
-//   // 選択された場所の座標を取得
-//   // final place = await _getLocationForGenre(genre);
-//   final details = await _googlePlace.details.get(genre);
-//   final location = details?.result?.geometry?.location;
-//   if (location != null) {
-//     final newCameraPosition = CameraPosition(
-//       target: LatLng(10.0, 10.0),
-//       zoom: 15.0,
-//     );
-//     ref.read(cameraPositionProvider.notifier).state = newCameraPosition;
-
-//     // マーカーを追加
-//     //ref.read(googlemapModelProvider.notifier).addMarker(place.name, location);
-//   }
-// }
-
-// Future<void> _addMarkerForGenre(String genre, WidgetRef ref) async {
-//   // ジャンルに対応する位置情報の取得
-//   final location = await _getLocationForGenre(genre);
-//   if (location != null) {
-//     // マーカーを追加
-//     ref.read(googlemapModelProvider.notifier).addMarker(genre, location);
-//   }
-// }
-
 class ShowTextModal extends ConsumerWidget {
   final TextEditingController textController = TextEditingController();
   ShowTextModal({Key? key}) : super(key: key);
@@ -363,8 +302,6 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude) {
     place.latitude,
     place.longitude,
   );
-  // 距離をキロメートルに変換
-  double distanceInKm = distanceInMeters;
 
   return InkWell(
     child: Container(
@@ -419,18 +356,26 @@ class ShowModal extends ConsumerWidget {
                 onTap: () async {
                   if (selectItem.contains(item)) {
                     await ref.read(selectItemsProvider.notifier).remove(item);
-                    // ref
-                    //     .read(autoCompleteSearchTypeProvider.notifier)
-                    //     .autoCompleteSearchType(
-                    //         itemNameMap[ref
-                    //                     .watch(selectItemsProvider)
-                    //                     .split(",")] !=
-                    //                 ""
-                    //             ? itemNameMap[
-                    //                 ref.watch(selectItemsProvider).split(",")]
-                    //             : "",
-                    //         latitude,
-                    //         longitude);
+                    if (ref.watch(selectItemsProvider).length != 0) {
+                      List<String> japaneseNames =
+                          ref.watch(selectItemsProvider).split(',');
+                      List<String> englishNames = [];
+                      for (String japaneseName in japaneseNames) {
+                        String trimmedJapaneseName = japaneseName.trim();
+                        if (itemNameMap.containsKey(trimmedJapaneseName)) {
+                          englishNames.add(itemNameMap[trimmedJapaneseName]!);
+                        }
+                      }
+                      print(englishNames);
+                      ref
+                          .read(autoCompleteSearchTypeProvider.notifier)
+                          .autoCompleteSearchType(
+                              englishNames, latitude, longitude);
+                    } else {
+                      await ref
+                          .read(autoCompleteSearchTypeProvider.notifier)
+                          .noneAutoCompleteSearch();
+                    }
                   } else {
                     await ref.read(selectItemsProvider.notifier).add(item);
                     List<String> japaneseNames =
@@ -442,6 +387,7 @@ class ShowModal extends ConsumerWidget {
                         englishNames.add(itemNameMap[trimmedJapaneseName]!);
                       }
                     }
+                    print(englishNames);
                     ref
                         .read(autoCompleteSearchTypeProvider.notifier)
                         .autoCompleteSearchType(
@@ -478,8 +424,12 @@ class ShowModal extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     ref.read(selectItemsProvider.notifier).none();
+                    // マーカー全て消す。
+                    await ref
+                        .read(autoCompleteSearchTypeProvider.notifier)
+                        .noneAutoCompleteSearch();
                   },
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(

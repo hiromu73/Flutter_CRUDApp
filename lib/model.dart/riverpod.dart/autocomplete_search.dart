@@ -54,7 +54,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     final response = await http.get(
       Uri.parse(
-          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5000&&language=ja'),
+          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=50&&language=ja'),
     );
     if (response.statusCode == 200) {
       final decodedResponse = json.decode(response.body);
