@@ -31,13 +31,14 @@ class MapSample extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    late GoogleMapController mapController;
     final selectItems = ref.watch(selectItemsProvider);
     final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-// IDのリスト
+    GoogleMapController mapController;
+
+    // IDのリスト
     List<String> idList = [];
     var uuid = Uuid();
     var newId = uuid.v4();
@@ -46,10 +47,6 @@ class MapSample extends ConsumerWidget {
       newId = uuid.v4();
     }
     idList.add(newId);
-
-    void onMapCreated(GoogleMapController controller) {
-      mapController = controller;
-    }
 
     _initializeOnes(ref);
     // 画面が初期化された際にフォーカスを外す
@@ -64,7 +61,9 @@ class MapSample extends ConsumerWidget {
         body: Stack(
           children: <Widget>[
             GoogleMap(
-              onMapCreated: onMapCreated,
+              onMapCreated: (GoogleMapController controller) {
+                mapController = controller;
+              },
               markers: Set<Marker>.of(
                 selectItemeMakers.map(
                   (item) => Marker(
@@ -166,30 +165,6 @@ class MapSample extends ConsumerWidget {
                 child: FloatingActionButton(
                     child: const Icon(Icons.create),
                     onPressed: () => {Navigator.pop(context)}))
-          ],
-        ),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              heroTag: 'heroId$idList',
-              onPressed: () {
-                mapController.animateCamera(
-                  CameraUpdate.zoomIn(),
-                );
-              },
-              child: const Icon(Icons.add),
-            ),
-            const SizedBox(height: 16.0),
-            FloatingActionButton(
-              heroTag: 'hero2Id$idList',
-              onPressed: () {
-                mapController.animateCamera(
-                  CameraUpdate.zoomOut(),
-                );
-              },
-              child: const Icon(Icons.remove),
-            ),
           ],
         ),
       ),
