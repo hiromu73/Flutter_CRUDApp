@@ -100,6 +100,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
           }
         }
       }
+      print(places);
       state = places;
     } else {
       print('Error: ${response.statusCode}');

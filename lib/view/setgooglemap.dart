@@ -26,12 +26,11 @@ class MapSample extends ConsumerWidget {
     zoom: 15.0,
   );
 
-  late GoogleMapController mapController;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    late GoogleMapController mapController;
     final selectItems = ref.watch(selectItemsProvider);
     final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
@@ -137,22 +136,43 @@ class MapSample extends ConsumerWidget {
                               enableDrag: true,
                               barrierColor: Colors.black.withOpacity(0.6),
                               builder: (context) {
+                                // テキスト検索モーダル
                                 return ShowTextModal();
                               })
                           .whenComplete(() async => await ref
                               .read(autoCompleteSearchProvider.notifier)
                               .noneAutoCompleteSearch("", latitude, longitude));
                     },
-                    onChanged: (value) {
-                      print(value);
-                    },
                   ),
+                )),
+            // 以下各ボタンの間隔を等間隔で調整できない？固定値を使わない方法！
+            // zoomInボタン
+            Align(
+                alignment: const Alignment(0.94, 0.5),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    mapController.animateCamera(
+                      CameraUpdate.zoomIn(),
+                    );
+                  },
+                  child: const Icon(Icons.add),
+                )),
+            // zoomOutボタン
+            Align(
+                alignment: const Alignment(0.94, 0.65),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    mapController.animateCamera(
+                      CameraUpdate.zoomOut(),
+                    );
+                  },
+                  child: const Icon(Icons.remove),
                 )),
             // 登録ボタン
             Align(
                 alignment: const Alignment(0.94, 0.8),
                 child: FloatingActionButton(
-                    child: const Icon(Icons.add),
+                    child: const Icon(Icons.create),
                     onPressed: () => {Navigator.pop(context)}))
           ],
         ),
@@ -252,17 +272,20 @@ class ShowTextModal extends ConsumerWidget {
                     englishNames.add(itemNameMap[trimmedJapaneseName]!);
                   }
                 }
+                print('typeAri');
                 // タイプあり検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteTypeSearch(
                         value, englishNames, latitude, longitude);
               } else if (value.isNotEmpty) {
+                print('typeNasi');
                 // タイプ無し検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteSearch(value, latitude, longitude);
               } else {
+                print('入力なし');
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .noneAutoCompleteSearch(value, latitude, longitude);
@@ -356,7 +379,8 @@ class ShowModal extends ConsumerWidget {
                 onTap: () async {
                   if (selectItem.contains(item)) {
                     await ref.read(selectItemsProvider.notifier).remove(item);
-                    if (ref.watch(selectItemsProvider).length != 0) {
+                    if (ref.watch(selectItemsProvider).isNotEmpty) {
+                      print(ref.watch(selectItemsProvider));
                       List<String> japaneseNames =
                           ref.watch(selectItemsProvider).split(',');
                       List<String> englishNames = [];
@@ -366,7 +390,6 @@ class ShowModal extends ConsumerWidget {
                           englishNames.add(itemNameMap[trimmedJapaneseName]!);
                         }
                       }
-                      print(englishNames);
                       ref
                           .read(autoCompleteSearchTypeProvider.notifier)
                           .autoCompleteSearchType(
@@ -387,7 +410,6 @@ class ShowModal extends ConsumerWidget {
                         englishNames.add(itemNameMap[trimmedJapaneseName]!);
                       }
                     }
-                    print(englishNames);
                     ref
                         .read(autoCompleteSearchTypeProvider.notifier)
                         .autoCompleteSearchType(
@@ -456,48 +478,48 @@ class ShowModal extends ConsumerWidget {
 //         .changePredictions(result.predictions!);
 //   }
 // }
-  // Future<CameraPosition> _initPosition(latitude, longitude) async {
-  //   // 現在位置を取得するメソッドの結果を取得する。
-  //   final cameraPosition = await CameraPosition(
-  //     target: LatLng(latitude, longitude),
-  //     zoom: 15,
-  //   );
-  //   return cameraPosition;
-  // }
-  //   final latitude = position.latitude;
-  //   final longitude = position.longitude;
-  //   String? isSelectMenu = "";
-  //   Uri? mapURL;
+// Future<CameraPosition> _initPosition(latitude, longitude) async {
+//   // 現在位置を取得するメソッドの結果を取得する。
+//   final cameraPosition = await CameraPosition(
+//     target: LatLng(latitude, longitude),
+//     zoom: 15,
+//   );
+//   return cameraPosition;
+// }
+//   final latitude = position.latitude;
+//   final longitude = position.longitude;
+//   String? isSelectMenu = "";
+//   Uri? mapURL;
 
-  //   // googlemapと同じAPIキーを指定
-  //   final googlePlace = GooglePlace(apiKey);
+//   // googlemapと同じAPIキーを指定
+//   final googlePlace = GooglePlace(apiKey);
 
-  //   // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
-  //   final response = await googlePlace.search.getNearBySearch(
-  //       Location(lat: latitude, lng: longitude), 1000,
-  //       language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
+//   // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
+//   final response = await googlePlace.search.getNearBySearch(
+//       Location(lat: latitude, lng: longitude), 1000,
+//       language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
 
-  //   final results = response!.results;
-  //   final isExist = results?.isNotEmpty ?? false;
+//   final results = response!.results;
+//   final isExist = results?.isNotEmpty ?? false;
 
-  //   if (isExist) {
-  //     return;
-  //   }
+//   if (isExist) {
+//     return;
+//   }
 
-  //   final firstResult = results?.first;
-  //   final selectLocation = firstResult?.geometry?.location;
-  //   final selectLocationLatitude = selectLocation?.lat;
-  //   final selectLocationLongitude = selectLocation?.lng;
+//   final firstResult = results?.first;
+//   final selectLocation = firstResult?.geometry?.location;
+//   final selectLocationLatitude = selectLocation?.lat;
+//   final selectLocationLongitude = selectLocation?.lng;
 
-  //   String urlString = '';
-  //   if (Platform.isAndroid) {
-  //     urlString =
-  //         'https://www.google.co.jp/maps/dir/$latitude,$longitude/$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
-  //   } else if (Platform.isIOS) {
-  //     urlString =
-  //         'comgooglemaps://?saddr=$latitude,$longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
-  //   }
+//   String urlString = '';
+//   if (Platform.isAndroid) {
+//     urlString =
+//         'https://www.google.co.jp/maps/dir/$latitude,$longitude/$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
+//   } else if (Platform.isIOS) {
+//     urlString =
+//         'comgooglemaps://?saddr=$latitude,$longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
+//   }
 
-  //   mapURL = Uri.parse(urlString);
-  // }
+//   mapURL = Uri.parse(urlString);
+// }
 // }
