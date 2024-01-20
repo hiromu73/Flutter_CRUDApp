@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter CrudApp',
       theme: ThemeData(
-          primaryColor: MaterialColor(
+          primaryColor: const MaterialColor(
         0xFFFFFFFF,
         <int, Color>{
           500: Color(0xFFFFFFFF),

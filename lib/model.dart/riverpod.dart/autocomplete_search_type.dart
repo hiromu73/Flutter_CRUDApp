@@ -53,8 +53,6 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
   }
 
   Future<void> noneAutoCompleteSearch() async {
-    const apiUrl =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     List<Place> places = [];
     final uid =
         '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
@@ -65,7 +63,6 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
       uid: uid,
     );
     places.add(place);
-
     state = places;
   }
 }

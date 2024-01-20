@@ -3,6 +3,10 @@ import 'package:flutter_crudapp/view/firebasecollection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
+import 'package:uuid/uuid.dart';
+
+var uuid = const Uuid();
+var newId = uuid.v4();
 
 // メモの一覧を表示
 class ToDoApp extends ConsumerWidget {
@@ -21,7 +25,7 @@ class ToDoApp extends ConsumerWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-          heroTag: "hero1",
+          heroTag: "heroId$newId",
           child: const Icon(Icons.add),
           onPressed: () => routes.AddPage(context: context)),
     );

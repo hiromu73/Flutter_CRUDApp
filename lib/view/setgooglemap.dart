@@ -16,6 +16,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
@@ -36,6 +37,20 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+// IDのリスト
+    List<String> idList = [];
+    var uuid = Uuid();
+    var newId = uuid.v4();
+    while (idList.any((id) => id == newId)) {
+      // 被りがあるので、IDを再生成する
+      newId = uuid.v4();
+    }
+    idList.add(newId);
+
+    void onMapCreated(GoogleMapController controller) {
+      mapController = controller;
+    }
+
     _initializeOnes(ref);
     // 画面が初期化された際にフォーカスを外す
     WidgetsBinding.instance!.addPostFrameCallback((_) {
@@ -49,9 +64,7 @@ class MapSample extends ConsumerWidget {
         body: Stack(
           children: <Widget>[
             GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-              },
+              onMapCreated: onMapCreated,
               markers: Set<Marker>.of(
                 selectItemeMakers.map(
                   (item) => Marker(
@@ -65,7 +78,9 @@ class MapSample extends ConsumerWidget {
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
-              onTap: (LatLng latLang) {},
+              onTap: (LatLng latLang) {
+                print(latLang);
+              },
               zoomGesturesEnabled: true,
             ),
             // 簡易選択モーダル表示
@@ -145,35 +160,36 @@ class MapSample extends ConsumerWidget {
                     },
                   ),
                 )),
-            // 以下各ボタンの間隔を等間隔で調整できない？固定値を使わない方法！
-            // zoomInボタン
-            Align(
-                alignment: const Alignment(0.94, 0.5),
-                child: FloatingActionButton(
-                  onPressed: () {
-                    mapController.animateCamera(
-                      CameraUpdate.zoomIn(),
-                    );
-                  },
-                  child: const Icon(Icons.add),
-                )),
-            // zoomOutボタン
-            Align(
-                alignment: const Alignment(0.94, 0.65),
-                child: FloatingActionButton(
-                  onPressed: () {
-                    mapController.animateCamera(
-                      CameraUpdate.zoomOut(),
-                    );
-                  },
-                  child: const Icon(Icons.remove),
-                )),
             // 登録ボタン
             Align(
                 alignment: const Alignment(0.94, 0.8),
                 child: FloatingActionButton(
                     child: const Icon(Icons.create),
                     onPressed: () => {Navigator.pop(context)}))
+          ],
+        ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              heroTag: 'heroId$idList',
+              onPressed: () {
+                mapController.animateCamera(
+                  CameraUpdate.zoomIn(),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+            const SizedBox(height: 16.0),
+            FloatingActionButton(
+              heroTag: 'hero2Id$idList',
+              onPressed: () {
+                mapController.animateCamera(
+                  CameraUpdate.zoomOut(),
+                );
+              },
+              child: const Icon(Icons.remove),
+            ),
           ],
         ),
       ),
@@ -466,60 +482,3 @@ class ShowModal extends ConsumerWidget {
     );
   }
 }
-
-// 入力内容から自動補完した結果を取得する。
-// Future<void> autoCompletePreditonsSearch(String value, WidgetRef ref) async {
-//   late GooglePlace googlePlace;
-//   googlePlace = GooglePlace(Api.apiKey);
-//   final result = await googlePlace.autocomplete.get(value, language: "ja");
-//   if (result != null && result.predictions != null) {
-//     ref
-//         .read(predictionsProvider.notifier)
-//         .changePredictions(result.predictions!);
-//   }
-// }
-// Future<CameraPosition> _initPosition(latitude, longitude) async {
-//   // 現在位置を取得するメソッドの結果を取得する。
-//   final cameraPosition = await CameraPosition(
-//     target: LatLng(latitude, longitude),
-//     zoom: 15,
-//   );
-//   return cameraPosition;
-// }
-//   final latitude = position.latitude;
-//   final longitude = position.longitude;
-//   String? isSelectMenu = "";
-//   Uri? mapURL;
-
-//   // googlemapと同じAPIキーを指定
-//   final googlePlace = GooglePlace(apiKey);
-
-//   // 検索処理 googlePlace.search.getNearBySearch() 近くの検索
-//   final response = await googlePlace.search.getNearBySearch(
-//       Location(lat: latitude, lng: longitude), 1000,
-//       language: 'ja', keyword: isSelectMenu, rankby: RankBy.Distance);
-
-//   final results = response!.results;
-//   final isExist = results?.isNotEmpty ?? false;
-
-//   if (isExist) {
-//     return;
-//   }
-
-//   final firstResult = results?.first;
-//   final selectLocation = firstResult?.geometry?.location;
-//   final selectLocationLatitude = selectLocation?.lat;
-//   final selectLocationLongitude = selectLocation?.lng;
-
-//   String urlString = '';
-//   if (Platform.isAndroid) {
-//     urlString =
-//         'https://www.google.co.jp/maps/dir/$latitude,$longitude/$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
-//   } else if (Platform.isIOS) {
-//     urlString =
-//         'comgooglemaps://?saddr=$latitude,$longitude&daddr=$selectLocationLatitude,$selectLocationLongitude&directionsmode=bicycling';
-//   }
-
-//   mapURL = Uri.parse(urlString);
-// }
-// }

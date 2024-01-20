@@ -54,7 +54,8 @@ class TodoAddPage extends ConsumerWidget {
                   isDense: true,
                   hintText: memo,
                   hintStyle: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w100),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w100),
                   prefixIcon: const Icon(Icons.create),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(32),
