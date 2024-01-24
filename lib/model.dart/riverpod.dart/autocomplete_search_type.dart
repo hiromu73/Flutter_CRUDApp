@@ -38,12 +38,11 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
             final uid =
                 '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
             final place = Place(
-              name: name,
-              latitude: latitude,
-              longitude: longitude,
-              uid: uid,
-              check: false
-            );
+                name: name,
+                latitude: latitude,
+                longitude: longitude,
+                uid: uid,
+                check: false);
             places.add(place);
           }
         }
@@ -58,32 +57,26 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     List<Place> places = [];
     final uid =
         '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
-    final place = Place(
-      name: "",
-      latitude: 0.0,
-      longitude: 0.0,
-      uid: uid,
-      check: false
-    );
+    final place =
+        Place(name: "", latitude: 0.0, longitude: 0.0, uid: uid, check: false);
     places.add(place);
     state = places;
   }
 
 // maker追加
-  Future<void> addMarker(LatLng latLang) async {
-    List<Place> places = [];
-    final latitude = latLang.latitude;
-    final longitude = latLang.longitude;
-    final uid =
-        '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
-    final place = Place(
-      name: "",
-      latitude: latitude,
-      longitude: longitude,
-      uid: uid,
-      check: false
-    );
-    places.add(place);
-    state = places;
+  Future<void> addMarker(
+      String uid, String name, double latitude, double longitude) async {
+    state = [
+      for (final place in state)
+        if (place.uid == uid)
+          place.copyWith(
+              name: name,
+              latitude: latitude,
+              longitude: longitude,
+              uid: uid,
+              check: true)
+        else
+          place,
+    ];
   }
 }

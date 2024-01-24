@@ -112,7 +112,10 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     }
   }
 
-  Future<void> checkChange(bool? bool) async {
-    // state.add(value);
+  Future<void> checkChange(String uid, bool? check) async {
+    state = [
+      for (final place in state)
+        if (place.uid == uid) place.copyWith(check: check) else place,
+    ];
   }
 }
