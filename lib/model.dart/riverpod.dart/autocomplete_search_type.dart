@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -41,6 +42,7 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
               latitude: latitude,
               longitude: longitude,
               uid: uid,
+              check: false
             );
             places.add(place);
           }
@@ -61,6 +63,25 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
       latitude: 0.0,
       longitude: 0.0,
       uid: uid,
+      check: false
+    );
+    places.add(place);
+    state = places;
+  }
+
+// maker追加
+  Future<void> addMarker(LatLng latLang) async {
+    List<Place> places = [];
+    final latitude = latLang.latitude;
+    final longitude = latLang.longitude;
+    final uid =
+        '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
+    final place = Place(
+      name: "",
+      latitude: latitude,
+      longitude: longitude,
+      uid: uid,
+      check: false
     );
     places.add(place);
     state = places;

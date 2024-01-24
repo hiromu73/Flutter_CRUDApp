@@ -3,11 +3,13 @@ class Place {
   final double latitude;
   final double longitude;
   final String uid;
+  final bool check;
 
   Place({
     required this.name,
     required this.latitude,
     required this.longitude,
     required this.uid,
+    required this.check,
   });
 }

@@ -77,34 +77,9 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     }
   }
 
-  Future<void> noneAutoCompleteSearch(
-      String value, double currentLatitude, double currentLongitude) async {
-    const apiUrl =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-    final response = await http.get(
-      Uri.parse(
-          '$apiUrl?input=$value&key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=5000&language=ja'),
-    );
-    if (response.statusCode == 200) {
-      final decodedResponse = json.decode(response.body);
-      final predictions = decodedResponse['predictions'];
-
-      List<Place> places = [];
-
-      for (var prediction in predictions) {
-        if (prediction['place_id'] is String) {
-          final placeId = prediction['place_id'] as String;
-          final placeDetails = await getPlaceDetails(placeId);
-          if (placeDetails != null) {
-            places.add(placeDetails);
-          }
-        }
-      }
-      print(places);
-      state = places;
-    } else {
-      print('Error: ${response.statusCode}');
-    }
+  Future<void> noneAutoCompleteSearch() async {
+    state = [];
+    print(state);
   }
 
   Future<Place?> getPlaceDetails(String placeId) async {
@@ -128,12 +103,16 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
             '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
 
         return Place(
-          name: name,
-          latitude: latitude,
-          longitude: longitude,
-          uid: uid,
-        );
+            name: name,
+            latitude: latitude,
+            longitude: longitude,
+            uid: uid,
+            check: false);
       }
     }
+  }
+
+  Future<void> checkChange(bool? bool) async {
+    // state.add(value);
   }
 }

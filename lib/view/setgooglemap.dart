@@ -8,7 +8,9 @@ import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_typ
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/menuitemcheckbox.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/select_marker.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,10 +34,20 @@ class MapSample extends ConsumerWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
+    // テキスト入力結果を取得
     final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
+    // 簡易選択の結果
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+
+    Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
+          markerId: MarkerId(item.uid),
+          position: LatLng(item.latitude, item.longitude),
+          infoWindow: InfoWindow(title: item.name),
+        )));
+
+    final selectMarker = ref.watch(selectMarkerProvider);
     GoogleMapController mapController;
 
     // IDのリスト
@@ -64,21 +76,17 @@ class MapSample extends ConsumerWidget {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
-              markers: Set<Marker>.of(
-                selectItemeMakers.map(
-                  (item) => Marker(
-                    markerId: MarkerId(item.uid),
-                    position: LatLng(item.latitude, item.longitude),
-                    infoWindow: InfoWindow(title: item.name),
-                  ),
-                ),
-              ),
+              markers: markers,
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               onTap: (LatLng latLang) {
-                print(latLang);
+                // maker追加
+                // ref.read().addMarker(latLang);
+                // 以下マーカーが選択された時の処理
+                // 選択されていない場合
+                // if (selectMarker != true) {}
               },
               zoomGesturesEnabled: true,
             ),
@@ -155,7 +163,7 @@ class MapSample extends ConsumerWidget {
                               })
                           .whenComplete(() async => await ref
                               .read(autoCompleteSearchProvider.notifier)
-                              .noneAutoCompleteSearch("", latitude, longitude));
+                              .noneAutoCompleteSearch());
                     },
                   ),
                 )),
@@ -218,6 +226,7 @@ class ShowTextModal extends ConsumerWidget {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+    final selectItemCheck = ref.watch(menuItemCheckBoxProvider);
     // final selectItem = ref.watch(selectItemsProvider);
     // final preditons = ref.watch(predictionsProvider);
 
@@ -263,23 +272,24 @@ class ShowTextModal extends ConsumerWidget {
                     englishNames.add(itemNameMap[trimmedJapaneseName]!);
                   }
                 }
-                print('typeAri');
                 // タイプあり検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteTypeSearch(
                         value, englishNames, latitude, longitude);
-              } else if (value.isNotEmpty) {
-                print('typeNasi');
+              } else if (value.isNotEmpty &&
+                  ref.watch(selectItemsProvider) == "") {
                 // タイプ無し検索処理
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .autoCompleteSearch(value, latitude, longitude);
               } else {
-                print('入力なし');
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
-                    .noneAutoCompleteSearch(value, latitude, longitude);
+                    .noneAutoCompleteSearch();
+                print('$value=>' '');
+                print('none');
+                // 前の結果が残る。(速さによる)(更新はされている。非同期の問題)
               }
             },
           ),
@@ -289,10 +299,7 @@ class ShowTextModal extends ConsumerWidget {
                 itemCount: autoCompleteSearch.length,
                 itemBuilder: (context, index) {
                   return menuItem(
-                    autoCompleteSearch[index],
-                    latitude,
-                    longitude,
-                  );
+                      autoCompleteSearch[index], latitude, longitude, ref);
                 }),
           ),
           ElevatedButton(
@@ -308,7 +315,63 @@ class ShowTextModal extends ConsumerWidget {
   }
 }
 
-Widget menuItem(Place place, double currentLatitude, double currentLongitude) {
+// class menuItem extends ConsumerWidget {
+//   menuItem({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
+//     final latitude = ref.watch(latitudeProvider);
+//     final longitude = ref.watch(longitudeProvider);
+//     final selectItemCheck = ref.watch(menuItemCheckBoxProvider);
+
+//     // 現在地からの距離を計算する
+//     double distanceInMeters = Geolocator.distanceBetween(
+//       currentLatitude,
+//       currentLongitude,
+//       autoCompleteSearch[index].latitude,
+//       place.longitude,
+//     );
+
+//     return InkWell(
+//       child: Container(
+//         padding: const EdgeInsets.all(8.0),
+//         decoration: const BoxDecoration(
+//             border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
+//         child: Row(
+//           children: <Widget>[
+//             Flexible(
+//               child: ListView.builder(
+//                   shrinkWrap: true,
+//                   itemCount: autoCompleteSearch.length,
+//                   itemBuilder: (context, index) {
+//                     return ListTile(
+//                       leading: Checkbox(
+//                           shape: const RoundedRectangleBorder(
+//                               borderRadius:
+//                                   BorderRadius.all(Radius.circular(20))),
+//                           value: false,
+//                           onChanged: (bool? value) {
+//                             value = true;
+//                           }),
+//                       title: Text(autoCompleteSearch[index].name),
+//                       trailing: Text(
+//                           '現在地から${distanceInMeters.toStringAsFixed(0)} km'),
+//                     );
+//                   }),
+//             ),
+//           ],
+//         ),
+//       ),
+//       onTap: () {
+//         print(autoCompleteSearch);
+//       },
+//     );
+//   }
+// }
+
+Widget menuItem(Place place, double currentLatitude, double currentLongitude,
+    WidgetRef ref) {
   // 現在地からの距離を計算する
   double distanceInMeters = Geolocator.distanceBetween(
     currentLatitude,
@@ -316,6 +379,8 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude) {
     place.latitude,
     place.longitude,
   );
+  final menuItemCheckBoxProvider =
+      StateProviderFamily<bool, String>((ref, placeId) => false);
 
   return InkWell(
     child: Container(
@@ -329,9 +394,20 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude) {
               leading: Checkbox(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20))),
-                  value: true,
-                  onChanged: (bool? value) {
-                    value = value;
+                  value: place.check,
+                  onChanged: (bool? value) async {
+                    // ref
+                    //     .read(menuItemCheckBoxProvider(place.uid).notifier)
+                    //     .state = false;
+                    ref
+                        .read(autoCompleteSearchProvider.notifier)
+                        .checkChange(value);
+                    // ref
+                    //     .read(menuItemCheckBoxProvider(place.uid).notifier)
+                    //     .state = true;
+
+                    print(ref.watch(menuItemCheckBoxProvider(place.uid)));
+                    print(ref.watch(menuItemCheckBoxProvider(place.name)));
                   }),
               title: Text(place.name),
               trailing: Text('現在地から${distanceInMeters.toStringAsFixed(0)} km'),
@@ -340,9 +416,7 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude) {
         ],
       ),
     ),
-    onTap: () {
-      print(place.name);
-    },
+    onTap: () async {},
   );
 }
 
@@ -439,7 +513,6 @@ class ShowModal extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     ref.read(selectItemsProvider.notifier).none();
-                    // マーカー全て消す。
                     await ref
                         .read(autoCompleteSearchTypeProvider.notifier)
                         .noneAutoCompleteSearch();
