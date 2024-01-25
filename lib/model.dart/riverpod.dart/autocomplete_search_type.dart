@@ -53,6 +53,21 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     state = places;
   }
 
+  Future<void> addMarker(String name, double latitude, double longitude,
+      String uid, bool check) async {
+    print("addMarker");
+    final place = Place(
+        name: name,
+        latitude: latitude,
+        longitude: longitude,
+        uid: uid,
+        check: false);
+
+    state.add(place);
+
+    print(state);
+  }
+
   Future<void> noneAutoCompleteSearch() async {
     List<Place> places = [];
     final uid =
@@ -63,20 +78,9 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     state = places;
   }
 
-// maker追加
-  Future<void> addMarker(
-      String uid, String name, double latitude, double longitude) async {
-    state = [
-      for (final place in state)
-        if (place.uid == uid)
-          place.copyWith(
-              name: name,
-              latitude: latitude,
-              longitude: longitude,
-              uid: uid,
-              check: true)
-        else
-          place,
-    ];
+  // チェックされたPlaceオブジェクトのリストを取得するメソッド
+  List<Place> getCheckedPlaces(List<Place> place) {
+    print(state);
+    return state.where((place) => place.check).toList();
   }
 }

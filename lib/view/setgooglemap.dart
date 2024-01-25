@@ -302,8 +302,23 @@ class ShowTextModal extends ConsumerWidget {
                 }),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               // チェックになっている対象のデータをマップ上にマーカーを設置する。
+              // チェックされたPlaceオブジェクトのリストを取得
+              final checkedPlaces = ref
+                  .read(autoCompleteSearchTypeProvider.notifier)
+                  .getCheckedPlaces(autoCompleteSearch);
+              // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
+              print(checkedPlaces);
+              for (final place in checkedPlaces) {
+                await ref
+                    .read(autoCompleteSearchTypeProvider.notifier)
+                    .addMarker(place.name, place.latitude, place.longitude,
+                        place.uid, place.check);
+              }
+
+              // モーダルを閉じる
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -343,8 +358,6 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
                     ref
                         .read(autoCompleteSearchProvider.notifier)
                         .checkChange(place.uid, value);
-                    print(place.check);
-                    print("onChange");
                   }),
             ),
           ),
@@ -361,9 +374,6 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
             .read(autoCompleteSearchProvider.notifier)
             .checkChange(place.uid, false);
       }
-      ref
-          .read(autoCompleteSearchTypeProvider.notifier)
-          .addMarker(place.uid, place.name, place.latitude, place.longitude,);
     },
   );
 }
