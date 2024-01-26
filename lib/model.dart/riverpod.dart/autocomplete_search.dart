@@ -79,7 +79,6 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
 
   Future<void> noneAutoCompleteSearch() async {
     state = [];
-    print(state);
   }
 
   Future<Place?> getPlaceDetails(String placeId) async {

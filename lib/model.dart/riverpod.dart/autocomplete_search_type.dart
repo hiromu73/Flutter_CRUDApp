@@ -9,13 +9,14 @@ import 'package:http/http.dart' as http;
 
 part 'autocomplete_search_type.g.dart';
 
-// 簡易検索処理
+// マーカーに設定する状態を管理する。
 @riverpod
 class AutoCompleteSearchType extends _$AutoCompleteSearchType {
   final _apiKey = Api.apiKey;
   @override
   List<Place> build() => [];
 
+// 簡易検索処理
   Future<void> autoCompleteSearchType(List<String> typesList,
       double currentLatitude, double currentLongitude) async {
     List<Place> places = [];
@@ -55,6 +56,7 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
 
   Future<void> addMarker(String name, double latitude, double longitude,
       String uid, bool check) async {
+    List<Place> places = [];
     print("addMarker");
     final place = Place(
         name: name,
@@ -62,10 +64,10 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
         longitude: longitude,
         uid: uid,
         check: false);
+    places.add(place);
 
-    state.add(place);
-
-    print(state);
+    // 現在のstateに新しいPlaceを追加
+    state = [...state, place];
   }
 
   Future<void> noneAutoCompleteSearch() async {
@@ -78,9 +80,8 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     state = places;
   }
 
-  // チェックされたPlaceオブジェクトのリストを取得するメソッド
-  List<Place> getCheckedPlaces(List<Place> place) {
-    print(state);
-    return state.where((place) => place.check).toList();
+  // チェックがtrueのPlaceオブジェクトのリストを取得するメソッド
+  List<Place> getCheckedPlaces() {
+    return state.where((place) => place.check == true).toList();
   }
 }

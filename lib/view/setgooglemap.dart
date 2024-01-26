@@ -39,8 +39,8 @@ class MapSample extends ConsumerWidget {
     final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
     // 設置するマーカーの一覧
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    final latitude = ref.watch(latitudeProvider);
-    final longitude = ref.watch(longitudeProvider);
+    // final latitude = ref.watch(latitudeProvider);
+    // final longitude = ref.watch(longitudeProvider);
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -77,7 +77,11 @@ class MapSample extends ConsumerWidget {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
-              markers: markers,
+              markers: Set<Marker>.of(selectItemeMakers.map((item) => Marker(
+                    markerId: MarkerId(item.uid),
+                    position: LatLng(item.latitude, item.longitude),
+                    infoWindow: InfoWindow(title: item.name),
+                  ))), //markerの設置
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
@@ -153,18 +157,19 @@ class MapSample extends ConsumerWidget {
                     ),
                     onTap: () async {
                       await showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.transparent,
-                              isScrollControlled: true,
-                              enableDrag: true,
-                              barrierColor: Colors.black.withOpacity(0.6),
-                              builder: (context) {
-                                // テキスト検索モーダル
-                                return ShowTextModal();
-                              })
-                          .whenComplete(() async => await ref
-                              .read(autoCompleteSearchProvider.notifier)
-                              .noneAutoCompleteSearch());
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          enableDrag: true,
+                          barrierColor: Colors.black.withOpacity(0.6),
+                          builder: (context) {
+                            // テキスト検索モーダル
+                            return ShowTextModal();
+                          });
+                      // モーダルを閉じたら、テキスト検索全て無くす。
+                      // .whenComplete(() async => await ref
+                      //     .read(autoCompleteSearchProvider.notifier)
+                      //     .noneAutoCompleteSearch());
                     },
                   ),
                 )),
@@ -307,16 +312,15 @@ class ShowTextModal extends ConsumerWidget {
               // チェックされたPlaceオブジェクトのリストを取得
               final checkedPlaces = ref
                   .read(autoCompleteSearchTypeProvider.notifier)
-                  .getCheckedPlaces(autoCompleteSearch);
+                  .getCheckedPlaces();
               // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
-              print(checkedPlaces);
               for (final place in checkedPlaces) {
+                print('check');
                 await ref
                     .read(autoCompleteSearchTypeProvider.notifier)
                     .addMarker(place.name, place.latitude, place.longitude,
                         place.uid, place.check);
               }
-
               // モーダルを閉じる
               Navigator.pop(context);
             },
@@ -403,7 +407,6 @@ class ShowModal extends ConsumerWidget {
                   if (selectItem.contains(item)) {
                     await ref.read(selectItemsProvider.notifier).remove(item);
                     if (ref.watch(selectItemsProvider).isNotEmpty) {
-                      print(ref.watch(selectItemsProvider));
                       List<String> japaneseNames =
                           ref.watch(selectItemsProvider).split(',');
                       List<String> englishNames = [];
