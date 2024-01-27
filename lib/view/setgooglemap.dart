@@ -35,17 +35,24 @@ class MapSample extends ConsumerWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
-    // テキスト入力結果を取得
-    // final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
     // 設置するマーカーの一覧
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    // final latitude = ref.watch(latitudeProvider);
-    // final longitude = ref.watch(longitudeProvider);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),
           infoWindow: InfoWindow(title: item.name),
+          icon: item.check
+              ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
+              : BitmapDescriptor.defaultMarker, // チェックされている場合は緑色のマーカーを使用
+          onTap: () async {
+            // マーカーをタップしたときの処理
+            await ref
+                .read(autoCompleteSearchProvider.notifier)
+                .toggleMarkerCheck(item.uid);
+          },
         )));
 
     final selectMarker = ref.watch(selectMarkerProvider);
@@ -217,8 +224,6 @@ Future _initializeOnes(WidgetRef ref) async {
   final position = await _determinePosition();
   ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
   ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
-  print(position.latitude);
-  print(position.longitude);
 }
 
 class ShowTextModal extends ConsumerWidget {
@@ -306,22 +311,23 @@ class ShowTextModal extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () async {
+              // 非同期後にcontextが変わってしまう為、現在のcontextを取得しておく。
+              final localContext = context;
               // チェックになっている対象のデータをマップ上にマーカーを設置する。
               // チェックされたPlaceオブジェクトのリストを取得
-              final checkedPlaces = ref
-                  .read(autoCompleteSearchTypeProvider.notifier)
+              final checkedPlaces = await ref
+                  .read(autoCompleteSearchProvider.notifier)
                   .getCheckedPlaces();
-              print('check-$checkedPlaces');
               // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
               for (final place in checkedPlaces) {
-                print('check-$place');
                 await ref
                     .read(autoCompleteSearchTypeProvider.notifier)
                     .addMarker(place.name, place.latitude, place.longitude,
                         place.uid, place.check);
               }
-              // モーダルを閉じる
-              Navigator.pop(context);
+              // 質問Zoom①
+              // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、元の画面のcontextが無くなっているのでエラーになる
+              Navigator.pop(localContext);
             },
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -368,7 +374,6 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
       ),
     ),
     onTap: () async {
-      print("ontap-$place.check");
       if (place.check == false) {
         ref
             .read(autoCompleteSearchProvider.notifier)

@@ -111,6 +111,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     }
   }
 
+// チェックの変更
   Future<void> checkChange(String uid, bool? check) async {
     print("checkChagesメソッド-$check");
     state = [
@@ -118,8 +119,24 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
         if (place.uid == uid) place.copyWith(check: check) else place,
     ];
     for (final test in state) {
-      print(test.check);
       print(test.name);
+      print(test.check);
     }
+  }
+
+  Future<void> toggleMarkerCheck(String uid) async {
+    state = state.map((place) {
+      if (place.uid == uid) {
+        return place.copyWith(check: !place.check); // チェック状態を切り替え
+      }
+      return place;
+    }).toList();
+    // マーカーの色を更新するために状態を更新
+    state = state;
+  }
+
+  // チェックがtrueのPlaceオブジェクトのリストを取得するメソッド
+  Future<List<Place>> getCheckedPlaces() async {
+    return state.where((place) => place.check).toList();
   }
 }

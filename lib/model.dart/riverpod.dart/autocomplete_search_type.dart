@@ -23,9 +23,6 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     const apiUrl =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
     for (String type in typesList) {
-      var test =
-          '$apiUrl?key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=500&types=$type&language=ja';
-      print(test);
       final response = await http.get(Uri.parse(
           '$apiUrl?key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=500&types=$type&language=ja'));
       if (response.statusCode == 200) {
@@ -85,10 +82,5 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
         Place(name: "", latitude: 0.0, longitude: 0.0, uid: uid, check: false);
     places.add(place);
     state = places;
-  }
-
-  // チェックがtrueのPlaceオブジェクトのリストを取得するメソッド
-  List<Place> getCheckedPlaces() {
-    return state.where((place) => place.check).toList();
   }
 }
