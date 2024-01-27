@@ -23,6 +23,9 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     const apiUrl =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
     for (String type in typesList) {
+      var test =
+          '$apiUrl?key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=500&types=$type&language=ja';
+      print(test);
       final response = await http.get(Uri.parse(
           '$apiUrl?key=$_apiKey&location=$currentLatitude,$currentLongitude&radius=500&types=$type&language=ja'));
       if (response.statusCode == 200) {
@@ -56,18 +59,22 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
 
   Future<void> addMarker(String name, double latitude, double longitude,
       String uid, bool check) async {
-    List<Place> places = [];
-    print("addMarker");
-    final place = Place(
+    // 既存のPlaceを検索
+    final existingPlaceIndex = state.indexWhere((place) => place.uid == uid);
+    if (existingPlaceIndex >= 0) {
+      // 既に存在する場合は削除
+      state = List<Place>.from(state)..removeAt(existingPlaceIndex);
+    } else {
+      // 存在しない場合は新しいPlaceを追加
+      final newPlace = Place(
         name: name,
         latitude: latitude,
         longitude: longitude,
         uid: uid,
-        check: false);
-    places.add(place);
-
-    // 現在のstateに新しいPlaceを追加
-    state = [...state, place];
+        check: check,
+      );
+      state = [...state, newPlace];
+    }
   }
 
   Future<void> noneAutoCompleteSearch() async {
@@ -82,6 +89,6 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
 
   // チェックがtrueのPlaceオブジェクトのリストを取得するメソッド
   List<Place> getCheckedPlaces() {
-    return state.where((place) => place.check == true).toList();
+    return state.where((place) => place.check).toList();
   }
 }

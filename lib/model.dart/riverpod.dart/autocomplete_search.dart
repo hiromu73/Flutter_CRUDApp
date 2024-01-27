@@ -112,9 +112,14 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
   }
 
   Future<void> checkChange(String uid, bool? check) async {
+    print("checkChagesメソッド-$check");
     state = [
       for (final place in state)
         if (place.uid == uid) place.copyWith(check: check) else place,
     ];
+    for (final test in state) {
+      print(test.check);
+      print(test.name);
+    }
   }
 }

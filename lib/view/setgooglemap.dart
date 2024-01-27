@@ -36,7 +36,7 @@ class MapSample extends ConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     // テキスト入力結果を取得
-    final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
+    // final selectTextItemeMakers = ref.watch(autoCompleteSearchProvider);
     // 設置するマーカーの一覧
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     // final latitude = ref.watch(latitudeProvider);
@@ -77,11 +77,7 @@ class MapSample extends ConsumerWidget {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
-              markers: Set<Marker>.of(selectItemeMakers.map((item) => Marker(
-                    markerId: MarkerId(item.uid),
-                    position: LatLng(item.latitude, item.longitude),
-                    infoWindow: InfoWindow(title: item.name),
-                  ))), //markerの設置
+              markers: markers, //markerの設置
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
@@ -221,6 +217,8 @@ Future _initializeOnes(WidgetRef ref) async {
   final position = await _determinePosition();
   ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
   ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
+  print(position.latitude);
+  print(position.longitude);
 }
 
 class ShowTextModal extends ConsumerWidget {
@@ -313,9 +311,10 @@ class ShowTextModal extends ConsumerWidget {
               final checkedPlaces = ref
                   .read(autoCompleteSearchTypeProvider.notifier)
                   .getCheckedPlaces();
+              print('check-$checkedPlaces');
               // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
               for (final place in checkedPlaces) {
-                print('check');
+                print('check-$place');
                 await ref
                     .read(autoCompleteSearchTypeProvider.notifier)
                     .addMarker(place.name, place.latitude, place.longitude,
@@ -369,6 +368,7 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
       ),
     ),
     onTap: () async {
+      print("ontap-$place.check");
       if (place.check == false) {
         ref
             .read(autoCompleteSearchProvider.notifier)
@@ -416,7 +416,7 @@ class ShowModal extends ConsumerWidget {
                           englishNames.add(itemNameMap[trimmedJapaneseName]!);
                         }
                       }
-                      ref
+                      await ref
                           .read(autoCompleteSearchTypeProvider.notifier)
                           .autoCompleteSearchType(
                               englishNames, latitude, longitude);
@@ -436,7 +436,7 @@ class ShowModal extends ConsumerWidget {
                         englishNames.add(itemNameMap[trimmedJapaneseName]!);
                       }
                     }
-                    ref
+                    await ref
                         .read(autoCompleteSearchTypeProvider.notifier)
                         .autoCompleteSearchType(
                             englishNames, latitude, longitude);
