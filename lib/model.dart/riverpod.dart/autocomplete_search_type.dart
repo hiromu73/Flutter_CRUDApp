@@ -74,6 +74,19 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     }
   }
 
+    Future<void> toggleMarkerCheck(String uid) async {
+    state = state.map((place) {
+      if (place.uid == uid) {
+        print("test");
+        return place.copyWith(check: !place.check); // チェック状態を切り替え
+      }
+      return place;
+    }).toList();
+    print("toggleMarkerCheck");
+    // マーカーの色を更新するために状態を更新
+    state = state;
+  }
+
   Future<void> noneAutoCompleteSearch() async {
     List<Place> places = [];
     final uid =

@@ -39,6 +39,9 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+    final pageController = PageController(
+      viewportFraction: 0.85,
+    );
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -50,20 +53,22 @@ class MapSample extends ConsumerWidget {
           onTap: () async {
             // マーカーをタップしたときの処理
             await ref
-                .read(autoCompleteSearchProvider.notifier)
+                .read(autoCompleteSearchTypeProvider.notifier)
                 .toggleMarkerCheck(item.uid);
+            //タップしたマーカー(shop)のindexを取得
+            final index = selectItemeMakers.indexWhere((shop) => shop == item);
+            pageController.jumpToPage(index);
           },
         )));
 
     final selectMarker = ref.watch(selectMarkerProvider);
-    GoogleMapController mapController;
+    GoogleMapController? mapController;
 
     // IDのリスト
     List<String> idList = [];
-    var uuid = Uuid();
+    var uuid = const Uuid();
     var newId = uuid.v4();
     while (idList.any((id) => id == newId)) {
-      // 被りがあるので、IDを再生成する
       newId = uuid.v4();
     }
     idList.add(newId);
@@ -84,17 +89,14 @@ class MapSample extends ConsumerWidget {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
-              markers: markers, //markerの設置
+              markers: markers,
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               onTap: (LatLng latLang) {
-                // maker追加
-                // ref.read().addMarker(latLang);
-                // 以下マーカーが選択された時の処理
-                // 選択されていない場合
-                // if (selectMarker != true) {}
+                // map上に新たにマーカーを追加(初回時は緑の状態)
+                // ref.read(autoCompleteSearchTypeProvider.notifier).addMarker(latLang);
               },
               zoomGesturesEnabled: true,
             ),
@@ -122,7 +124,7 @@ class MapSample extends ConsumerWidget {
                         backgroundColor: Colors.transparent,
                         barrierColor: Colors.black.withOpacity(0.6),
                         builder: (context) {
-                          return ShowModal();
+                          return const ShowModal();
                         });
                   }),
             ),
@@ -169,24 +171,85 @@ class MapSample extends ConsumerWidget {
                             // テキスト検索モーダル
                             return ShowTextModal();
                           });
-                      // モーダルを閉じたら、テキスト検索全て無くす。
-                      // .whenComplete(() async => await ref
-                      //     .read(autoCompleteSearchProvider.notifier)
-                      //     .noneAutoCompleteSearch());
                     },
                   ),
                 )),
+            Align(
+              alignment: const Alignment(-1.0, 1.0),
+              child: cardSection(ref),
+            ),
             // 登録ボタン
             Align(
-                alignment: const Alignment(0.94, 0.8),
+                alignment: const Alignment(0.94, 0.5),
                 child: FloatingActionButton(
                     child: const Icon(Icons.create),
                     onPressed: () => {Navigator.pop(context)}))
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            await mapController?.animateCamera(
+              CameraUpdate.newLatLng(LatLng(
+                latitude,
+                longitude,
+              )),
+            );
+          },
+          child: const Icon(Icons.my_location),
+        ),
       ),
     );
   }
+}
+
+Widget cardSection(WidgetRef ref) {
+  final items = ref.watch(autoCompleteSearchTypeProvider);
+  final pageController = PageController(
+    viewportFraction: 0.85, //0.85くらいで端っこに別のカードが見えてる感じになる
+  );
+  GoogleMapController? mapController;
+  return Container(
+    height: 148,
+    width: 350,
+    padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+    child: PageView(
+      onPageChanged: (int index) async {
+        //スワイプ後のページのお店を取得
+        final selectedShop = items.elementAt(index);
+        //現在のズームレベルを取得
+        final zoomLevel = await mapController!.getZoomLevel();
+        //スワイプ後のお店の座標までカメラを移動
+        mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(selectedShop.latitude, selectedShop.longitude),
+              zoom: zoomLevel,
+            ),
+          ),
+        );
+      },
+      controller: pageController,
+      children: _shopTiles(ref),
+    ),
+  );
+}
+
+//カード1枚1枚について
+List<Widget> _shopTiles(WidgetRef ref) {
+  final items = ref.watch(autoCompleteSearchTypeProvider);
+  final shopTiles = items.map(
+    (shop) {
+      return Card(
+        child: SizedBox(
+          height: 100,
+          child: Center(
+            child: Text(shop.name),
+          ),
+        ),
+      );
+    },
+  ).toList();
+  return shopTiles;
 }
 
 // 現在位置を取得するメソッド
