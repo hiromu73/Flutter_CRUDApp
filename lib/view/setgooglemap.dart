@@ -62,7 +62,6 @@ class MapSample extends ConsumerWidget {
         )));
 
     final selectMarker = ref.watch(selectMarkerProvider);
-    GoogleMapController? mapController;
 
     // IDのリスト
     List<String> idList = [];
@@ -72,12 +71,20 @@ class MapSample extends ConsumerWidget {
       newId = uuid.v4();
     }
     idList.add(newId);
-
     _initializeOnes(ref);
     // 画面が初期化された際にフォーカスを外す
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
+
+    final mapControllerCompleter = Completer<GoogleMapController>();
+    Future<void> onMapCreated(GoogleMapController controller) async {
+      mapControllerCompleter.complete(controller);
+    }
+    // late GoogleMapController mapController;
+    // Future<void> onMapCreated(GoogleMapController controller) async {
+    //   mapController = controller;
+    // }
 
     return SizedBox(
       height: height,
@@ -86,14 +93,12 @@ class MapSample extends ConsumerWidget {
         body: Stack(
           children: <Widget>[
             GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-              },
+              onMapCreated: onMapCreated,
               markers: markers,
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
-              myLocationButtonEnabled: true,
+              myLocationButtonEnabled: false,
               onTap: (LatLng latLang) {
                 // map上に新たにマーカーを追加(初回時は緑の状態)
                 // ref.read(autoCompleteSearchTypeProvider.notifier).addMarker(latLang);
@@ -178,24 +183,106 @@ class MapSample extends ConsumerWidget {
               alignment: const Alignment(-1.0, 1.0),
               child: cardSection(ref),
             ),
-            // 登録ボタン
             Align(
-                alignment: const Alignment(0.94, 0.5),
-                child: FloatingActionButton(
-                    child: const Icon(Icons.create),
-                    onPressed: () => {Navigator.pop(context)}))
+              alignment: const Alignment(0.95, 0.1),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10.0, bottom: 30.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // 登録ボタン
+                    ClipOval(
+                      child: Material(
+                        color: Colors.blue[400], // ボタンを押す前のカラー
+                        child: InkWell(
+                            splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                            child: const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Icon(Icons.create, color: Colors.white),
+                            ),
+                            onTap: () => {Navigator.pop(context)}),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // 現在位置ボタン
+                    ClipOval(
+                      child: Material(
+                        color: Colors.blue[400], // ボタンを押す前のカラー
+                        child: InkWell(
+                          splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                          child: const SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Icon(Icons.my_location, color: Colors.white),
+                          ),
+                          onTap: () async {
+                            print('aaa');
+                            final mapController =
+                                await mapControllerCompleter.future;
+
+                            mapController.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: LatLng(ref.watch(latitudeProvider),
+                                      ref.watch(longitudeProvider)),
+                                  zoom: 18.0,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // ズームインボタン
+                    ClipOval(
+                      child: Material(
+                        color: Colors.blue[400], // ボタンを押す前のカラー
+                        child: InkWell(
+                          splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                          child: const SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Icon(Icons.add, color: Colors.white),
+                          ),
+                          onTap: () async {
+                            final mapController =
+                                await mapControllerCompleter.future;
+                            mapController.animateCamera(
+                              CameraUpdate.zoomIn(),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // ズームアウトボタン
+                    ClipOval(
+                      child: Material(
+                        color: Colors.blue[400], // ボタンを押す前のカラー
+                        child: InkWell(
+                          splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                          child: const SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Icon(Icons.remove, color: Colors.white),
+                          ),
+                          onTap: () async {
+                            final mapController =
+                                await mapControllerCompleter.future;
+                            mapController.animateCamera(
+                              CameraUpdate.zoomOut(),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            await mapController?.animateCamera(
-              CameraUpdate.newLatLng(LatLng(
-                latitude,
-                longitude,
-              )),
-            );
-          },
-          child: const Icon(Icons.my_location),
         ),
       ),
     );
@@ -210,7 +297,7 @@ Widget cardSection(WidgetRef ref) {
   GoogleMapController? mapController;
   return Container(
     height: 148,
-    width: 350,
+    width: 355,
     padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
     child: PageView(
       onPageChanged: (int index) async {
