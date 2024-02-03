@@ -190,7 +190,7 @@ class MapSample extends ConsumerWidget {
                     },
                   ),
                 )),
-            Align(alignment: const Alignment(-0.5, 0.9), child: CardSection()),
+            Align(alignment: const Alignment(0.0, 0.95), child: CardSection()),
             Align(
               alignment: const Alignment(0.95, 0.1),
               child: Padding(
@@ -238,46 +238,45 @@ class MapSample extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    // ズームインボタン
-                    ClipOval(
-                      child: Material(
-                        color: Colors.blue[400], // ボタンを押す前のカラー
-                        child: InkWell(
-                          splashColor: Colors.blue[100], // ボタンを押した後のカラー
-                          child: const SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Icon(Icons.add, color: Colors.white),
-                          ),
-                          onTap: () async {
-                            await _mapController.animateCamera(
-                              CameraUpdate.zoomIn(),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // ズームアウトボタン
-                    ClipOval(
-                      child: Material(
-                        color: Colors.blue[400], // ボタンを押す前のカラー
-                        child: InkWell(
-                          splashColor: Colors.blue[100], // ボタンを押した後のカラー
-                          child: const SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Icon(Icons.remove, color: Colors.white),
-                          ),
-                          onTap: () async {
-                            await _mapController.animateCamera(
-                              CameraUpdate.zoomOut(),
-                            );
-                          },
-                        ),
-                      ),
-                    )
+                    // // ズームインボタン // 必要か検討？
+                    // ClipOval(
+                    //   child: Material(
+                    //     color: Colors.blue[400], // ボタンを押す前のカラー
+                    //     child: InkWell(
+                    //       splashColor: Colors.blue[100], // ボタンを押した後のカラー
+                    //       child: const SizedBox(
+                    //         width: 50,
+                    //         height: 50,
+                    //         child: Icon(Icons.add, color: Colors.white),
+                    //       ),
+                    //       onTap: () async {
+                    //         await _mapController.animateCamera(
+                    //           CameraUpdate.zoomIn(),
+                    //         );
+                    //       },
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 10),
+                    // // ズームアウトボタン
+                    // ClipOval(
+                    //   child: Material(
+                    //     color: Colors.blue[400], // ボタンを押す前のカラー
+                    //     child: InkWell(
+                    //       splashColor: Colors.blue[100], // ボタンを押した後のカラー
+                    //       child: const SizedBox(
+                    //         width: 50,
+                    //         height: 50,
+                    //         child: Icon(Icons.remove, color: Colors.white),
+                    //       ),
+                    //       onTap: () async {
+                    //         await _mapController.animateCamera(
+                    //           CameraUpdate.zoomOut(),
+                    //         );
+                    //       },
+                    //     ),
+                    //   ),
+                    // )
                   ],
                 ),
               ),
@@ -303,10 +302,13 @@ class CardSection extends ConsumerWidget {
         ref.read(googleMapControllerProvider);
 
     return Container(
-      color: Colors.grey.withOpacity(0.5),
-      height: 148,
-      width: 300,
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey.withOpacity(0.6),
+      ),
+      height: 150,
+      width: 380,
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: PageView(
         onPageChanged: (int index) async {
           //スワイプ後のページのお店を取得
