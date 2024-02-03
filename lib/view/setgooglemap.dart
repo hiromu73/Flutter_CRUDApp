@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/constants/string.dart';
+import 'package:flutter_crudapp/model.dart/googlemapcontrollernotifier.dart';
 import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
@@ -22,6 +23,11 @@ import 'package:google_place/google_place.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
+final googleMapControllerProvider =
+    StateNotifierProvider<GoogleMapControllerNotifier, GoogleMapController?>(
+  (ref) => GoogleMapControllerNotifier(),
+);
+
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
 
@@ -31,10 +37,12 @@ class MapSample extends ConsumerWidget {
     zoom: 15.0,
   );
 
-  late GoogleMapController mapController;
   final pageController = PageController(
     viewportFraction: 0.85,
   );
+
+  late GoogleMapController _mapController;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
@@ -44,6 +52,7 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+    final selectMarker = ref.watch(selectMarkerProvider);
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -62,8 +71,6 @@ class MapSample extends ConsumerWidget {
             pageController.jumpToPage(index);
           },
         )));
-
-    final selectMarker = ref.watch(selectMarkerProvider);
 
     // IDのリスト
     List<String> idList = [];
@@ -87,7 +94,10 @@ class MapSample extends ConsumerWidget {
           children: <Widget>[
             GoogleMap(
               onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
+                _mapController = controller;
+                ref
+                    .read(googleMapControllerProvider.notifier)
+                    .setController(controller);
               },
               markers: markers,
               mapType: MapType.normal,
@@ -180,10 +190,7 @@ class MapSample extends ConsumerWidget {
                     },
                   ),
                 )),
-            Align(
-              alignment: const Alignment(-0.5, 0.9),
-              child: cardSection(ref),
-            ),
+            Align(alignment: const Alignment(-0.5, 0.9), child: CardSection()),
             Align(
               alignment: const Alignment(0.95, 0.1),
               child: Padding(
@@ -218,9 +225,7 @@ class MapSample extends ConsumerWidget {
                             child: Icon(Icons.my_location, color: Colors.white),
                           ),
                           onTap: () async {
-                            // final mapController =
-                            //     await mapControllerCompleter.future;
-                            await mapController.animateCamera(
+                            await _mapController.animateCamera(
                               CameraUpdate.newCameraPosition(
                                 CameraPosition(
                                   target: LatLng(ref.watch(latitudeProvider),
@@ -246,7 +251,7 @@ class MapSample extends ConsumerWidget {
                             child: Icon(Icons.add, color: Colors.white),
                           ),
                           onTap: () async {
-                            await mapController.animateCamera(
+                            await _mapController.animateCamera(
                               CameraUpdate.zoomIn(),
                             );
                           },
@@ -266,7 +271,7 @@ class MapSample extends ConsumerWidget {
                             child: Icon(Icons.remove, color: Colors.white),
                           ),
                           onTap: () async {
-                            await mapController.animateCamera(
+                            await _mapController.animateCamera(
                               CameraUpdate.zoomOut(),
                             );
                           },
@@ -284,38 +289,47 @@ class MapSample extends ConsumerWidget {
   }
 }
 
-Widget cardSection(WidgetRef ref) {
-  final items = ref.watch(autoCompleteSearchTypeProvider);
-  final pageController = PageController(
-    viewportFraction: 0.85, //0.85くらいで端っこに別のカードが見えてる感じになる
-  );
-  GoogleMapController? mapController;
+class CardSection extends ConsumerWidget {
+  final TextEditingController textController = TextEditingController();
+  CardSection({Key? key}) : super(key: key);
 
-  return Container(
-    color: Colors.grey.withOpacity(0.5),
-    height: 148,
-    width: 300,
-    padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-    child: PageView(
-      onPageChanged: (int index) async {
-        //スワイプ後のページのお店を取得
-        final selectedShop = items.elementAt(index);
-        //現在のズームレベルを取得
-        final zoomLevel = await mapController!.getZoomLevel();
-        //スワイプ後のお店の座標までカメラを移動
-        mapController.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(selectedShop.latitude, selectedShop.longitude),
-              zoom: zoomLevel,
-            ),
-          ),
-        );
-      },
-      controller: pageController,
-      children: _shopTiles(ref),
-    ),
-  );
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(autoCompleteSearchTypeProvider);
+    final pageController = PageController(
+      viewportFraction: 0.85, //0.85くらいで端っこに別のカードが見えてる感じになる
+    );
+    final GoogleMapController? mapController =
+        ref.read(googleMapControllerProvider);
+
+    return Container(
+      color: Colors.grey.withOpacity(0.5),
+      height: 148,
+      width: 300,
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+      child: PageView(
+        onPageChanged: (int index) async {
+          //スワイプ後のページのお店を取得
+          final selectedShop = items.elementAt(index);
+          //現在のズームレベルを取得
+          if (mapController != null) {
+            final zoomLevel = await mapController.getZoomLevel();
+            //スワイプ後のお店の座標までカメラを移動
+            mapController.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  target: LatLng(selectedShop.latitude, selectedShop.longitude),
+                  zoom: zoomLevel,
+                ),
+              ),
+            );
+          }
+        },
+        controller: pageController,
+        children: _shopTiles(ref),
+      ),
+    );
+  }
 }
 
 //カード1枚1枚について
