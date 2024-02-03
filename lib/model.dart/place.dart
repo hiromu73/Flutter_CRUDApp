@@ -1,17 +1,16 @@
 class Place {
-  final String name;
+  final String? name;
   final double latitude;
   final double longitude;
   final String uid;
   final bool check;
   Place({
-    required this.name,
+    this.name,
     required this.latitude,
     required this.longitude,
     required this.uid,
     this.check = false,
   });
-
 
   Place copyWith({
     String? name,

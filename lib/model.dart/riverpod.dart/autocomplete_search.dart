@@ -127,8 +127,8 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
   Future<void> toggleMarkerCheck(String uid) async {
     state = state.map((place) {
       if (place.uid == uid) {
-        print("test");
-        return place.copyWith(check: !place.check); // チェック状態を切り替え
+        // チェック状態を切り替え
+        return place.copyWith(check: !place.check);
       }
       return place;
     }).toList();

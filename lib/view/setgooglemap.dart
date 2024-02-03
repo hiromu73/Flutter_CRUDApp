@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/api.dart';
@@ -39,7 +40,10 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-    final pageController = PageController(
+
+    late PageController pageController;
+    late GoogleMapController mapController;
+    pageController = PageController(
       viewportFraction: 0.85,
     );
 
@@ -49,7 +53,7 @@ class MapSample extends ConsumerWidget {
           infoWindow: InfoWindow(title: item.name),
           icon: item.check
               ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
-              : BitmapDescriptor.defaultMarker, // チェックされている場合は緑色のマーカーを使用
+              : BitmapDescriptor.defaultMarker,
           onTap: () async {
             // マーカーをタップしたときの処理
             await ref
@@ -77,15 +81,6 @@ class MapSample extends ConsumerWidget {
       FocusScope.of(context).unfocus();
     });
 
-    final mapControllerCompleter = Completer<GoogleMapController>();
-    Future<void> onMapCreated(GoogleMapController controller) async {
-      mapControllerCompleter.complete(controller);
-    }
-    // late GoogleMapController mapController;
-    // Future<void> onMapCreated(GoogleMapController controller) async {
-    //   mapController = controller;
-    // }
-
     return SizedBox(
       height: height,
       width: width,
@@ -93,15 +88,23 @@ class MapSample extends ConsumerWidget {
         body: Stack(
           children: <Widget>[
             GoogleMap(
-              onMapCreated: onMapCreated,
+              onMapCreated: (GoogleMapController controller) {
+                mapController = controller;
+              },
               markers: markers,
               mapType: MapType.normal,
               initialCameraPosition: initialLocation,
               myLocationEnabled: true,
               myLocationButtonEnabled: false,
               onTap: (LatLng latLang) {
-                // map上に新たにマーカーを追加(初回時は緑の状態)
-                // ref.read(autoCompleteSearchTypeProvider.notifier).addMarker(latLang);
+                // // map上に新たにマーカーを追加(初回時はチェックされている状態なので緑になる。)
+                // final latitude = latLang.latitude;
+                // final longitude = latLang.longitude;
+                // final uid =
+                //     '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
+                // ref
+                //     .read(autoCompleteSearchTypeProvider.notifier)
+                //     .onTapAddMarker(latitude, longitude, uid, true);
               },
               zoomGesturesEnabled: true,
             ),
@@ -180,7 +183,7 @@ class MapSample extends ConsumerWidget {
                   ),
                 )),
             Align(
-              alignment: const Alignment(-1.0, 1.0),
+              alignment: const Alignment(-0.5, 0.9),
               child: cardSection(ref),
             ),
             Align(
@@ -217,16 +220,14 @@ class MapSample extends ConsumerWidget {
                             child: Icon(Icons.my_location, color: Colors.white),
                           ),
                           onTap: () async {
-                            print('aaa');
-                            final mapController =
-                                await mapControllerCompleter.future;
-
-                            mapController.animateCamera(
+                            // final mapController =
+                            //     await mapControllerCompleter.future;
+                            await mapController.animateCamera(
                               CameraUpdate.newCameraPosition(
                                 CameraPosition(
                                   target: LatLng(ref.watch(latitudeProvider),
                                       ref.watch(longitudeProvider)),
-                                  zoom: 18.0,
+                                  zoom: 15.0,
                                 ),
                               ),
                             );
@@ -240,16 +241,14 @@ class MapSample extends ConsumerWidget {
                       child: Material(
                         color: Colors.blue[400], // ボタンを押す前のカラー
                         child: InkWell(
-                          splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                          splashColor: Colors.blue[100], // ボタンを押した後のカラー
                           child: const SizedBox(
                             width: 50,
                             height: 50,
                             child: Icon(Icons.add, color: Colors.white),
                           ),
                           onTap: () async {
-                            final mapController =
-                                await mapControllerCompleter.future;
-                            mapController.animateCamera(
+                            await mapController.animateCamera(
                               CameraUpdate.zoomIn(),
                             );
                           },
@@ -262,16 +261,14 @@ class MapSample extends ConsumerWidget {
                       child: Material(
                         color: Colors.blue[400], // ボタンを押す前のカラー
                         child: InkWell(
-                          splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                          splashColor: Colors.blue[100], // ボタンを押した後のカラー
                           child: const SizedBox(
                             width: 50,
                             height: 50,
                             child: Icon(Icons.remove, color: Colors.white),
                           ),
                           onTap: () async {
-                            final mapController =
-                                await mapControllerCompleter.future;
-                            mapController.animateCamera(
+                            await mapController.animateCamera(
                               CameraUpdate.zoomOut(),
                             );
                           },
@@ -295,9 +292,11 @@ Widget cardSection(WidgetRef ref) {
     viewportFraction: 0.85, //0.85くらいで端っこに別のカードが見えてる感じになる
   );
   GoogleMapController? mapController;
+
   return Container(
+    color: Colors.grey.withOpacity(0.5),
     height: 148,
-    width: 355,
+    width: 300,
     padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
     child: PageView(
       onPageChanged: (int index) async {
@@ -330,7 +329,7 @@ List<Widget> _shopTiles(WidgetRef ref) {
         child: SizedBox(
           height: 100,
           child: Center(
-            child: Text(shop.name),
+            child: Text(shop.name!),
           ),
         ),
       );
@@ -386,8 +385,6 @@ class ShowTextModal extends ConsumerWidget {
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    // final selectItem = ref.watch(selectItemsProvider);
-    // final preditons = ref.watch(predictionsProvider);
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -472,11 +469,12 @@ class ShowTextModal extends ConsumerWidget {
               for (final place in checkedPlaces) {
                 await ref
                     .read(autoCompleteSearchTypeProvider.notifier)
-                    .addMarker(place.name, place.latitude, place.longitude,
+                    .addMarker(place.name!, place.latitude, place.longitude,
                         place.uid, place.check);
               }
               // 質問Zoom①
-              // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、元の画面のcontextが無くなっているのでエラーになる
+              // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、
+              // 元の画面のcontextが無くなっているのでエラーになる
               Navigator.pop(localContext);
             },
             style: ElevatedButton.styleFrom(
@@ -507,7 +505,7 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
         children: <Widget>[
           Flexible(
             child: ListTile(
-              title: Text(place.name),
+              title: Text(place.name!),
               subtitle: Text('現在地から${distanceInMeters.toStringAsFixed(0)} km'),
               trailing: Checkbox(
                   shape: const RoundedRectangleBorder(

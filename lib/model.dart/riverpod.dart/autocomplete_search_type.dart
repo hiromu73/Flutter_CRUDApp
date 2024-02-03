@@ -74,6 +74,25 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     }
   }
 
+  Future<void> onTapAddMarker(double latitude, double longitude,
+      String uid, bool check) async {
+    // 既存のPlaceを検索
+    final existingPlaceIndex = state.indexWhere((place) => place.uid == uid);
+    if (existingPlaceIndex >= 0) {
+      // 既に存在する場合は削除
+      state = List<Place>.from(state)..removeAt(existingPlaceIndex);
+    } else {
+      // 存在しない場合は新しいPlaceを追加
+      final newPlace = Place(
+        latitude: latitude,
+        longitude: longitude,
+        uid: uid,
+        check: check,
+      );
+      state = [...state, newPlace];
+    }
+  }
+
     Future<void> toggleMarkerCheck(String uid) async {
     state = state.map((place) {
       if (place.uid == uid) {
