@@ -31,6 +31,10 @@ class MapSample extends ConsumerWidget {
     zoom: 15.0,
   );
 
+  late GoogleMapController mapController;
+  final pageController = PageController(
+    viewportFraction: 0.85,
+  );
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var height = MediaQuery.of(context).size.height;
@@ -40,12 +44,6 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-
-    late PageController pageController;
-    late GoogleMapController mapController;
-    pageController = PageController(
-      viewportFraction: 0.85,
-    );
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
