@@ -190,7 +190,9 @@ class MapSample extends ConsumerWidget {
                     },
                   ),
                 )),
-            Align(alignment: const Alignment(0.0, 0.95), child: CardSection()),
+            Align(
+                alignment: const Alignment(0.0, 0.95),
+                child: CardSection(pageController: pageController)),
             Align(
               alignment: const Alignment(0.95, 0.1),
               child: Padding(
@@ -288,16 +290,20 @@ class MapSample extends ConsumerWidget {
   }
 }
 
+// マーカーの情報をcardで表示
+// 今後は写真と現在位置からの距離、ルートを実装する。
 class CardSection extends ConsumerWidget {
   final TextEditingController textController = TextEditingController();
-  CardSection({Key? key}) : super(key: key);
+  final PageController pageController;
+  CardSection({Key? key, required this.pageController}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     final items = ref.watch(autoCompleteSearchTypeProvider);
-    final pageController = PageController(
-      viewportFraction: 0.85, //0.85くらいで端っこに別のカードが見えてる感じになる
-    );
+
     final GoogleMapController? mapController =
         ref.read(googleMapControllerProvider);
 
