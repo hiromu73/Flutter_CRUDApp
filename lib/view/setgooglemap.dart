@@ -52,7 +52,6 @@ class MapSample extends ConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-    final selectMarker = ref.watch(selectMarkerProvider);
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -82,7 +81,7 @@ class MapSample extends ConsumerWidget {
     idList.add(newId);
     _initializeOnes(ref);
     // 画面が初期化された際にフォーカスを外す
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
 
@@ -303,7 +302,6 @@ class CardSection extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final items = ref.watch(autoCompleteSearchTypeProvider);
-
     final GoogleMapController? mapController =
         ref.read(googleMapControllerProvider);
 
@@ -319,6 +317,7 @@ class CardSection extends ConsumerWidget {
         onPageChanged: (int index) async {
           //スワイプ後のページのお店を取得
           final selectedShop = items.elementAt(index);
+          print(selectedShop.name);
           //現在のズームレベルを取得
           if (mapController != null) {
             final zoomLevel = await mapController.getZoomLevel();
@@ -334,22 +333,29 @@ class CardSection extends ConsumerWidget {
           }
         },
         controller: pageController,
-        children: _shopTiles(ref),
+        children: shopTiles(ref),
       ),
     );
   }
 }
 
 //カード1枚1枚について
-List<Widget> _shopTiles(WidgetRef ref) {
+List<Widget> shopTiles(WidgetRef ref) {
   final items = ref.watch(autoCompleteSearchTypeProvider);
   final shopTiles = items.map(
     (shop) {
-      return Card(
-        child: SizedBox(
-          height: 100,
-          child: Center(
-            child: Text(shop.name!),
+      return Align(
+        alignment: const Alignment(-3.5, 0.1),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: SizedBox(
+            height: 150,
+            width: 300,
+            child: Center(
+              child: Text(shop.name!),
+            ),
           ),
         ),
       );
@@ -404,7 +410,6 @@ class ShowTextModal extends ConsumerWidget {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-    final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -463,7 +468,7 @@ class ShowTextModal extends ConsumerWidget {
                 await ref
                     .read(autoCompleteSearchProvider.notifier)
                     .noneAutoCompleteSearch();
-                // 前の結果が残る。(速さによる)(更新はされている。非同期の問題)
+                // 前の結果が残る。(速さによる)(更新はされている。非同期の問題？) 質問Zoom②
               }
             },
           ),
@@ -495,7 +500,7 @@ class ShowTextModal extends ConsumerWidget {
               // 質問Zoom①
               // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、
               // 元の画面のcontextが無くなっているのでエラーになる
-              Navigator.pop(localContext);
+              // Navigator.pop(localContext);
             },
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
