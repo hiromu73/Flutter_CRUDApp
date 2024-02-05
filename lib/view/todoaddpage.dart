@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import './todoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
@@ -15,7 +16,27 @@ class TodoAddPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
+    // チェックがtrueとなっている状態をする。
+    final checkList = ref
+        .watch(autoCompleteSearchTypeProvider)
+        .where((marker) => marker.check == true)
+        .toList();
+
+    // チェックがtrueとなっているマーカーのnameを取得
+    List<String?> checkedMarkerNames =
+        checkList.map((marker) => marker.name).toList();
+
+// チェックがtrueとなっているマーカーのlatitudeを取得
+    List<double> checkedMarkerLatitudes =
+        checkList.map((marker) => marker.latitude).toList();
+
+// チェックがtrueとなっているマーカーのlongitudeを取得
+    List<double> checkedMarkerLongitudes =
+        checkList.map((marker) => marker.longitude).toList();
+
+    print(checkedMarkerNames);
+    print(checkedMarkerLatitudes);
+    print(checkedMarkerLongitudes);
 
     return Scaffold(
       appBar: AppBar(

@@ -70,7 +70,11 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
         uid: uid,
         check: check,
       );
-      state = [...state, newPlace];
+      if (state.isEmpty) {
+        state = [newPlace];
+      } else {
+        state = [...state, newPlace];
+      }
     }
   }
 

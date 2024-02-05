@@ -317,7 +317,6 @@ class CardSection extends ConsumerWidget {
         onPageChanged: (int index) async {
           //スワイプ後のページのお店を取得
           final selectedShop = items.elementAt(index);
-          print(selectedShop.name);
           //現在のズームレベルを取得
           if (mapController != null) {
             final zoomLevel = await mapController.getZoomLevel();
