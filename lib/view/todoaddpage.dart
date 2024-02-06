@@ -38,6 +38,12 @@ class TodoAddPage extends ConsumerWidget {
     print(checkedMarkerLatitudes);
     print(checkedMarkerLongitudes);
 
+    // メモ内容
+    final textMemo = ref.watch(memoProvider);
+
+    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    TextEditingController _textController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -97,23 +103,27 @@ class TodoAddPage extends ConsumerWidget {
                 child: const Text(positionSearch),
               ),
               const SizedBox(height: 8),
+              Text("$checkedMarkerNames"),
+              const SizedBox(height: 8),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30))),
                 onPressed: () async {
-                  final date = DateTime.now().toLocal().toIso8601String();
-                  await FirebaseFirestore.instance
-                      .collection('post')
-                      .doc()
-                      .set({
-                    'text': ref.watch(memoProvider.notifier).state,
-                    //'latitude': mapPosition.toString().split(','),
-                    //'longitude': mapPosition.toString().split(','),
-                    'date': date,
-                    'alert': true,
-                  });
-                  Navigator.of(context).pop();
+                  if (textMemo != "") {
+                    final date = DateTime.now().toLocal().toIso8601String();
+                    await FirebaseFirestore.instance
+                        .collection('post')
+                        .doc()
+                        .set({
+                      'text': textMemo,
+                      //'latitude': mapPosition.toString().split(','),
+                      //'longitude': mapPosition.toString().split(','),
+                      'date': date,
+                      'alert': true,
+                    });
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: const Text(registration),
               )
