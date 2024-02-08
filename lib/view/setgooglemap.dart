@@ -304,6 +304,8 @@ class CardSection extends ConsumerWidget {
     final items = ref.watch(autoCompleteSearchTypeProvider);
     final GoogleMapController? mapController =
         ref.read(googleMapControllerProvider);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -332,15 +334,30 @@ class CardSection extends ConsumerWidget {
           }
         },
         controller: pageController,
-        children: shopTiles(ref),
+        children: shopTiles(ref, latitude, longitude),
       ),
     );
   }
 }
 
 //カード1枚1枚について
-List<Widget> shopTiles(WidgetRef ref) {
+List<Widget> shopTiles(
+  WidgetRef ref,
+  double currentLatitude,
+  double currentLongitude,
+) {
   final items = ref.watch(autoCompleteSearchTypeProvider);
+  List<double> distances = items.map((place) {
+    double distanceInMeters = Geolocator.distanceBetween(
+      currentLatitude,
+      currentLongitude,
+      place.latitude,
+      place.longitude,
+    );
+    return distanceInMeters;
+  }).toList();
+  // 複数取得？[1]目が正確。
+
   final shopTiles = items.map(
     (shop) {
       return Align(
@@ -353,7 +370,12 @@ List<Widget> shopTiles(WidgetRef ref) {
             height: 150,
             width: 300,
             child: Center(
-              child: Text(shop.name!),
+              child: Column(
+                children: [
+                  Text(shop.name!),
+                  Text('現在地から${distances[1].ceilToDouble()} km'),
+                ],
+              ),
             ),
           ),
         ),

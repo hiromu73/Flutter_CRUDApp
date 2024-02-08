@@ -33,16 +33,12 @@ class TodoAddPage extends ConsumerWidget {
 // チェックがtrueとなっているマーカーのlongitudeを取得
     List<double> checkedMarkerLongitudes =
         checkList.map((marker) => marker.longitude).toList();
-
-    print(checkedMarkerNames);
-    print(checkedMarkerLatitudes);
-    print(checkedMarkerLongitudes);
+    // print(checkedMarkerNames);
+    // print(checkedMarkerLatitudes);
+    // print(checkedMarkerLongitudes);
 
     // メモ内容
     final textMemo = ref.watch(memoProvider);
-
-    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-    TextEditingController _textController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -103,7 +99,21 @@ class TodoAddPage extends ConsumerWidget {
                 child: const Text(positionSearch),
               ),
               const SizedBox(height: 8),
-              Text("$checkedMarkerNames"),
+              Center(
+                child: Column(
+                  children: [
+                    const Text("選択されている位置情報"),
+                    ListView.builder(
+                      itemCount: checkedMarkerNames.length,
+                      itemBuilder: (context, index) {
+                        return Text(checkedMarkerNames[index]!);
+                      },
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 8),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -150,4 +160,25 @@ class TodoAddPage extends ConsumerWidget {
       // ),
     );
   }
+}
+
+Widget markerNames(List<String?> name) {
+  if (name.isNotEmpty) {
+    print("isNotEmpty");
+    return Column(children: [
+      const Text("選択されている位置情報"),
+      checkNames(name),
+    ]);
+  } else {
+    return Container();
+  }
+}
+
+Widget checkNames(List<String?> name) {
+  return ListView.builder(
+    itemCount: name.length,
+    itemBuilder: (context, index) {
+      return Text(name[index]!);
+    },
+  );
 }
