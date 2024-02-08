@@ -358,6 +358,7 @@ List<Widget> shopTiles(
   }).toList();
   // 複数取得？[1]目が正確。
 
+  print(distances);
   final shopTiles = items.map(
     (shop) {
       return Align(
@@ -373,7 +374,10 @@ List<Widget> shopTiles(
               child: Column(
                 children: [
                   Text(shop.name!),
-                  Text('現在地から${distances[1].ceilToDouble()} km'),
+                  if (shop.name != null) ...[
+                    
+                    Text('現在地から${distances[0].ceilToDouble()} km')
+                  ]
                 ],
               ),
             ),
