@@ -16,6 +16,8 @@ class TodoAddPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final editController = TextEditingController();
+
     // チェックがtrueとなっている状態をする。
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
@@ -69,6 +71,7 @@ class TodoAddPage extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextFormField(
+                controller: editController,
                 maxLength: null,
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
@@ -106,7 +109,7 @@ class TodoAddPage extends ConsumerWidget {
                     ListView.builder(
                       itemCount: checkedMarkerNames.length,
                       itemBuilder: (context, index) {
-                        return Text(checkedMarkerNames[index]!);
+                        return Text("・${checkedMarkerNames[index]!}");
                       },
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -115,27 +118,48 @@ class TodoAddPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30))),
-                onPressed: () async {
-                  if (textMemo != "") {
-                    final date = DateTime.now().toLocal().toIso8601String();
-                    await FirebaseFirestore.instance
-                        .collection('post')
-                        .doc()
-                        .set({
-                      'text': textMemo,
-                      //'latitude': mapPosition.toString().split(','),
-                      //'longitude': mapPosition.toString().split(','),
-                      'date': date,
-                      'alert': true,
-                    });
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text(registration),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30))),
+                    onPressed: () async {
+                      if (textMemo != "") {
+                        final date = DateTime.now().toLocal().toIso8601String();
+                        await FirebaseFirestore.instance
+                            .collection('post')
+                            .doc()
+                            .set({
+                          'text': textMemo,
+                          //'latitude': mapPosition.toString().split(','),
+                          //'longitude': mapPosition.toString().split(','),
+                          'date': date,
+                          'alert': true,
+                        });
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text(registration),
+                  ),
+                  const SizedBox(
+                    width: 50,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30))),
+                    onPressed: () async {
+                      editController.clear();
+                      ref
+                          .read(autoCompleteSearchTypeProvider.notifier)
+                          .noneAutoCompleteSearch();
+                      // ref.read(memoProvider.notifier).state = "";
+                    },
+                    child: const Text(clear),
+                  ),
+                ],
               )
             ],
           ),

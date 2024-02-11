@@ -20,6 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
@@ -79,7 +80,9 @@ class MapSample extends ConsumerWidget {
       newId = uuid.v4();
     }
     idList.add(newId);
+
     _initializeOnes(ref);
+
     // 画面が初期化された際にフォーカスを外す
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
@@ -301,52 +304,66 @@ class CardSection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    final items = ref.watch(autoCompleteSearchTypeProvider);
     final GoogleMapController? mapController =
         ref.read(googleMapControllerProvider);
+    final items = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
 
+    List<String?> checkedMarkerNames =
+        items.map((marker) => marker.name).toList();
+
+    List<bool> checkList = ref
+        .watch(autoCompleteSearchTypeProvider)
+        .map((e) => e.check == true)
+        .toList();
+
+    bool nameBool = checkedMarkerNames.length > 1;
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.grey.withOpacity(0.6),
-      ),
-      height: 150,
-      width: 380,
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-      child: PageView(
-        onPageChanged: (int index) async {
-          //スワイプ後のページのお店を取得
-          final selectedShop = items.elementAt(index);
-          //現在のズームレベルを取得
-          if (mapController != null) {
-            final zoomLevel = await mapController.getZoomLevel();
-            //スワイプ後のお店の座標までカメラを移動
-            mapController.animateCamera(
-              CameraUpdate.newCameraPosition(
-                CameraPosition(
-                  target: LatLng(selectedShop.latitude, selectedShop.longitude),
-                  zoom: zoomLevel,
-                ),
-              ),
-            );
-          }
-        },
-        controller: pageController,
-        children: shopTiles(ref, latitude, longitude),
-      ),
-    );
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.grey.withOpacity(0.6),
+        ),
+        height: 150,
+        width: 380,
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        child: PageView(
+            onPageChanged: (int index) async {
+              //スワイプ後のページのお店を取得
+              final selectedShop = items.elementAt(index);
+              //現在のズームレベルを取得
+              if (mapController != null) {
+                final zoomLevel = await mapController.getZoomLevel();
+                //スワイプ後のお店の座標までカメラを移動
+                mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                      target:
+                          LatLng(selectedShop.latitude, selectedShop.longitude),
+                      zoom: zoomLevel,
+                    ),
+                  ),
+                );
+              }
+            },
+            controller: pageController,
+            children: [
+              ...(nameBool)
+                  ? [
+                      ...shopTiles(items, latitude, longitude),
+                    ]
+                  : [
+                      const SizedBox.shrink(),
+                    ]
+            ]));
   }
 }
 
 //カード1枚1枚について
 List<Widget> shopTiles(
-  WidgetRef ref,
-  double currentLatitude,
-  double currentLongitude,
-) {
-  final items = ref.watch(autoCompleteSearchTypeProvider);
+    List<Place> items, double currentLatitude, double currentLongitude) {
+  // final items = ref.watch(autoCompleteSearchTypeProvider);
+
   List<double> distances = items.map((place) {
     double distanceInMeters = Geolocator.distanceBetween(
       currentLatitude,
@@ -356,11 +373,11 @@ List<Widget> shopTiles(
     );
     return distanceInMeters;
   }).toList();
-  // 複数取得？[1]目が正確。
 
-  print(distances);
-  final shopTiles = items.map(
-    (shop) {
+  final shopTiles = items.asMap().entries.map(
+    (entry) {
+      final index = entry.key;
+      final place = entry.value;
       return Align(
         alignment: const Alignment(-3.5, 0.1),
         child: Card(
@@ -371,15 +388,16 @@ List<Widget> shopTiles(
             height: 150,
             width: 300,
             child: Center(
-              child: Column(
-                children: [
-                  Text(shop.name!),
-                  if (shop.name != null) ...[
-                    
-                    Text('現在地から${distances[0].ceilToDouble()} km')
-                  ]
-                ],
-              ),
+              child: Column(children: [
+                ...(place.name == null)
+                    ? [
+                        const SizedBox.shrink(),
+                      ]
+                    : [
+                        Text(place.name as String),
+                        Text('現在地から${distances[index].ceilToDouble()} km')
+                      ]
+              ]),
             ),
           ),
         ),
@@ -506,31 +524,62 @@ class ShowTextModal extends ConsumerWidget {
                       autoCompleteSearch[index], latitude, longitude, ref);
                 }),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              // 非同期後にcontextが変わってしまう為、現在のcontextを取得しておく。
-              final localContext = context;
-              // チェックになっている対象のデータをマップ上にマーカーを設置する。
-              // チェックされたPlaceオブジェクトのリストを取得
-              final checkedPlaces = await ref
-                  .read(autoCompleteSearchProvider.notifier)
-                  .getCheckedPlaces();
-              // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
-              for (final place in checkedPlaces) {
-                await ref
-                    .read(autoCompleteSearchTypeProvider.notifier)
-                    .addMarker(place.name!, place.latitude, place.longitude,
-                        place.uid, place.check);
-              }
-              // 質問Zoom①
-              // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、
-              // 元の画面のcontextが無くなっているのでエラーになる
-              // Navigator.pop(localContext);
-            },
-            style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30))),
-            child: const Text(serach),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  // 非同期後にcontextが変わってしまう為、現在のcontextを取得しておく。
+                  final localContext = context;
+
+                  // チェックされたPlaceオブジェクトのリストを取得
+                  final checkedPlaces = await ref
+                      .read(autoCompleteSearchProvider.notifier)
+                      .getCheckedPlaces();
+
+                  // // 現在設置されているマーカーを取得
+                  // final getSetMarker = await ref
+                  //     .read(autoCompleteSearchTypeProvider.notifier)
+                  //     .getSetMarkers();
+
+                  // // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
+                  // for (final place in checkedPlaces) {
+                  //   List<bool> checkList =
+                  //       getSetMarker.map((e) => e == place.name).toList();
+
+                  //   if (checkList.isNotEmpty) {
+                  //     // チェックになっている対象のデータをマップ上にマーカーを設置する。
+                  //     await ref
+                  //         .read(autoCompleteSearchTypeProvider.notifier)
+                  //         .addMarker(place.name!, place.latitude,
+                  //             place.longitude, place.uid, place.check);
+                  //   }
+                  // }
+                  // 質問Zoom①
+                  // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、
+                  // 元の画面のcontextが無くなっているのでエラーになる
+                  // Navigator.pop(localContext);
+                },
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
+                child: const Text(serach),
+              ),
+              const SizedBox(width: 50),
+              ElevatedButton(
+                  onPressed: () async {
+                    // マップ上のマーカーも全て消す。
+                    // リスト上のtrueをfalseにする。
+                    await ref
+                        .read(autoCompleteSearchTypeProvider.notifier)
+                        .noneAutoCompleteSearch();
+                    textController.clear();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  child: const Text(clear))
+            ],
           )
         ],
       ),
@@ -562,9 +611,10 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
                       borderRadius: BorderRadius.all(Radius.circular(20))),
                   value: place.check,
                   onChanged: (bool? value) async {
-                    ref
+                    await ref
                         .read(autoCompleteSearchProvider.notifier)
                         .checkChange(place.uid, value);
+                    // setMarkder(ref);
                   }),
             ),
           ),
@@ -573,11 +623,12 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
     ),
     onTap: () async {
       if (place.check == false) {
-        ref
+        await ref
             .read(autoCompleteSearchProvider.notifier)
             .checkChange(place.uid, true);
+        // setMarkder(ref);
       } else {
-        ref
+        await ref
             .read(autoCompleteSearchProvider.notifier)
             .checkChange(place.uid, false);
       }
@@ -692,5 +743,17 @@ class ShowModal extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Future<void> setMarkder(WidgetRef ref) async {
+  // チェックになっている対象のデータをマップ上にマーカーを設置する。
+  // チェックされたPlaceオブジェクトのリストを取得
+  final checkedPlaces =
+      await ref.read(autoCompleteSearchProvider.notifier).getCheckedPlaces();
+  // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
+  for (final place in checkedPlaces) {
+    await ref.read(autoCompleteSearchTypeProvider.notifier).addMarker(
+        place.name!, place.latitude, place.longitude, place.uid, place.check);
   }
 }

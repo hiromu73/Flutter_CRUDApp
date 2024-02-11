@@ -56,12 +56,9 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
 
   Future<void> addMarker(String name, double latitude, double longitude,
       String uid, bool check) async {
-    // 既存のPlaceを検索
-    final existingPlaceIndex = state.indexWhere((place) => place.uid == uid);
-    if (existingPlaceIndex >= 0) {
-      // 既に存在する場合は削除
-      state = List<Place>.from(state)..removeAt(existingPlaceIndex);
-    } else {
+    // 指定された条件を満たす最初の要素のインデックスを返す。
+    final existingPlaceName = state.indexWhere((place) => place.name == name);
+    if (existingPlaceName == -1) {
       // 存在しない場合は新しいPlaceを追加
       final newPlace = Place(
         name: name,
@@ -108,13 +105,23 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     state = state;
   }
 
+  Future<void> checkFalseChange() async {
+    state = state.map((place) {
+      if (place.check == true) {
+        return place.copyWith(check: !place.check); // チェック状態を切り替え
+      }
+      return place;
+    }).toList();
+    // マーカーの色を更新するために状態を更新
+    state = state;
+  }
+
+  // マーカーが設置されている状態を取得するメソッド
+  Future<List<String?>> getSetMarkers() async {
+    return state.map((place) => place.name).toList();
+  }
+
   Future<void> noneAutoCompleteSearch() async {
-    List<Place> places = [];
-    final uid =
-        '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
-    final place =
-        Place(name: "", latitude: 0.0, longitude: 0.0, uid: uid, check: false);
-    places.add(place);
-    state = places;
+    state = [];
   }
 }

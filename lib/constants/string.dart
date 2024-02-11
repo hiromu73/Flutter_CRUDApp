@@ -3,6 +3,7 @@
 const String memo = "内容を記載して下さい。";
 const String positionSearch = "場所の検索";
 const String registration = "登録";
+const String clear = "Clear";
 const String ok = "OK";
 const String no = "NO";
 const String deleteMemo = "Are you sure you want to delete this content?";

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
+import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -81,6 +82,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     state = [];
   }
 
+// place_idから名前や位置情報など詳細な情報を取得し、Placeクラスを返す。
   Future<Place?> getPlaceDetails(String placeId) async {
     const detailsUrl =
         'https://maps.googleapis.com/maps/api/place/details/json';
@@ -101,12 +103,17 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
         final uid =
             '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
 
+        List<String?> checkedMarkerNames = ref
+            .watch(autoCompleteSearchTypeProvider)
+            .map((marker) => marker.name)
+            .toList();
+
         return Place(
             name: name,
             latitude: latitude,
             longitude: longitude,
             uid: uid,
-            check: false);
+            check: checkedMarkerNames.contains(name) ? true : false);
       }
     }
   }
@@ -130,8 +137,20 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     state = state;
   }
 
+Future<void> checkFalseChange() async {
+    state = state.map((place) {
+      if (place.check == true) {
+        return place.copyWith(check: !place.check); // チェック状態を切り替え
+      }
+      return place;
+    }).toList();
+    // マーカーの色を更新するために状態を更新
+    state = state;
+  }
+
   // チェックがtrueのPlaceオブジェクトのリストを取得するメソッド
   Future<List<Place>> getCheckedPlaces() async {
     return state.where((place) => place.check).toList();
   }
+
 }
