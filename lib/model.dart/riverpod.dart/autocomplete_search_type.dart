@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -94,25 +93,27 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
     }
   }
 
+  // マーカーの色を更新するために状態を更新
   Future<void> toggleMarkerCheck(String uid) async {
     state = state.map((place) {
       if (place.uid == uid) {
-        return place.copyWith(check: !place.check); // チェック状態を切り替え
+        // チェック状態を切り替え
+        return place.copyWith(check: !place.check);
       }
       return place;
     }).toList();
-    // マーカーの色を更新するために状態を更新
     state = state;
   }
 
+  // trueをfalseに変更する。
   Future<void> checkFalseChange() async {
     state = state.map((place) {
       if (place.check == true) {
-        return place.copyWith(check: !place.check); // チェック状態を切り替え
+         // チェック状態を切り替え
+        return place.copyWith(check: !place.check);
       }
       return place;
     }).toList();
-    // マーカーの色を更新するために状態を更新
     state = state;
   }
 

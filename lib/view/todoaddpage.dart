@@ -3,21 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import './todoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
+final editController = TextEditingController();
 
 class TodoAddPage extends ConsumerWidget {
   const TodoAddPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final editController = TextEditingController();
-
     // チェックがtrueとなっている状態をする。
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
@@ -35,9 +33,9 @@ class TodoAddPage extends ConsumerWidget {
 // チェックがtrueとなっているマーカーのlongitudeを取得
     List<double> checkedMarkerLongitudes =
         checkList.map((marker) => marker.longitude).toList();
-    // print(checkedMarkerNames);
-    // print(checkedMarkerLatitudes);
-    // print(checkedMarkerLongitudes);
+    print(checkedMarkerNames);
+    print(checkedMarkerLatitudes);
+    print(checkedMarkerLongitudes);
 
     // メモ内容
     final textMemo = ref.watch(memoProvider);

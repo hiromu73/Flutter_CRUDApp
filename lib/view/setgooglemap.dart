@@ -1,27 +1,16 @@
 import 'dart:async';
-import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/api.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/googlemapcontrollernotifier.dart';
-import 'package:flutter_crudapp/model.dart/mapinitialized_model.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/menuitemcheckbox.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/predictions.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/select_marker.dart';
 import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/textpredictions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_place/google_place.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 final googleMapControllerProvider =
@@ -87,6 +76,7 @@ class MapSample extends ConsumerWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
+
 
     return SizedBox(
       height: height,
@@ -299,6 +289,8 @@ class CardSection extends ConsumerWidget {
   final PageController pageController;
   CardSection({Key? key, required this.pageController}) : super(key: key);
 
+// 画面が戻った時にスクロール位置を調整する
+
   @override
   Widget build(
     BuildContext context,
@@ -309,6 +301,14 @@ class CardSection extends ConsumerWidget {
     final items = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+
+// 画面が戻った時にCardSectionの最初の要素にスクロールする
+    void scrollToFirstElement() {
+      if (items.isNotEmpty) {
+        pageController.animateToPage(0,
+            duration: Duration(milliseconds: 500), curve: Curves.ease);
+      }
+    }
 
     List<String?> checkedMarkerNames =
         items.map((marker) => marker.name).toList();
@@ -537,28 +537,25 @@ class ShowTextModal extends ConsumerWidget {
                       .read(autoCompleteSearchProvider.notifier)
                       .getCheckedPlaces();
 
-                  // // 現在設置されているマーカーを取得
-                  // final getSetMarker = await ref
-                  //     .read(autoCompleteSearchTypeProvider.notifier)
-                  //     .getSetMarkers();
-
-                  // // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
-                  // for (final place in checkedPlaces) {
-                  //   List<bool> checkList =
-                  //       getSetMarker.map((e) => e == place.name).toList();
-
-                  //   if (checkList.isNotEmpty) {
-                  //     // チェックになっている対象のデータをマップ上にマーカーを設置する。
-                  //     await ref
-                  //         .read(autoCompleteSearchTypeProvider.notifier)
-                  //         .addMarker(place.name!, place.latitude,
-                  //             place.longitude, place.uid, place.check);
-                  //   }
-                  // }
+                  // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
+                  for (final place in checkedPlaces) {
+                    // 既にcheckがtrueになっている要素のnameを取得し、一致指定あたら追加しない。
+                    if (!ref.watch(autoCompleteSearchTypeProvider).any(
+                        (element) =>
+                            element.name == place.name &&
+                            element.check == true)) {
+                      await ref
+                          .read(autoCompleteSearchTypeProvider.notifier)
+                          .addMarker(place.name!, place.latitude,
+                              place.longitude, place.uid, place.check);
+                    }
+                  }
                   // 質問Zoom①
                   // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、
                   // 元の画面のcontextが無くなっているのでエラーになる
-                  // Navigator.pop(localContext);
+                  if (context.mounted) {
+                    Navigator.pop(localContext, true);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
