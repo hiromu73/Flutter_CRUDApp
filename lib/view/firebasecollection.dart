@@ -41,13 +41,22 @@ class FirebaseCollection extends ConsumerWidget {
                               'alert': value,
                             });
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error: $e'),
-                              ),
-                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: $e'),
+                                ),
+                              );
+                            }
                           }
                         }),
+                    subtitle: Column(
+                      children: [
+                        document['checkName'] != null
+                            ? Text("位置情報:${document['checkName']}".toString())
+                            : const SizedBox.shrink(),
+                      ],
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -71,7 +80,9 @@ class FirebaseCollection extends ConsumerWidget {
                                                 .collection('post')
                                                 .doc(docId)
                                                 .delete();
-                                            Navigator.pop(context);
+                                            if (context.mounted) {
+                                              Navigator.pop(context);
+                                            }
                                           } catch (e) {
                                             return Navigator.pop(context);
                                           }

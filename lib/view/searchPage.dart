@@ -16,7 +16,7 @@ class _SerachPage extends State<SerachPage> with WidgetsBindingObserver {
   late GooglePlace googlePlace;
   List<AutocompletePrediction> predictions = [];
   final apiKey = Api.apiKey;
-  List LatLng = [];
+  List latLng = [];
 
   @override
   void initState() {
@@ -98,10 +98,12 @@ class _SerachPage extends State<SerachPage> with WidgetsBindingObserver {
                           List? locations = await locationFromAddress(
                               predictions[index].description.toString());
                           setState(() {
-                            LatLng.add(locations.first.latitude);
-                            LatLng.add(locations.first.longitude);
+                            latLng.add(locations.first.latitude);
+                            latLng.add(locations.first.longitude);
                           });
-                          Navigator.pop(context, LatLng);
+                          if (context.mounted) {
+                            Navigator.pop(context, latLng);
+                          }
                         },
                       ),
                     );

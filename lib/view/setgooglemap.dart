@@ -77,7 +77,6 @@ class MapSample extends ConsumerWidget {
       FocusScope.of(context).unfocus();
     });
 
-
     return SizedBox(
       height: height,
       width: width,
@@ -302,21 +301,17 @@ class CardSection extends ConsumerWidget {
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
 
+// 画面が戻った時,cardがあればcardの1番目にする。
 // 画面が戻った時にCardSectionの最初の要素にスクロールする
-    void scrollToFirstElement() {
-      if (items.isNotEmpty) {
-        pageController.animateToPage(0,
-            duration: Duration(milliseconds: 500), curve: Curves.ease);
-      }
-    }
+    // void scrollToFirstElement() {
+    //   if (items.isNotEmpty) {
+    //     pageController.animateToPage(0,
+    //         duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    //   }
+    // }
 
     List<String?> checkedMarkerNames =
         items.map((marker) => marker.name).toList();
-
-    List<bool> checkList = ref
-        .watch(autoCompleteSearchTypeProvider)
-        .map((e) => e.check == true)
-        .toList();
 
     bool nameBool = checkedMarkerNames.length > 1;
     return Container(
@@ -438,6 +433,7 @@ Future<Position> _determinePosition() async {
   return position;
 }
 
+// 起動時に呼ばれる。
 Future _initializeOnes(WidgetRef ref) async {
   final position = await _determinePosition();
   ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);

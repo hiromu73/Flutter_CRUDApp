@@ -131,12 +131,21 @@ class TodoAddPage extends ConsumerWidget {
                             .doc()
                             .set({
                           'text': textMemo,
-                          //'latitude': mapPosition.toString().split(','),
-                          //'longitude': mapPosition.toString().split(','),
+                          'checkName': checkedMarkerNames.isNotEmpty
+                              ? checkedMarkerNames
+                              : null,
+                          'latitude': checkedMarkerLatitudes.isNotEmpty
+                              ? checkedMarkerLatitudes
+                              : null,
+                          'longitude': checkedMarkerLongitudes.isNotEmpty
+                              ? checkedMarkerLongitudes
+                              : null,
                           'date': date,
                           'alert': true,
                         });
-                        Navigator.of(context).pop();
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
                       }
                     },
                     child: const Text(registration),

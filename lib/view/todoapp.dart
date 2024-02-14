@@ -27,7 +27,7 @@ class ToDoApp extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
           heroTag: "heroId$newId",
           child: const Icon(Icons.add),
-          onPressed: () => routes.AddPage(context: context)),
+          onPressed: () => routes.addPage(context: context)),
     );
   }
 }
