@@ -7,7 +7,10 @@
         <!-- 追加 -->
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyB3hlptGf6fXPV4rmv_WObYCuUFBrQ1doM"/>
         <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+        <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+        <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+        <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

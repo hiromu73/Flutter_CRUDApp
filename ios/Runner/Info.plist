@@ -29,9 +29,17 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
   <key>NSLocationWhenInUseUsageDescription</key>
-  <string>Your location is required for this app</string>
+  <string>Used to monitor location in the background and notify to app.</string>
   <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Used to monitor location in the background and notify to app.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Used to monitor location in the background and notify to app.</string>
   <string>Your location is required for this app</string>
+	<key>UIBackgroundModes</key>
+	<array>
+    <string>fetch</string>
+    <string>location</string>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
