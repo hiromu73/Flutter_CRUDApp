@@ -7,6 +7,7 @@ import 'package:flutter_crudapp/view/firebase_options.dart';
 import 'package:flutter_crudapp/view/todoapp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:background_task/background_task.dart';
 
 /// プラットフォームの確認
 final isAndroid =
@@ -54,6 +55,19 @@ void main() async {
 // バックグラウンドでの処理
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  @pragma('vm:entry-point')
+  void backgroundHandler(Location data) {
+    // ここにバックグラウンドで実行したい処理を書く。
+  }
+
+// バックグラウンドで位置情報の使用を開始
+  await BackgroundTask.instance.start();
+  BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
+  BackgroundTask.instance.stream.listen((event) {
+    print("↓位置情報");
+    print(event.lat);
+    print(event.lng);
+  });
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp()),
   ));

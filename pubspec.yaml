@@ -55,6 +55,7 @@ dependencies:
   uuid: ^4.2.2
   location: ^5.0.3
   firebase_messaging: ^14.6.9
+  background_task: ^0.1.1+1
 
 dev_dependencies:
   flutter_test:
