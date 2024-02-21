@@ -546,9 +546,6 @@ class ShowTextModal extends ConsumerWidget {
                               place.longitude, place.uid, place.check);
                     }
                   }
-                  // 質問Zoom①
-                  // 非同期処理中に、「Navigator」のように、contextを渡す処理があると、非同期処理から戻ってきたときに、既に画面遷移が終わっていて、
-                  // 元の画面のcontextが無くなっているのでエラーになる
                   if (context.mounted) {
                     Navigator.pop(localContext, true);
                   }

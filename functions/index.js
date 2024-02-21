@@ -42,9 +42,9 @@ exports.getFirestore = functions.https.onRequest((req, res) => {
 // 位置情報を取得
 exports.sendPushNotification = functions.firestore
   .collection("post")
-  .onUpdate(async (change, context) => {
+  .onRequest(async (res, context) => {
     const userId = context.params.userId;
-    const userData = change.after.data();
+    const userData = res.after.data();
 
     // ユーザーの現在位置情報と登録された位置情報を比較し、一定の距離内に入った場合にプッシュ通知を送信するロジックを実装
 
