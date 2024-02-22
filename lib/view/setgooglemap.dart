@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/googlemapcontrollernotifier.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
@@ -453,7 +454,7 @@ class ShowTextModal extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.white,
-      height: MediaQuery.of(context).size.height * 0.8,
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Column(
         children: [
           TextFormField(
@@ -511,8 +512,9 @@ class ShowTextModal extends ConsumerWidget {
               }
             },
           ),
-          SizedBox(
+          Expanded(
             child: ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: autoCompleteSearch.length,
                 itemBuilder: (context, index) {

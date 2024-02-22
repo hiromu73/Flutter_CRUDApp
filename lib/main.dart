@@ -87,6 +87,7 @@ void main() async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print("↓トークン");
   print(fcmToken);
+  // fXKli8UTAERMspm8buAdPm:APA91bGMDp8V0G98B_BfdzLM8F0mVx8sOl2XQn-7YZF7nyGYYAzybE9rk8Wa1KquQiyQPJ5FuJ16J3tEDuvHB9TNKMA6O44KtPadvIb9QDd4hIOi_I9vUjnLySTLAzqXdHEqvFknULEL
 
   // push通知のパーミションの設定
   FirebaseMessaging messaging = FirebaseMessaging.instance;
