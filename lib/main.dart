@@ -6,76 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_crudapp/view/firebase_options.dart';
 import 'package:flutter_crudapp/view/todoapp.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_messaging_platform_interface/firebase_messaging_platform_interface.dart';
 
 /// プラットフォームの確認
 final isAndroid =
     defaultTargetPlatform == TargetPlatform.android ? true : false;
 final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
-}
-
-Future<void> _getCurrentLocation() async {
-  try {
-    LocationPermission permission = await Geolocator.requestPermission();
-
-    if (permission == LocationPermission.denied) {
-      // ユーザーが位置情報の利用を拒否した場合の処理
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    print("フォアグラウンドの位置情報=$position");
-    // ここでfirestoreに保存されている位置情報を取得してチェックする？
-    // 距離を割り出す
-    // double distanceInMeters = Geolocator.distanceBetween(
-    //   event.lat,
-    //   currentLongitude,
-    //   event.lat!,
-    //   event.lng!,
-    // );
-
-    // Firebase Cloud Messaging（FCM）のメッセージを作成
-    final fcmMessage = {
-      'notification': {
-        'title': '近くにいます',
-        'body': 'お知らせ: 一定の距離以内にいます。',
-      },
-      'to': '/topics/all_devices', // トピック名
-    };
-
-    // FCM メッセージを送信
-    sendFcmMessage(fcmMessage);
-  } catch (e) {
-    print("Error getting location: $e");
-  }
-}
-
-void getLocationUpdates() {
-  Geolocator.getPositionStream().listen((Position position) {
-    // リアルタイムな位置情報がここに届く
-    print(
-        'Location Update(フォアグラウンド): ${position.latitude}, ${position.longitude}');
-    // 位置情報を利用して必要な処理を実行
-  });
-}
-
-void sendFcmMessage(Map<String, dynamic> message) {
-  // メッセージを Firebase Cloud Messaging に送信するロジックを実装
-  // この部分は Firebase Cloud Messaging の実際の API 呼び出しに依存します
-  // https://firebase.flutter.dev/docs/messaging/usage
-  // 例えば、FirebaseMessaging クラスを使用することが一般的です
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,11 +26,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // フォアグラウンドで通知が表示されるオプションの設定
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: false,
+    sound: true,
+  );
+
   //トークン取得
-  final fcmToken = await FirebaseMessaging.instance.getToken();
+  String? fcmToken = await FirebaseMessaging.instance.getToken();
   print("↓トークン");
   print(fcmToken);
-  // fXKli8UTAERMspm8buAdPm:APA91bGMDp8V0G98B_BfdzLM8F0mVx8sOl2XQn-7YZF7nyGYYAzybE9rk8Wa1KquQiyQPJ5FuJ16J3tEDuvHB9TNKMA6O44KtPadvIb9QDd4hIOi_I9vUjnLySTLAzqXdHEqvFknULEL
 
   // push通知のパーミションの設定
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -101,56 +50,97 @@ void main() async {
     sound: true,
   );
 
-// フォアグラウンドでのメッセージの処理
-  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //   print('Got a message whilst in the foreground!');
-  //   print('Message data: ${message.data}');
+  List<double> latitude = [];
+  List<double> longiLang = [];
 
-  //   if (message.notification != null) {
-  //     print('Message also contained a notification: ${message.notification}');
-  //   }
-  // });
+  FirebaseFirestore.instance.collection('post').orderBy((document) {
+    // Firestoreから位置情報を取得
+    latitude = document['latitude'];
+    longiLang = document['longiLang'];
+  });
 
-  _getCurrentLocation();
+// Andorid構成
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    importance: Importance.max,
+  );
 
-  BackgroundTask.instance.stream.listen((event) {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+// フォアグラウンドでのメッセージを受信した際の処理
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification!.android;
+
+    if (notification != null && android != null) {
+      flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              icon: android.smallIcon,
+              // other properties...
+            ),
+          ));
+    }
+  });
+
+  // バックグラウンド
+  BackgroundTask.instance.stream.listen((event) async {
     print("↓バックグラウンド位置情報");
     // アプリ内での位置情報処理
     print('Received location: ${event.lat}, ${event.lng}');
 
+    // バックグラウンドで位置情報の使用を開始
+    await BackgroundTask.instance.start();
+    // getLocationUpdates();
+    // Firebaseの初期化 // オフラインでの動作を有効にする場合
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+    );
+
     // 距離を割り出す
-    // double distanceInMeters = Geolocator.distanceBetween(
-    //   currentLongitude,
-    //   currentLongitude,
-    //   event.lat!,
-    //   event.lng!,
-    // );
+    double distanceInMeters = Geolocator.distanceBetween(
+      latitude[0],
+      longiLang[0],
+      event.lat!,
+      event.lng!,
+    );
 
-    // Firebase Cloud Messaging（FCM）のメッセージを作成
-    final fcmMessage = {
-      'notification': {
-        'title': '近くにいます',
-        'body': 'お知らせ: 一定の距離以内にいます。',
-      },
-      'data': {
-        // 任意のデータ
-        'lat': event.lat.toString(),
-        'lng': event.lng.toString(),
-      },
-      'to': '/topics/all_devices', // トピック名
-    };
+    print(distanceInMeters);
+    final functions = FirebaseFunctions.instanceFor(region: 'asia-northeast1');
+    // 一定距離内に近づいたらプッシュ通知を送信
+    // if (distanceInMeters < 100) {
+    //   await FirebaseMessaging.instance.subscribeToTopic("topic");
+    // }
+    Future<void> push(String token) async {
+      try {
+        final HttpsCallable callable = functions.httpsCallable('pushTalk');
+        final HttpsCallableResult result = await callable.call({
+          'title': 'Push通知テスト',
+          'body': '自分から届きました',
+          'token': fcmToken
+        }); // 関数を呼び出し、引数を渡す
 
-    // FCM メッセージを送信
-    sendFcmMessage(fcmMessage);
+        final data = result.data;
+
+        print('結果: ${data}'); // 結果を表示
+      } catch (e) {
+        print('エラー: $e'); // エラーハンドリング
+      }
+    }
   });
-  // バックグラウンドで位置情報の使用を開始
-  await BackgroundTask.instance.start();
-  getLocationUpdates();
-  // Firebaseの初期化 // オフラインでの動作を有効にする場合
-  FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: true,
-  );
-//CR84FK9GRR
+
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp()),
   ));

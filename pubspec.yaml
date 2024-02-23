@@ -56,6 +56,8 @@ dependencies:
   location: ^5.0.3
   firebase_messaging: ^14.6.9
   background_task: ^0.1.1+1
+  firebase_messaging_platform_interface: ^4.5.24
+  cloud_functions: ^4.6.5
 
 dev_dependencies:
   flutter_test:
