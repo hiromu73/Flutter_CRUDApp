@@ -12,13 +12,27 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging_platform_interface/firebase_messaging_platform_interface.dart';
+import 'package:http/http.dart' as http;
 
 /// プラットフォームの確認
 final isAndroid =
     defaultTargetPlatform == TargetPlatform.android ? true : false;
 final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
+
+Future<void> callFirebaseFunction() async {
+  final response = await http.get(
+    Uri.parse(
+        'https://asia-northeast1-flutter-crudapp-688ac.cloudfunctions.net/pushTalk'),
+  );
+
+  print("fcm");
+  if (response.statusCode == 200) {
+    print('Firebase Function called successfully.');
+  } else {
+    print('Failed to call Firebase Function.');
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -118,27 +132,28 @@ void main() async {
     );
 
     print(distanceInMeters);
-    final functions = FirebaseFunctions.instanceFor(region: 'asia-northeast1');
-    // 一定距離内に近づいたらプッシュ通知を送信
-    // if (distanceInMeters < 100) {
-    //   await FirebaseMessaging.instance.subscribeToTopic("topic");
+    // final functions = FirebaseFunctions.instanceFor(region: 'asia-northeast1');
+    // // 一定距離内に近づいたらプッシュ通知を送信
+    // // if (distanceInMeters < 100) {
+    // //   await FirebaseMessaging.instance.subscribeToTopic("topic");
+    // // }
+    // Future<void> push(String token) async {
+    //   try {
+    //     final HttpsCallable callable = functions.httpsCallable('pushTalk');
+    //     final HttpsCallableResult result = await callable.call({
+    //       'title': 'Push通知テスト',
+    //       'body': '自分から届きました',
+    //       'token': fcmToken
+    //     }); // 関数を呼び出し、引数を渡す
+
+    //     final data = result.data;
+
+    //     print('結果: ${data}'); // 結果を表示
+    //   } catch (e) {
+    //     print('エラー: $e'); // エラーハンドリング
+    //   }
     // }
-    Future<void> push(String token) async {
-      try {
-        final HttpsCallable callable = functions.httpsCallable('pushTalk');
-        final HttpsCallableResult result = await callable.call({
-          'title': 'Push通知テスト',
-          'body': '自分から届きました',
-          'token': fcmToken
-        }); // 関数を呼び出し、引数を渡す
-
-        final data = result.data;
-
-        print('結果: ${data}'); // 結果を表示
-      } catch (e) {
-        print('エラー: $e'); // エラーハンドリング
-      }
-    }
+    await callFirebaseFunction();
   });
 
   runApp(const ProviderScope(
