@@ -1,22 +1,18 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-fcmToken = await FirebaseMessaging.instance.getToken();
-
-// Admin SDKでfireStoreを使う
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
 
 // データベースの参照を取得する
 const fireStore = admin.firestore();
 
-//CloudFunctionsに送る関数
-exports.pushTalk = functions.https.onRequest((req, res) => {
+//fcmに送る関数
+exports.pushTalk = functions.https.onCall(async (req, res) => {
   const message = {
     notification: {
-      title: "近くにメモした内容",
-      body: "内容は",
+      title: "忘れてないですか？",
+      body: "近くにメモした内容",
     },
-    token: fcmToken,
   };
 
   admin

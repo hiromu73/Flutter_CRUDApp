@@ -14,11 +14,21 @@ import 'package:geolocator/geolocator.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_messaging_platform_interface/firebase_messaging_platform_interface.dart';
 import 'package:http/http.dart' as http;
+import 'package:cloud_functions/cloud_functions.dart';
 
 /// プラットフォームの確認
 final isAndroid =
     defaultTargetPlatform == TargetPlatform.android ? true : false;
 final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
+
+Future<void> writeMessage() async {
+  HttpsCallable callable =
+      FirebaseFunctions.instanceFor(region: 'asia-northeast1')
+          .httpsCallable('pushTalk');
+
+  final resp = await callable.call();
+  print("result: ${resp.data}");
+}
 
 Future<void> callFirebaseFunction() async {
   final response = await http.get(
@@ -26,7 +36,6 @@ Future<void> callFirebaseFunction() async {
         'https://asia-northeast1-flutter-crudapp-688ac.cloudfunctions.net/pushTalk'),
   );
 
-  print("fcm");
   if (response.statusCode == 200) {
     print('Firebase Function called successfully.');
   } else {
@@ -39,39 +48,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // フォアグラウンドで通知が表示されるオプションの設定
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: false,
-    sound: true,
-  );
-
-  //トークン取得
-  String? fcmToken = await FirebaseMessaging.instance.getToken();
-  print("↓トークン");
-  print(fcmToken);
-
-  // push通知のパーミションの設定
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-
-  List<double> latitude = [];
-  List<double> longiLang = [];
-
-  FirebaseFirestore.instance.collection('post').orderBy((document) {
-    // Firestoreから位置情報を取得
-    latitude = document['latitude'];
-    longiLang = document['longiLang'];
-  });
 
 // Andorid構成
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -88,6 +64,51 @@ void main() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
+  // フォアグラウンドで通知が表示されるオプションの設定
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: false,
+    sound: true,
+  );
+
+  // push通知のパーミションの設定
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  //トークン取得
+  String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+  List<dynamic> latitude = [];
+  List<dynamic> longiLang = [];
+  List<String> name = [];
+
+  CollectionReference collectionReference =
+      FirebaseFirestore.instance.collection('post');
+
+  QuerySnapshot querySnapshot = await collectionReference.get();
+
+  for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
+    dynamic fieldValue = documentSnapshot['latitude'];
+    dynamic fieldValues = documentSnapshot['longitude'];
+    dynamic fieldNameValue = documentSnapshot['text'];
+
+    latitude.add(fieldValue);
+    longiLang.add(fieldValues);
+    name.add(fieldNameValue);
+  }
+  print("longiLang-$longiLang");
+  print("latitude-$latitude");
+  print("name-$name");
+  print("---");
+
 // フォアグラウンドでのメッセージを受信した際の処理
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
@@ -103,7 +124,6 @@ void main() async {
               channel.id,
               channel.name,
               icon: android.smallIcon,
-              // other properties...
             ),
           ));
     }
@@ -132,29 +152,13 @@ void main() async {
     );
 
     print(distanceInMeters);
-    // final functions = FirebaseFunctions.instanceFor(region: 'asia-northeast1');
-    // // 一定距離内に近づいたらプッシュ通知を送信
-    // // if (distanceInMeters < 100) {
-    // //   await FirebaseMessaging.instance.subscribeToTopic("topic");
-    // // }
-    // Future<void> push(String token) async {
-    //   try {
-    //     final HttpsCallable callable = functions.httpsCallable('pushTalk');
-    //     final HttpsCallableResult result = await callable.call({
-    //       'title': 'Push通知テスト',
-    //       'body': '自分から届きました',
-    //       'token': fcmToken
-    //     }); // 関数を呼び出し、引数を渡す
-
-    //     final data = result.data;
-
-    //     print('結果: ${data}'); // 結果を表示
-    //   } catch (e) {
-    //     print('エラー: $e'); // エラーハンドリング
-    //   }
-    // }
-    await callFirebaseFunction();
+    // 一定距離内に近づいたらプッシュ通知を送信
+    if (distanceInMeters < 100) {
+      await callFirebaseFunction();
+    }
   });
+
+  await writeMessage();
 
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp()),
