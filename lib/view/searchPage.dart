@@ -127,6 +127,3 @@ class _SerachPage extends State<SerachPage> with WidgetsBindingObserver {
     }
   }
 }
-
-// initState()はFutureできないのでメソッドを格納。
-// Future initState() async {}

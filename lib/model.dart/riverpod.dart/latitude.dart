@@ -7,7 +7,7 @@ class Latitude extends _$Latitude {
   @override
   double build() => 0.0;
 
-  void changeLatitude(double latitude) {
+  Future<void> changeLatitude(double latitude) async {
     state = latitude;
   }
 }

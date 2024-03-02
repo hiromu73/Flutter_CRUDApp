@@ -9,35 +9,29 @@ import 'package:flutter_crudapp/constants/routes.dart' as routes;
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
-final editController = TextEditingController();
+
+TextEditingController editController = TextEditingController();
 
 class TodoAddPage extends ConsumerWidget {
   const TodoAddPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // チェックがtrueとなっている状態をする。
+    editController.text = "";
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
         .where((marker) => marker.check == true)
         .toList();
 
-    // チェックがtrueとなっているマーカーのnameを取得
     List<String?> checkedMarkerNames =
         checkList.map((marker) => marker.name).toList();
 
-// チェックがtrueとなっているマーカーのlatitudeを取得
     List<double> checkedMarkerLatitudes =
         checkList.map((marker) => marker.latitude).toList();
 
-// チェックがtrueとなっているマーカーのlongitudeを取得
     List<double> checkedMarkerLongitudes =
         checkList.map((marker) => marker.longitude).toList();
-    print(checkedMarkerNames);
-    print(checkedMarkerLatitudes);
-    print(checkedMarkerLongitudes);
 
-    // メモ内容
     final textMemo = ref.watch(memoProvider);
 
     return Scaffold(
@@ -69,6 +63,7 @@ class TodoAddPage extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextFormField(
+                // 質問Zoom②値が残ってしまう。
                 controller: editController,
                 maxLength: null,
                 maxLines: null,
@@ -162,7 +157,6 @@ class TodoAddPage extends ConsumerWidget {
                       ref
                           .read(autoCompleteSearchTypeProvider.notifier)
                           .noneAutoCompleteSearch();
-                      // ref.read(memoProvider.notifier).state = "";
                     },
                     child: const Text(clear),
                   ),

@@ -21,12 +21,7 @@ final googleMapControllerProvider =
 
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
-
-  // 初期位置
-  CameraPosition initialLocation = const CameraPosition(
-    target: LatLng(34.758663, 135.4971856623888),
-    zoom: 15.0,
-  );
+  final bool _isFirstBuild = true;
 
   final pageController = PageController(
     viewportFraction: 0.85,
@@ -36,13 +31,25 @@ class MapSample extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (_isFirstBuild) {
+      _initializeOnes(ref);
+    }
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
-    // 設置するマーカーの一覧
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+    print("初回起動 $latitude");
+    print("初回起動 $longitude");
+
+    // 初期位置
+    // 質問Zoom①初回起動時に_initializeOnes(ref)で状態管理されたlatitude、longitudeで初期位置を設定したい。
+    CameraPosition initialLocation = const CameraPosition(
+      target: LatLng(34.758663, 135.4971856623888),
+      zoom: 15.0,
+    );
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -52,11 +59,9 @@ class MapSample extends ConsumerWidget {
               ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
               : BitmapDescriptor.defaultMarker,
           onTap: () async {
-            // マーカーをタップしたときの処理
             await ref
                 .read(autoCompleteSearchTypeProvider.notifier)
                 .toggleMarkerCheck(item.uid);
-            //タップしたマーカー(shop)のindexを取得
             final index = selectItemeMakers.indexWhere((shop) => shop == item);
             pageController.jumpToPage(index);
           },
@@ -70,8 +75,6 @@ class MapSample extends ConsumerWidget {
       newId = uuid.v4();
     }
     idList.add(newId);
-
-    _initializeOnes(ref);
 
     // 画面が初期化された際にフォーカスを外す
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -219,6 +222,8 @@ class MapSample extends ConsumerWidget {
                             child: Icon(Icons.my_location, color: Colors.white),
                           ),
                           onTap: () async {
+                            print(ref.watch(latitudeProvider));
+                            print(ref.watch(longitudeProvider));
                             await _mapController.animateCamera(
                               CameraUpdate.newCameraPosition(
                                 CameraPosition(
@@ -427,6 +432,7 @@ Future<Position> _determinePosition() async {
   if (permission == LocationPermission.deniedForever) {
     return Future.error('デバイスの場所を取得するための許可してください');
   }
+
   // デバイスの現在の場所を返す。
   Position position = await Geolocator.getCurrentPosition(
     desiredAccuracy: LocationAccuracy.high,

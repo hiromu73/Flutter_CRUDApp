@@ -11,36 +11,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_messaging_platform_interface/firebase_messaging_platform_interface.dart';
-import 'package:http/http.dart' as http;
 import 'package:cloud_functions/cloud_functions.dart';
 
-/// プラットフォームの確認
+// プラットフォームの確認
 final isAndroid =
     defaultTargetPlatform == TargetPlatform.android ? true : false;
 final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
 
+// functionを呼び出す。
 Future<void> writeMessage() async {
   HttpsCallable callable =
       FirebaseFunctions.instanceFor(region: 'asia-northeast1')
           .httpsCallable('pushTalk');
-
   final resp = await callable.call();
   print("result: ${resp.data}");
-}
-
-Future<void> callFirebaseFunction() async {
-  final response = await http.get(
-    Uri.parse(
-        'https://asia-northeast1-flutter-crudapp-688ac.cloudfunctions.net/pushTalk'),
-  );
-
-  if (response.statusCode == 200) {
-    print('Firebase Function called successfully.');
-  } else {
-    print('Failed to call Firebase Function.');
-  }
 }
 
 void main() async {
@@ -73,6 +57,10 @@ void main() async {
 
   // push通知のパーミションの設定
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // トピック作成
+  FirebaseMessaging.instance.subscribeToTopic('locationsMemo');
+
   await messaging.requestPermission(
     alert: true,
     announcement: false,
@@ -84,10 +72,10 @@ void main() async {
   );
 
   //トークン取得
-  String? fcmToken = await FirebaseMessaging.instance.getToken();
+  // String? fcmToken = await FirebaseMessaging.instance.getToken();
 
-  List<dynamic> latitude = [];
-  List<dynamic> longiLang = [];
+  List<double> latitude = [];
+  List<double> longiLang = [];
   List<String> name = [];
 
   CollectionReference collectionReference =
@@ -100,14 +88,39 @@ void main() async {
     dynamic fieldValues = documentSnapshot['longitude'];
     dynamic fieldNameValue = documentSnapshot['text'];
 
-    latitude.add(fieldValue);
-    longiLang.add(fieldValues);
-    name.add(fieldNameValue);
+    for (int i = 0; i < fieldValue.length; i++) {
+      latitude.add(double.parse(fieldValue[i].toString()));
+      longiLang.add(double.parse(fieldValues[i].toString()));
+      name.add(fieldNameValue);
+    }
   }
+
   print("longiLang-$longiLang");
   print("latitude-$latitude");
   print("name-$name");
   print("---");
+
+// フォアグラウンドで位置情報の取得
+  Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+
+  for (int i = 0; i < latitude.length; i++) {
+    print(double.parse(latitude[i].toString()));
+    print(double.parse(longiLang[i].toString()));
+    double distanceInMeters = Geolocator.distanceBetween(
+      double.parse(latitude[i].toString()),
+      double.parse(longiLang[i].toString()),
+      position.latitude,
+      position.longitude,
+    );
+    print(" $i: $distanceInMeters meters");
+
+    if (distanceInMeters < 200) {
+      print("Distance from document $i: $distanceInMeters meters");
+      // await writeMessage();
+    }
+  }
 
 // フォアグラウンドでのメッセージを受信した際の処理
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -131,34 +144,31 @@ void main() async {
 
   // バックグラウンド
   BackgroundTask.instance.stream.listen((event) async {
-    print("↓バックグラウンド位置情報");
-    // アプリ内での位置情報処理
     print('Received location: ${event.lat}, ${event.lng}');
 
     // バックグラウンドで位置情報の使用を開始
     await BackgroundTask.instance.start();
-    // getLocationUpdates();
-    // Firebaseの初期化 // オフラインでの動作を有効にする場合
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
     );
 
-    // 距離を割り出す
-    double distanceInMeters = Geolocator.distanceBetween(
-      latitude[0],
-      longiLang[0],
-      event.lat!,
-      event.lng!,
-    );
+    for (int i = 0; i < latitude.length; i++) {
+      print(double.parse(latitude[i].toString()));
+      print(double.parse(longiLang[i].toString()));
+      double distanceInMeters = Geolocator.distanceBetween(
+        double.parse(latitude[i].toString()),
+        double.parse(longiLang[i].toString()),
+        event.lat!,
+        event.lng!,
+      );
 
-    print(distanceInMeters);
-    // 一定距離内に近づいたらプッシュ通知を送信
-    if (distanceInMeters < 100) {
-      await callFirebaseFunction();
+      print(distanceInMeters);
+      // 一定距離内に近づいたらプッシュ通知を送信
+      if (distanceInMeters < 100) {
+        // await writeMessage();
+      }
     }
   });
-
-  await writeMessage();
 
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp()),

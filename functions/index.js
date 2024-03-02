@@ -3,27 +3,25 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-// データベースの参照を取得する
-const fireStore = admin.firestore();
-
 //fcmに送る関数
-exports.pushTalk = functions.https.onCall(async (req, res) => {
-  const message = {
-    notification: {
-      title: "忘れてないですか？",
-      body: "近くにメモした内容",
-    },
-  };
+exports.pushTalk = functions
+  .region("asia-northeast1")
+  .https.onCall(async (req, res) => {
+    const message = {
+      notification: {
+        title: "忘れてないですか？",
+        body: "メモした位置の近くにいます。",
+      },
+      topic: "locationsMemo",
+    };
 
-  admin
-    .messaging()
-    .send(message)
-    .then((response) => {
-      console.log("Successfully sent message:", response);
-      res.status(200).send("Message sent successfully");
-    })
-    .catch((error) => {
-      console.log("Error sending message:", error);
-      res.status(500).send("Error sending message");
-    });
-});
+    admin
+      .messaging()
+      .send(message)
+      .then((response) => {
+        console.log("Successfully sent message:", response);
+      })
+      .catch((error) => {
+        console.log("Error sending message:", error);
+      });
+  });
