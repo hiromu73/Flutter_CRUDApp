@@ -9,9 +9,9 @@ void toDoPage({required BuildContext context}) => Navigator.push(
     context, MaterialPageRoute(builder: (context) => const ToDoApp()));
 
 void addPage({required BuildContext context}) => Navigator.push(
-    context, MaterialPageRoute(builder: (context) => const TodoAddPage()));
+    context, MaterialPageRoute(builder: (context) => TodoAddPage()));
 
 void mapSamplePage({required BuildContext context}) =>
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return  MapSample();
+      return MapSample();
     }));

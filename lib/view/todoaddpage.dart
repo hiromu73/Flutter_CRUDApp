@@ -10,14 +10,13 @@ import 'package:flutter_crudapp/constants/routes.dart' as routes;
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
 
-TextEditingController editController = TextEditingController();
-
 class TodoAddPage extends ConsumerWidget {
-  const TodoAddPage({super.key});
+  TodoAddPage({super.key});
+
+  final TextEditingController editController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    editController.text = "";
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
         .where((marker) => marker.check == true)
