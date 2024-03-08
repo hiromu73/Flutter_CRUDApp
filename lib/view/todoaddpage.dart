@@ -12,7 +12,6 @@ final memoProvider = StateProvider.autoDispose((ref) => "");
 
 class TodoAddPage extends ConsumerWidget {
   TodoAddPage({super.key});
-
   final TextEditingController editController = TextEditingController();
 
   @override

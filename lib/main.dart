@@ -18,13 +18,44 @@ final isAndroid =
     defaultTargetPlatform == TargetPlatform.android ? true : false;
 final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
 
-// functionを呼び出す。
 Future<void> writeMessage() async {
   HttpsCallable callable =
       FirebaseFunctions.instanceFor(region: 'asia-northeast1')
           .httpsCallable('pushTalk');
   final resp = await callable.call();
   print("result: ${resp.data}");
+}
+
+// 現在位置を取得するメソッド
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+  // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('ロケーションサービスが無効です。');
+  }
+
+  // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
+  permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    // デバイスの場所へのアクセス許可をリクエストする
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('デバイスの場所を取得するための許可がされていません。');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error('デバイスの場所を取得するための許可してください');
+  }
+
+  // デバイスの現在の場所を返す。
+  Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return position;
 }
 
 void main() async {
@@ -71,7 +102,7 @@ void main() async {
     sound: true,
   );
 
-  //トークン取得
+  // トークン取得
   // String? fcmToken = await FirebaseMessaging.instance.getToken();
 
   List<double> latitude = [];
@@ -95,15 +126,8 @@ void main() async {
     }
   }
 
-  print("longiLang-$longiLang");
-  print("latitude-$latitude");
-  print("name-$name");
-  print("---");
-
-// フォアグラウンドで位置情報の取得
-  Position position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
-  );
+  //  フォアグラウンドで現在位置を取得する。
+  final position = await _determinePosition();
 
   for (int i = 0; i < latitude.length; i++) {
     print(double.parse(latitude[i].toString()));
@@ -118,7 +142,7 @@ void main() async {
 
     if (distanceInMeters < 200) {
       print("Distance from document $i: $distanceInMeters meters");
-      // await writeMessage();
+      await writeMessage();
     }
   }
 
@@ -162,10 +186,10 @@ void main() async {
         event.lng!,
       );
 
-      print(distanceInMeters);
+      print("d-$distanceInMeters");
       // 一定距離内に近づいたらプッシュ通知を送信
       if (distanceInMeters < 100) {
-        // await writeMessage();
+        await writeMessage();
       }
     }
   });

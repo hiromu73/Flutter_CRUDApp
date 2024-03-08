@@ -11,7 +11,7 @@ class Predictions extends _$Predictions {
   void changePredictions(List<AutocompletePrediction> predictions) {
     for (var prediction in predictions) {
       state?.add(prediction);
-      print("${prediction}");
+      print("$prediction");
     }
   }
 }

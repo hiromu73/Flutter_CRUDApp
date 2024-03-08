@@ -116,6 +116,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
             check: checkedMarkerNames.contains(name) ? true : false);
       }
     }
+    return null;
   }
 
 // チェックの変更

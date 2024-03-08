@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/model.dart/googlemapcontrollernotifier.dart';
 import 'package:flutter_crudapp/model.dart/place.dart';
@@ -330,9 +329,9 @@ class CardSection extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         child: PageView(
             onPageChanged: (int index) async {
-              //スワイプ後のページのお店を取得
+              // スワイプ後のページのお店を取得
               final selectedShop = items.elementAt(index);
-              //現在のズームレベルを取得
+              // 現在のズームレベルを取得
               if (mapController != null) {
                 final zoomLevel = await mapController.getZoomLevel();
                 //スワイプ後のお店の座標までカメラを移動
@@ -520,7 +519,7 @@ class ShowTextModal extends ConsumerWidget {
           ),
           Expanded(
             child: ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: autoCompleteSearch.length,
                 itemBuilder: (context, index) {
