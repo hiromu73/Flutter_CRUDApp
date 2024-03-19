@@ -102,9 +102,6 @@ void main() async {
     sound: true,
   );
 
-  // トークン取得
-  // String? fcmToken = await FirebaseMessaging.instance.getToken();
-
   List<double> latitude = [];
   List<double> longiLang = [];
   List<String> name = [];
@@ -119,10 +116,12 @@ void main() async {
     dynamic fieldValues = documentSnapshot['longitude'];
     dynamic fieldNameValue = documentSnapshot['text'];
 
-    for (int i = 0; i < fieldValue.length; i++) {
-      latitude.add(double.parse(fieldValue[i].toString()));
-      longiLang.add(double.parse(fieldValues[i].toString()));
-      name.add(fieldNameValue);
+    if (fieldValue != null) {
+      for (int i = 0; i < fieldValue.length; i++) {
+        latitude.add(double.parse(fieldValue[i].toString()));
+        longiLang.add(double.parse(fieldValues[i].toString()));
+        name.add(fieldNameValue);
+      }
     }
   }
 
@@ -150,7 +149,7 @@ void main() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification!.android;
-
+    print('Message data: ${message.data}');
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin.show(
           notification.hashCode,

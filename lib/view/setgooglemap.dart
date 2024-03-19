@@ -11,6 +11,7 @@ import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 final googleMapControllerProvider =
@@ -33,23 +34,23 @@ class MapSample extends ConsumerWidget {
     if (_isFirstBuild) {
       _initializeOnes(ref);
     }
-
+    final currentPositionFuture = ref.watch(currentPositionProvider);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-    print("初回起動 $latitude");
-    print("初回起動 $longitude");
-
+    print("初期値 $latitude");
+    print("初期値 $longitude");
     // 初期位置
     // 質問Zoom①初回起動時に_initializeOnes(ref)で状態管理されたlatitude、longitudeで初期位置を設定したい。
-    CameraPosition initialLocation = const CameraPosition(
-      target: LatLng(34.758663, 135.4971856623888),
-      zoom: 15.0,
-    );
+    // CameraPosition initialLocation = CameraPosition(
+    //   target: LatLng(latitude, longitude),
+    //   zoom: 15.0,
+    // );
 
+    // print("初回起動時 $initialLocation");
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),
@@ -66,7 +67,6 @@ class MapSample extends ConsumerWidget {
           },
         )));
 
-    // IDのリスト
     List<String> idList = [];
     var uuid = const Uuid();
     var newId = uuid.v4();
@@ -75,7 +75,6 @@ class MapSample extends ConsumerWidget {
     }
     idList.add(newId);
 
-    // 画面が初期化された際にフォーカスを外す
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
@@ -86,29 +85,39 @@ class MapSample extends ConsumerWidget {
       child: Scaffold(
         body: Stack(
           children: <Widget>[
-            GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
-                ref
-                    .read(googleMapControllerProvider.notifier)
-                    .setController(controller);
-              },
-              markers: markers,
-              mapType: MapType.normal,
-              initialCameraPosition: initialLocation,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              onTap: (LatLng latLang) {
-                // // map上に新たにマーカーを追加(初回時はチェックされている状態なので緑になる。)
-                // final latitude = latLang.latitude;
-                // final longitude = latLang.longitude;
-                // final uid =
-                //     '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
-                // ref
-                //     .read(autoCompleteSearchTypeProvider.notifier)
-                //     .onTapAddMarker(latitude, longitude, uid, true);
-              },
-              zoomGesturesEnabled: true,
+            currentPositionFuture.maybeWhen(
+              data: (data) => GoogleMap(
+                onMapCreated: (GoogleMapController controller) {
+                  _mapController = controller;
+                  ref
+                      .read(googleMapControllerProvider.notifier)
+                      .setController(controller);
+                  print("map表示");
+                  print(data.longitude);
+                },
+                markers: markers,
+                mapType: MapType.normal,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(data.latitude, data.longitude),
+                  zoom: 15.0,
+                ),
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                onTap: (LatLng latLang) {
+                  // // map上に新たにマーカーを追加(初回時はチェックされている状態なので緑になる。)
+                  // final latitude = latLang.latitude;
+                  // final longitude = latLang.longitude;
+                  // final uid =
+                  //     '${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(999999)}';
+                  // ref
+                  //     .read(autoCompleteSearchTypeProvider.notifier)
+                  //     .onTapAddMarker(latitude, longitude, uid, true);
+                },
+                zoomGesturesEnabled: true,
+              ),
+              orElse: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
             // 簡易選択モーダル表示
             Align(
@@ -194,12 +203,11 @@ class MapSample extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // 登録ボタン
                     ClipOval(
                       child: Material(
-                        color: Colors.blue[400], // ボタンを押す前のカラー
+                        color: Colors.blue[400],
                         child: InkWell(
-                            splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                            splashColor: Colors.blue[400],
                             child: const SizedBox(
                               width: 50,
                               height: 50,
@@ -212,26 +220,29 @@ class MapSample extends ConsumerWidget {
                     // 現在位置ボタン
                     ClipOval(
                       child: Material(
-                        color: Colors.blue[400], // ボタンを押す前のカラー
+                        color: Colors.blue[400],
                         child: InkWell(
-                          splashColor: Colors.blue[400], // ボタンを押した後のカラー
+                          splashColor: Colors.blue[400],
                           child: const SizedBox(
                             width: 50,
                             height: 50,
                             child: Icon(Icons.my_location, color: Colors.white),
                           ),
                           onTap: () async {
-                            print(ref.watch(latitudeProvider));
-                            print(ref.watch(longitudeProvider));
-                            await _mapController.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                CameraPosition(
-                                  target: LatLng(ref.watch(latitudeProvider),
-                                      ref.watch(longitudeProvider)),
+                            print("現在位置 $currentPositionFuture.latitude");
+                            await _mapController
+                                .animateCamera(CameraUpdate.newCameraPosition(
+                              currentPositionFuture.maybeWhen(
+                                data: (data) => CameraPosition(
+                                  target: LatLng(data.latitude, data.longitude),
+                                  zoom: 15.0,
+                                ),
+                                orElse: () => const CameraPosition(
+                                  target: LatLng(0, 0),
                                   zoom: 15.0,
                                 ),
                               ),
-                            );
+                            ));
                           },
                         ),
                       ),
@@ -293,8 +304,6 @@ class CardSection extends ConsumerWidget {
   final PageController pageController;
   CardSection({Key? key, required this.pageController}) : super(key: key);
 
-// 画面が戻った時にスクロール位置を調整する
-
   @override
   Widget build(
     BuildContext context,
@@ -329,12 +338,9 @@ class CardSection extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         child: PageView(
             onPageChanged: (int index) async {
-              // スワイプ後のページのお店を取得
               final selectedShop = items.elementAt(index);
-              // 現在のズームレベルを取得
               if (mapController != null) {
                 final zoomLevel = await mapController.getZoomLevel();
-                //スワイプ後のお店の座標までカメラを移動
                 mapController.animateCamera(
                   CameraUpdate.newCameraPosition(
                     CameraPosition(
@@ -444,8 +450,13 @@ Future _initializeOnes(WidgetRef ref) async {
   final position = await _determinePosition();
   ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
   ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
+  final latitude = ref.watch(latitudeProvider);
+  final longitude = ref.watch(longitudeProvider);
+  print("初期値 $latitude");
+  print("初期値 $longitude");
 }
 
+// テキスト検索モーダル
 class ShowTextModal extends ConsumerWidget {
   final TextEditingController textController = TextEditingController();
   ShowTextModal({Key? key}) : super(key: key);
@@ -602,7 +613,7 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
           Flexible(
             child: ListTile(
               title: Text(place.name!),
-              subtitle: Text('現在地から${distanceInMeters.toStringAsFixed(0)} km'),
+              subtitle: Text('現在地から${distanceInMeters.toStringAsFixed(0)} m'),
               trailing: Checkbox(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20))),
@@ -623,7 +634,6 @@ Widget menuItem(Place place, double currentLatitude, double currentLongitude,
         await ref
             .read(autoCompleteSearchProvider.notifier)
             .checkChange(place.uid, true);
-        // setMarkder(ref);
       } else {
         await ref
             .read(autoCompleteSearchProvider.notifier)

@@ -6,7 +6,22 @@ part of 'latitude.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$latitudeHash() => r'c38f45345f28c7726477e722625d0d026884ee3c';
+String _$currentPositionHash() => r'3abd741cd71d7bdcd474eb10908f5097d7e67b00';
+
+/// See also [currentPosition].
+@ProviderFor(currentPosition)
+final currentPositionProvider = AutoDisposeFutureProvider<Position>.internal(
+  currentPosition,
+  name: r'currentPositionProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentPositionHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentPositionRef = AutoDisposeFutureProviderRef<Position>;
+String _$latitudeHash() => r'600adb2a11c199b8d6fa24689145e543dbf5d036';
 
 /// See also [Latitude].
 @ProviderFor(Latitude)

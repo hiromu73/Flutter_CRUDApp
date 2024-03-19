@@ -37,8 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_riverpod: ^2.4.9
   firebase_auth: ^4.6.3
-  cloud_firestore: ^4.8.1
-  firebase_core: ^2.14.0
+  cloud_firestore: ^4.15.8
+  firebase_core: ^2.27.0
   google_maps_flutter: ^2.3.1
   geolocator: ^10.0.1
   google_place: ^0.4.7
@@ -46,7 +46,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   geocoding: ^2.1.0
   url_launcher: ^6.1.14
-  flutter_local_notifications: ^15.1.1
+  flutter_local_notifications: ^17.0.0
   timezone: ^0.9.2
   flutter_app_badger: ^1.5.0
   riverpod_annotation: ^2.3.3
@@ -56,7 +56,7 @@ dependencies:
   firebase_messaging: ^14.6.9
   background_task: ^0.1.1+1
   firebase_messaging_platform_interface: ^4.5.24
-  cloud_functions: ^4.6.5
+  cloud_functions: ^4.6.8
 
 dev_dependencies:
   flutter_test:

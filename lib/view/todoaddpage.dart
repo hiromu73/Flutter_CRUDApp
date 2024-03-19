@@ -113,36 +113,53 @@ class TodoAddPage extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30))),
-                    onPressed: () async {
-                      if (textMemo != "") {
-                        final date = DateTime.now().toLocal().toIso8601String();
-                        await FirebaseFirestore.instance
-                            .collection('post')
-                            .doc()
-                            .set({
-                          'text': textMemo,
-                          'checkName': checkedMarkerNames.isNotEmpty
-                              ? checkedMarkerNames
-                              : null,
-                          'latitude': checkedMarkerLatitudes.isNotEmpty
-                              ? checkedMarkerLatitudes
-                              : null,
-                          'longitude': checkedMarkerLongitudes.isNotEmpty
-                              ? checkedMarkerLongitudes
-                              : null,
-                          'date': date,
-                          'alert': true,
-                        });
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30))),
+                      child: const Text(registration),
+                      onPressed: () async {
+                        if (textMemo != "") {
+                          final date =
+                              DateTime.now().toLocal().toIso8601String();
+                          await FirebaseFirestore.instance
+                              .collection('post')
+                              .doc()
+                              .set({
+                            'text': textMemo,
+                            'checkName': checkedMarkerNames.isNotEmpty
+                                ? checkedMarkerNames
+                                : null,
+                            'latitude': checkedMarkerLatitudes.isNotEmpty
+                                ? checkedMarkerLatitudes
+                                : null,
+                            'longitude': checkedMarkerLongitudes.isNotEmpty
+                                ? checkedMarkerLongitudes
+                                : null,
+                            'date': date,
+                            'alert': true,
+                          });
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: const Text(
+                                      'No content has been entered.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              });
                         }
-                      }
-                    },
-                    child: const Text(registration),
-                  ),
+                      }),
                   const SizedBox(
                     width: 50,
                   ),

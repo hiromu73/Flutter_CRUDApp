@@ -1,17 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.flutter_crudapp">
-   <application
-        android:label="flutter_crudapp"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
-        <!-- 追加 -->
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyB3hlptGf6fXPV4rmv_WObYCuUFBrQ1doM"/>
-        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="high_importance_channel" />
         <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
         <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
         <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
         <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
         <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+   <application
+        android:label="flutter_crudapp"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        <!-- 追加 -->
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyB3hlptGf6fXPV4rmv_WObYCuUFBrQ1doM"/>
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="high_importance_channel" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -46,5 +47,14 @@
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />
+                <!-- [START firebase_service] -->
+        <!-- <service
+            android:name=".java.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service> -->
+        <!-- [END firebase_service] -->
     </application>
 </manifest>

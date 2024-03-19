@@ -6,7 +6,7 @@ part of 'predictions.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$predictionsHash() => r'a97461f918fb2250dd2b3e485fb0923e50469727';
+String _$predictionsHash() => r'3ee26a057b178b4109aa707e137a5f648f2210e8';
 
 /// See also [Predictions].
 @ProviderFor(Predictions)

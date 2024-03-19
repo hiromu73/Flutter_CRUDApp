@@ -1,25 +1,30 @@
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
+// allprojects {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.0'
-        // START: FlutterFire Configuration
-        classpath 'com.google.gms:google-services:4.3.10'
-        // END: FlutterFire Configuration
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // classpath 'com.android.tools.build:gradle:4.2.2'
-    }
-}
+    // dependencies {
+    //     classpath 'com.android.tools.build:gradle:7.4.0'
+    //     // START: FlutterFire Configuration
+    //     classpath 'com.google.gms:google-services:4.3.10'
+    //     // END: FlutterFire Configuration
+    //     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
+    // }
+// }
 
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+        dependencies {
+        // classpath 'com.android.tools.build:gradle:7.4.0'
+        // START: FlutterFire Configuration
+        // classpath 'com.google.gms:google-services:4.3.10'
+        // // END: FlutterFire Configuration
+        // classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 

@@ -109,7 +109,7 @@ class AutoCompleteSearchType extends _$AutoCompleteSearchType {
   Future<void> checkFalseChange() async {
     state = state.map((place) {
       if (place.check == true) {
-         // チェック状態を切り替え
+        // チェック状態を切り替え
         return place.copyWith(check: !place.check);
       }
       return place;

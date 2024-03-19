@@ -138,7 +138,7 @@ class AutoCompleteSearch extends _$AutoCompleteSearch {
     state = state;
   }
 
-Future<void> checkFalseChange() async {
+  Future<void> checkFalseChange() async {
     state = state.map((place) {
       if (place.check == true) {
         return place.copyWith(check: !place.check); // チェック状態を切り替え
@@ -153,5 +153,4 @@ Future<void> checkFalseChange() async {
   Future<List<Place>> getCheckedPlaces() async {
     return state.where((place) => place.check).toList();
   }
-
 }
