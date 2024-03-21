@@ -205,7 +205,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter CrudApp',
+      title: 'memoPlace',
       theme: ThemeData(
           primaryColor: const MaterialColor(
         0xFFFFFFFF,

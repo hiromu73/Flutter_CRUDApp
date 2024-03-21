@@ -8,7 +8,7 @@
    <application
         android:label="flutter_crudapp"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         <!-- 追加 -->
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyB3hlptGf6fXPV4rmv_WObYCuUFBrQ1doM"/>

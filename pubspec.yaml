@@ -17,7 +17,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: ">=2.19.0-146.2.beta <3.0.0"
@@ -57,6 +57,7 @@ dependencies:
   background_task: ^0.1.1+1
   firebase_messaging_platform_interface: ^4.5.24
   cloud_functions: ^4.6.8
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,11 @@ dev_dependencies:
   riverpod_lint: ^2.3.7
   build_runner: ^2.4.7
   riverpod_generator: ^2.3.9
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/memoPlaceicon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
