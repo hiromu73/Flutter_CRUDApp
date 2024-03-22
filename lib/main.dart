@@ -1,6 +1,5 @@
 // flutter
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // package
 import 'package:firebase_core/firebase_core.dart';
@@ -14,10 +13,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 // プラットフォームの確認
-final isAndroid =
-    defaultTargetPlatform == TargetPlatform.android ? true : false;
-final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
+// final isAndroid =
+//     defaultTargetPlatform == TargetPlatform.android ? true : false;
+// final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
 
+// function
 Future<void> writeMessage() async {
   HttpsCallable callable =
       FirebaseFunctions.instanceFor(region: 'asia-northeast1')
@@ -89,9 +89,6 @@ void main() async {
   // push通知のパーミションの設定
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  // トピック作成
-  FirebaseMessaging.instance.subscribeToTopic('locationsMemo');
-
   await messaging.requestPermission(
     alert: true,
     announcement: false,
@@ -101,6 +98,9 @@ void main() async {
     provisional: false,
     sound: true,
   );
+
+  // トピック作成
+  FirebaseMessaging.instance.subscribeToTopic('locationsMemo');
 
   List<double> latitude = [];
   List<double> longiLang = [];

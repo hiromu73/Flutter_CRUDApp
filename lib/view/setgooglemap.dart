@@ -11,7 +11,6 @@ import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 final googleMapControllerProvider =
@@ -39,18 +38,16 @@ class MapSample extends ConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    final latitude = ref.watch(latitudeProvider);
-    final longitude = ref.watch(longitudeProvider);
-    print("初期値 $latitude");
-    print("初期値 $longitude");
+    // final latitude = ref.watch(latitudeProvider);
+    // final longitude = ref.watch(longitudeProvider);
+    print("ビルド");
+
     // 初期位置
     // 質問Zoom①初回起動時に_initializeOnes(ref)で状態管理されたlatitude、longitudeで初期位置を設定したい。
     // CameraPosition initialLocation = CameraPosition(
     //   target: LatLng(latitude, longitude),
     //   zoom: 15.0,
     // );
-
-    // print("初回起動時 $initialLocation");
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),
@@ -92,8 +89,6 @@ class MapSample extends ConsumerWidget {
                   ref
                       .read(googleMapControllerProvider.notifier)
                       .setController(controller);
-                  print("map表示");
-                  print(data.longitude);
                 },
                 markers: markers,
                 mapType: MapType.normal,
@@ -450,10 +445,6 @@ Future _initializeOnes(WidgetRef ref) async {
   final position = await _determinePosition();
   ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
   ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
-  final latitude = ref.watch(latitudeProvider);
-  final longitude = ref.watch(longitudeProvider);
-  print("初期値 $latitude");
-  print("初期値 $longitude");
 }
 
 // テキスト検索モーダル
