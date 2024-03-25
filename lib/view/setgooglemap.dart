@@ -396,7 +396,7 @@ List<Widget> shopTiles(
                       ]
                     : [
                         Text(place.name as String),
-                        Text('現在地から${distances[index].ceilToDouble()} km')
+                        Text('現在地から${distances[index].ceilToDouble()} m')
                       ]
               ]),
             ),

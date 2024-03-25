@@ -139,7 +139,7 @@ void main() async {
     );
     print(" $i: $distanceInMeters meters");
 
-    if (distanceInMeters < 200) {
+    if (distanceInMeters < 1000) {
       print("Distance from document $i: $distanceInMeters meters");
       await writeMessage();
     }
@@ -150,6 +150,7 @@ void main() async {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification!.android;
     print('Message data: ${message.data}');
+    print('フォアグラんうんど');
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin.show(
           notification.hashCode,
@@ -168,6 +169,7 @@ void main() async {
   // バックグラウンド
   BackgroundTask.instance.stream.listen((event) async {
     print('Received location: ${event.lat}, ${event.lng}');
+    print('Received location: aaaaaaaa');
 
     // バックグラウンドで位置情報の使用を開始
     await BackgroundTask.instance.start();
@@ -187,7 +189,7 @@ void main() async {
 
       print("d-$distanceInMeters");
       // 一定距離内に近づいたらプッシュ通知を送信
-      if (distanceInMeters < 100) {
+      if (distanceInMeters < 1000) {
         await writeMessage();
       }
     }
