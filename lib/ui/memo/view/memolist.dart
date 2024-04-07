@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/ui/todo/view_model/firebase_model.dart';
+import 'package:flutter_crudapp/ui/memo/view_model/firebase_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FirebaseCollection extends ConsumerWidget {
-  const FirebaseCollection({super.key});
+class MemoList extends ConsumerWidget {
+  const MemoList({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // AsyncValueは非同期的に更新されるデータを安全に取り扱うためにRiverPodに内包されている

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // package
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_crudapp/ui/firebase_options.dart';
-import 'package:flutter_crudapp/ui/todo/view/todoapp.dart';
+import 'package:flutter_crudapp/ui/memo/view/memoapp.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -182,7 +182,6 @@ void main() async {
   });
 
   print('バックグラウンド');
-  // await BackgroundTask.instance.stop();
 
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false),
@@ -204,7 +203,7 @@ class MyApp extends StatelessWidget {
           500: Color(0xFFFFFFFF),
         },
       )),
-      home: const ToDoApp(),
+      home: const MemoApp(),
     );
   }
 }

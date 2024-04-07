@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
 import 'package:flutter_crudapp/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../todo/view/todoapp.dart';
+import '../../memo/view/memoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
 
-class TodoAddPage extends ConsumerWidget {
-  TodoAddPage({super.key});
+class AddPage extends ConsumerWidget {
+  AddPage({super.key});
   final TextEditingController editController = TextEditingController();
 
   @override
@@ -50,7 +50,7 @@ class TodoAddPage extends ConsumerWidget {
               color: Colors.black54,
             ),
             onPressed: () {
-              Navigator.of(context).pop(const ToDoApp());
+              Navigator.of(context).pop(const MemoApp());
             }),
       ),
       body: Center(
@@ -61,7 +61,6 @@ class TodoAddPage extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextFormField(
-                // 質問Zoom②値が残ってしまう。
                 controller: editController,
                 maxLength: null,
                 maxLines: null,
