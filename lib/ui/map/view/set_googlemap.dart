@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/ui/map/view_model/googlemapcontrollernotifier.dart';
+import 'package:flutter_crudapp/ui/map/view_model/googlemap_controller_notifier.dart';
 import 'package:flutter_crudapp/model/map/place.dart';
 import 'package:flutter_crudapp/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:flutter_crudapp/ui/map/view_model/latitude.dart';
 import 'package:flutter_crudapp/ui/map/view_model/longitude.dart';
 import 'package:flutter_crudapp/ui/map/view_model/autocomplete_search.dart';
-import 'package:flutter_crudapp/ui/map/view_model/selectitem.dart';
+import 'package:flutter_crudapp/ui/map/view_model/select_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,8 +18,8 @@ final googleMapControllerProvider =
   (ref) => GoogleMapControllerNotifier(),
 );
 
-class MapSample extends ConsumerWidget {
-  MapSample({super.key});
+class SetGoogleMap extends ConsumerWidget {
+  SetGoogleMap({super.key});
   final bool _isFirstBuild = true;
   late GoogleMapController _mapController;
 

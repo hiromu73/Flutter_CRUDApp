@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'textpredictions.dart';
+part of 'map_initialized_model.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$textPredictionsHash() => r'1de1d6c6df9577ddc1850575fbc8a25c17574253';
+String _$mapInitializedModelHash() =>
+    r'5b055a33f233ad40e7d5d6fc3b4dae1734ef1daa';
 
-/// See also [TextPredictions].
-@ProviderFor(TextPredictions)
-final textPredictionsProvider = AutoDisposeNotifierProvider<TextPredictions,
-    AutocompleteResponse?>.internal(
-  TextPredictions.new,
-  name: r'textPredictionsProvider',
+/// See also [MapInitializedModel].
+@ProviderFor(MapInitializedModel)
+final mapInitializedModelProvider =
+    AutoDisposeNotifierProvider<MapInitializedModel, bool>.internal(
+  MapInitializedModel.new,
+  name: r'mapInitializedModelProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$textPredictionsHash,
+      : _$mapInitializedModelHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$TextPredictions = AutoDisposeNotifier<AutocompleteResponse?>;
+typedef _$MapInitializedModel = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

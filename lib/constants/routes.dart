@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/ui/map/view/setgooglemap.dart';
+import 'package:flutter_crudapp/ui/map/view/set_googlemap.dart';
 import 'package:flutter_crudapp/ui/todoadd/view/todoaddpage.dart';
 import 'package:flutter_crudapp/ui/todo/view/todoapp.dart';
 
@@ -12,5 +12,5 @@ void addPage({required BuildContext context}) => Navigator.push(
 
 void mapSamplePage({required BuildContext context}) =>
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return MapSample();
+      return SetGoogleMap();
     }));

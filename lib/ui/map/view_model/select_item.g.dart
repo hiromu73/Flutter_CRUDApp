@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'selectitem.dart';
+part of 'select_item.dart';
 
 // **************************************************************************
 // RiverpodGenerator

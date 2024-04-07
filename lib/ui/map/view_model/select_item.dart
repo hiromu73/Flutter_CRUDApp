@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'selectitem.g.dart';
+part 'select_item.g.dart';
 
 @riverpod
 class SelectItems extends _$SelectItems {

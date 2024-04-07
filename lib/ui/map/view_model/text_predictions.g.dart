@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'menuitemcheckbox.dart';
+part of 'text_predictions.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$menuItemCheckBoxHash() => r'c9bd5c17dcee4728e93b6a1e7165419a8c97d8f8';
+String _$textPredictionsHash() => r'1de1d6c6df9577ddc1850575fbc8a25c17574253';
 
-/// See also [MenuItemCheckBox].
-@ProviderFor(MenuItemCheckBox)
-final menuItemCheckBoxProvider =
-    AutoDisposeNotifierProvider<MenuItemCheckBox, bool>.internal(
-  MenuItemCheckBox.new,
-  name: r'menuItemCheckBoxProvider',
+/// See also [TextPredictions].
+@ProviderFor(TextPredictions)
+final textPredictionsProvider = AutoDisposeNotifierProvider<TextPredictions,
+    AutocompleteResponse?>.internal(
+  TextPredictions.new,
+  name: r'textPredictionsProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$menuItemCheckBoxHash,
+      : _$textPredictionsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$MenuItemCheckBox = AutoDisposeNotifier<bool>;
+typedef _$TextPredictions = AutoDisposeNotifier<AutocompleteResponse?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
