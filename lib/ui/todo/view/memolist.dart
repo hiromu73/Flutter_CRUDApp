@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/model/riverpod.dart/firebase_model.dart';
+import 'package:flutter_crudapp/ui/todo/view_model/firebase_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FirebaseCollection extends ConsumerWidget {

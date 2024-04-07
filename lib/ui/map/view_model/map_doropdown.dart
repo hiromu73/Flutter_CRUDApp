@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-// 命名規則ファイル名.g.dart
 part 'map_doropdown.g.dart';
 
 @riverpod

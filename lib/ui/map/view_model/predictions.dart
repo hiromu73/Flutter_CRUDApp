@@ -15,6 +15,3 @@ class Predictions extends _$Predictions {
     }
   }
 }
-
-      // print("Description: ${prediction.description}");
-      // print("Place ID: ${prediction.placeId}");

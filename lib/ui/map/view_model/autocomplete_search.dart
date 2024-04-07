@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter_crudapp/api.dart';
-import 'package:flutter_crudapp/model/place.dart';
-import 'package:flutter_crudapp/model/riverpod.dart/autocomplete_search_type.dart';
+import 'package:flutter_crudapp/model/map/place.dart';
+import 'package:flutter_crudapp/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;

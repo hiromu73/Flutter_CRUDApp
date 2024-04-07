@@ -9,8 +9,6 @@ class MenuItemCheckBox extends _$MenuItemCheckBox {
   bool build() => false;
 
   Future<void> checkChange(bool value) async {
-    print("checkChangeメソッドの値は$value");
     state = value;
-    print("checkChangeメソッド後の値は$state");
   }
 }
