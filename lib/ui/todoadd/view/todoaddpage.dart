@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
+import 'package:flutter_crudapp/model/riverpod.dart/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import './todoapp.dart';
+import '../../todo/view/todoapp.dart';
 // constants
 import 'package:flutter_crudapp/constants/routes.dart' as routes;
 

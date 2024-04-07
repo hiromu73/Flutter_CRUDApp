@@ -23,8 +23,6 @@ class _SerachPage extends State<SerachPage> with WidgetsBindingObserver {
     super.initState();
     googlePlace = GooglePlace(apiKey);
     WidgetsBinding.instance.addObserver(this);
-    // initState()はFutureできないのでメソッドを格納。
-    // initState();
   }
 
   @override

@@ -1,8 +1,7 @@
-// flutter
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/view/setgooglemap.dart';
-import 'package:flutter_crudapp/view/todoaddpage.dart';
-import 'package:flutter_crudapp/view/todoapp.dart';
+import 'package:flutter_crudapp/ui/map/view/setgooglemap.dart';
+import 'package:flutter_crudapp/ui/todoadd/view/todoaddpage.dart';
+import 'package:flutter_crudapp/ui/todo/view/todoapp.dart';
 
 // pages
 void toDoPage({required BuildContext context}) => Navigator.push(

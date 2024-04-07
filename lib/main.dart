@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // package
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_crudapp/view/firebase_options.dart';
-import 'package:flutter_crudapp/view/todoapp.dart';
+import 'package:flutter_crudapp/ui/firebase_options.dart';
+import 'package:flutter_crudapp/ui/todo/view/todoapp.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -58,18 +58,22 @@ Future<Position> _determinePosition() async {
   return position;
 }
 
+// Andorid構成
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  importance: Importance.max,
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-// Andorid構成
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    importance: Importance.max,
-  );
+  // バックグラウンドで位置情報の使用を開始
+  print("バックグラウンドスタート");
+  await BackgroundTask.instance.start();
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -115,8 +119,10 @@ void main() async {
     dynamic fieldValue = documentSnapshot['latitude'];
     dynamic fieldValues = documentSnapshot['longitude'];
     dynamic fieldNameValue = documentSnapshot['text'];
+    dynamic fieldAlert = documentSnapshot['alert'];
+    print(fieldAlert);
 
-    if (fieldValue != null) {
+    if (fieldValue != null && fieldAlert == true) {
       for (int i = 0; i < fieldValue.length; i++) {
         latitude.add(double.parse(fieldValue[i].toString()));
         longiLang.add(double.parse(fieldValues[i].toString()));
@@ -127,30 +133,39 @@ void main() async {
 
   //  フォアグラウンドで現在位置を取得する。
   final position = await _determinePosition();
+  print("位置情報を取得");
 
-  for (int i = 0; i < latitude.length; i++) {
-    print(double.parse(latitude[i].toString()));
-    print(double.parse(longiLang[i].toString()));
-    double distanceInMeters = Geolocator.distanceBetween(
-      double.parse(latitude[i].toString()),
-      double.parse(longiLang[i].toString()),
-      position.latitude,
-      position.longitude,
-    );
-    print(" $i: $distanceInMeters meters");
+  //  位置情報が検知されると発火する
+  BackgroundTask.instance.stream.listen((event) async {
+    print("位置情報をListen");
+    for (int i = 0; i < latitude.length; i++) {
+      print(double.parse(latitude[i].toString()));
+      print(double.parse(longiLang[i].toString()));
+      double distanceInMeters = Geolocator.distanceBetween(
+        double.parse(latitude[i].toString()),
+        double.parse(longiLang[i].toString()),
+        position.latitude,
+        position.longitude,
+      );
+      print(" $i: $distanceInMeters meters");
 
-    if (distanceInMeters < 1000) {
-      print("Distance from document $i: $distanceInMeters meters");
-      await writeMessage();
+      if (distanceInMeters < 1000) {
+        print("Distance from document $i: $distanceInMeters meters");
+        await writeMessage();
+      }
     }
-  }
 
-// フォアグラウンドでのメッセージを受信した際の処理
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+    );
+  });
+
+  // フォアグラウンドでのメッセージを受信した際の処理
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification!.android;
     print('Message data: ${message.data}');
-    print('フォアグラんうんど');
+    print('フォアグラウンドでのメッセージを受信した際の処理');
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin.show(
           notification.hashCode,
@@ -166,37 +181,11 @@ void main() async {
     }
   });
 
-  // バックグラウンド
-  BackgroundTask.instance.stream.listen((event) async {
-    print('Received location: ${event.lat}, ${event.lng}');
-    print('Received location: aaaaaaaa');
-
-    // バックグラウンドで位置情報の使用を開始
-    await BackgroundTask.instance.start();
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-    );
-
-    for (int i = 0; i < latitude.length; i++) {
-      print(double.parse(latitude[i].toString()));
-      print(double.parse(longiLang[i].toString()));
-      double distanceInMeters = Geolocator.distanceBetween(
-        double.parse(latitude[i].toString()),
-        double.parse(longiLang[i].toString()),
-        event.lat!,
-        event.lng!,
-      );
-
-      print("d-$distanceInMeters");
-      // 一定距離内に近づいたらプッシュ通知を送信
-      if (distanceInMeters < 1000) {
-        await writeMessage();
-      }
-    }
-  });
+  print('バックグラウンド');
+  // await BackgroundTask.instance.stop();
 
   runApp(const ProviderScope(
-    child: MaterialApp(home: MyApp()),
+    child: MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false),
   ));
 }
 

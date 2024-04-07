@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/model.dart/googlemapcontrollernotifier.dart';
-import 'package:flutter_crudapp/model.dart/place.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search_type.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/latitude.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/longitude.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/autocomplete_search.dart';
-import 'package:flutter_crudapp/model.dart/riverpod.dart/selectitem.dart';
+import 'package:flutter_crudapp/model/googlemapcontrollernotifier.dart';
+import 'package:flutter_crudapp/model/place.dart';
+import 'package:flutter_crudapp/model/riverpod.dart/autocomplete_search_type.dart';
+import 'package:flutter_crudapp/model/riverpod.dart/latitude.dart';
+import 'package:flutter_crudapp/model/riverpod.dart/longitude.dart';
+import 'package:flutter_crudapp/model/riverpod.dart/autocomplete_search.dart';
+import 'package:flutter_crudapp/model/riverpod.dart/selectitem.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,12 +21,11 @@ final googleMapControllerProvider =
 class MapSample extends ConsumerWidget {
   MapSample({super.key});
   final bool _isFirstBuild = true;
+  late GoogleMapController _mapController;
 
   final pageController = PageController(
     viewportFraction: 0.85,
   );
-
-  late GoogleMapController _mapController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,13 +40,6 @@ class MapSample extends ConsumerWidget {
     // final latitude = ref.watch(latitudeProvider);
     // final longitude = ref.watch(longitudeProvider);
     print("ビルド");
-
-    // 初期位置
-    // 質問Zoom①初回起動時に_initializeOnes(ref)で状態管理されたlatitude、longitudeで初期位置を設定したい。
-    // CameraPosition initialLocation = CameraPosition(
-    //   target: LatLng(latitude, longitude),
-    //   zoom: 15.0,
-    // );
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),
@@ -496,8 +488,8 @@ class ShowTextModal extends ConsumerWidget {
                 List<String> englishNames = [];
                 for (String japaneseName in japaneseNames) {
                   String trimmedJapaneseName = japaneseName.trim();
-                  if (itemNameMap.containsKey(trimmedJapaneseName)) {
-                    englishNames.add(itemNameMap[trimmedJapaneseName]!);
+                  if (categoryList.containsKey(trimmedJapaneseName)) {
+                    englishNames.add(categoryList[trimmedJapaneseName]!);
                   }
                 }
                 // タイプあり検索処理
@@ -652,7 +644,7 @@ class ShowModal extends ConsumerWidget {
           Wrap(
             runSpacing: 16,
             spacing: 16,
-            children: itemNameMap.keys.map((item) {
+            children: categoryList.keys.map((item) {
               return InkWell(
                 borderRadius: const BorderRadius.all(Radius.circular(32)),
                 onTap: () async {
@@ -664,8 +656,8 @@ class ShowModal extends ConsumerWidget {
                       List<String> englishNames = [];
                       for (String japaneseName in japaneseNames) {
                         String trimmedJapaneseName = japaneseName.trim();
-                        if (itemNameMap.containsKey(trimmedJapaneseName)) {
-                          englishNames.add(itemNameMap[trimmedJapaneseName]!);
+                        if (categoryList.containsKey(trimmedJapaneseName)) {
+                          englishNames.add(categoryList[trimmedJapaneseName]!);
                         }
                       }
                       await ref
@@ -684,8 +676,8 @@ class ShowModal extends ConsumerWidget {
                     List<String> englishNames = [];
                     for (String japaneseName in japaneseNames) {
                       String trimmedJapaneseName = japaneseName.trim();
-                      if (itemNameMap.containsKey(trimmedJapaneseName)) {
-                        englishNames.add(itemNameMap[trimmedJapaneseName]!);
+                      if (categoryList.containsKey(trimmedJapaneseName)) {
+                        englishNames.add(categoryList[trimmedJapaneseName]!);
                       }
                     }
                     await ref

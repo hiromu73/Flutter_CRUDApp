@@ -1,5 +1,3 @@
-// title
-
 const String memo = "内容を記載して下さい。";
 const String positionSearch = "場所の検索";
 const String registration = "登録";
@@ -14,7 +12,7 @@ const String addPage = "AddPage";
 const String serach = "この条件で検索";
 const String serachPosition = "検索したい場所を入力";
 
-final Map<String, String> itemNameMap = {
+final Map<String, String> categoryList = {
   'スーパー': 'supermarket',
   'ドラッグストア': 'drugstore',
   '書店': 'book_store',
