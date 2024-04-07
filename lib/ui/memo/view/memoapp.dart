@@ -27,9 +27,11 @@ class MemoApp extends ConsumerWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-          // heroTag: "heroId$newId", // 複数のfabを設定する場合に識別するためuniqueなタグを設定する。
-          child: const Icon(Icons.add),
-          onPressed: () => routes.addPage(context: context)),
+        // heroTag: "heroId$newId", // 複数のfabを設定する場合に識別するためuniqueなタグを設定する。
+        backgroundColor: Colors.white38,
+        onPressed: () => routes.addPage(context: context),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

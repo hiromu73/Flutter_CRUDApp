@@ -18,12 +18,16 @@ import 'package:cloud_functions/cloud_functions.dart';
 // final isIOS = defaultTargetPlatform == TargetPlatform.iOS ? true : false;
 
 // function
-Future<void> writeMessage() async {
+Future<void> pushMessage() async {
   HttpsCallable callable =
       FirebaseFunctions.instanceFor(region: 'asia-northeast1')
           .httpsCallable('pushTalk');
-  final resp = await callable.call();
-  print("result: ${resp.data}");
+  final fcm = FirebaseMessaging.instance;
+  final token = await fcm.getToken();
+  final resp = await callable
+      .call({'title': '忘れてないですか？', 'body': '自分から届きました', 'token': token});
+  final data = resp.data;
+  print("result: $data");
 }
 
 // 現在位置を取得するメソッド
@@ -151,7 +155,7 @@ void main() async {
 
       if (distanceInMeters < 1000) {
         print("Distance from document $i: $distanceInMeters meters");
-        await writeMessage();
+        await pushMessage();
       }
     }
 
@@ -176,6 +180,13 @@ void main() async {
               channel.id,
               channel.name,
               icon: android.smallIcon,
+              // sound: ,
+            ),
+            iOS: const DarwinNotificationDetails(
+              presentAlert: true,
+              presentSound: true,
+              presentBanner: true,
+              // sound:, // 音声ファイル設定する！
             ),
           ));
     }
@@ -198,11 +209,12 @@ class MyApp extends StatelessWidget {
       title: 'memoPlace',
       theme: ThemeData(
           primaryColor: const MaterialColor(
-        0xFFFFFFFF,
-        <int, Color>{
-          500: Color(0xFFFFFFFF),
-        },
-      )),
+            0xFFFFFFFF,
+            <int, Color>{
+              500: Color(0xFFFFFFFF),
+            },
+          ),
+          hoverColor: Colors.amber[400]),
       home: const MemoApp(),
     );
   }
