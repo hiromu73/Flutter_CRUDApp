@@ -206,15 +206,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'memoPlace',
+      title: 'MemoPlace',
       theme: ThemeData(
-          primaryColor: const MaterialColor(
-            0xFFFFFFFF,
-            <int, Color>{
-              500: Color(0xFFFFFFFF),
-            },
-          ),
-          hoverColor: Colors.amber[400]),
+          brightness: Brightness.light, // 明るさ
+          colorScheme: ColorScheme.light(
+            background: Colors.orange.shade100, // 全体の背景
+            primary: Colors.black, // 主要な色
+            secondary: Colors.grey.shade200,
+          )),
       home: const MemoApp(),
     );
   }

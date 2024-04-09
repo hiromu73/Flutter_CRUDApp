@@ -38,12 +38,7 @@ class AddPage extends ConsumerWidget {
           addPage,
           style: TextStyle(color: Colors.black54),
         ),
-        backgroundColor: const MaterialColor(
-          0xFFFFFFFF,
-          <int, Color>{
-            500: Color(0xFFFFFFFF),
-          },
-        ),
+        backgroundColor: Theme.of(context).colorScheme.background,
         leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,

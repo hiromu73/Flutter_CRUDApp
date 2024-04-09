@@ -17,21 +17,20 @@ class MemoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: Container(
-        color: Colors.yellow[50],
-        child: const Column(
-          children: [
-            Expanded(child: MemoList()),
-          ],
-        ),
+      body: const Column(
+        children: [
+          Expanded(child: MemoList()),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        // heroTag: "heroId$newId", // 複数のfabを設定する場合に識別するためuniqueなタグを設定する。
-        backgroundColor: Colors.white38,
-        onPressed: () => routes.addPage(context: context),
-        child: const Icon(Icons.add),
-      ),
+          backgroundColor: Theme.of(context).colorScheme.background,
+          // heroTag: "heroId$newId", // 複数のfabを設定する場合に識別するためuniqueなタグを設定する。
+          child: Icon(
+            Icons.add,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          onPressed: () => routes.addPage(context: context)),
     );
   }
 }
