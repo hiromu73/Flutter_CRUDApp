@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/constants/string.dart';
-import 'package:flutter_crudapp/ui/map/view_model/autocomplete_search_type.dart';
+import 'package:memoplace/constants/string.dart';
+import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../memo/view/memoapp.dart';
 // constants
-import 'package:flutter_crudapp/constants/routes.dart' as routes;
+import 'package:memoplace/constants/routes.dart' as routes;
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");

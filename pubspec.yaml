@@ -1,4 +1,4 @@
-name: flutter_crudapp
+name: memoplace
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -58,6 +58,8 @@ dependencies:
   firebase_messaging_platform_interface: ^4.5.24
   cloud_functions: ^4.6.8
   flutter_launcher_icons: ^0.13.1
+  hooks_riverpod: ^2.5.1
+  flutter_hooks: ^0.22.0
 
 dev_dependencies:
   flutter_test:

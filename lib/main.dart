@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // package
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_crudapp/ui/firebase_options.dart';
-import 'package:flutter_crudapp/ui/memo/view/memoapp.dart';
+import 'package:memoplace/ui/firebase_options.dart';
+import 'package:memoplace/ui/memo/view/memoapp.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

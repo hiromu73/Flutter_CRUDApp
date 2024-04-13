@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/ui/map/view/set_googlemap.dart';
-import 'package:flutter_crudapp/ui/add/view/addpage.dart';
-import 'package:flutter_crudapp/ui/memo/view/memoapp.dart';
+import 'package:memoplace/ui/map/view/set_googlemap.dart';
+import 'package:memoplace/ui/add/view/addpage.dart';
+import 'package:memoplace/ui/memo/view/memoapp.dart';
 
 // pages
 void memoPage({required BuildContext context}) => Navigator.push(

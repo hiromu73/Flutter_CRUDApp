@@ -8,4 +8,8 @@ class FirebaseModel extends _$FirebaseModel {
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> build() =>
       FirebaseFirestore.instance.collection('post').orderBy('date').snapshots();
+
+  Future<bool> changeView() async {
+    return true;
+  }
 }

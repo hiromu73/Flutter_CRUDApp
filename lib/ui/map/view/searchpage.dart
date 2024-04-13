@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_crudapp/api.dart';
-import 'package:flutter_crudapp/constants/string.dart';
+import 'package:memoplace/api.dart';
+import 'package:memoplace/constants/string.dart';
 import 'package:google_place/google_place.dart';
 import 'package:geocoding/geocoding.dart';
 

@@ -6,7 +6,7 @@ part of 'menu_item_checkbox.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$menuItemCheckBoxHash() => r'c9bd5c17dcee4728e93b6a1e7165419a8c97d8f8';
+String _$menuItemCheckBoxHash() => r'88ff4a1c298a9a8f06edef909e47bbbcf9e81fa1';
 
 /// See also [MenuItemCheckBox].
 @ProviderFor(MenuItemCheckBox)
