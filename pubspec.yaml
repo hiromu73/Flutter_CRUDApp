@@ -59,7 +59,7 @@ dependencies:
   cloud_functions: ^4.6.8
   flutter_launcher_icons: ^0.13.1
   hooks_riverpod: ^2.5.1
-  flutter_hooks: ^0.22.0
+  flutter_hooks: ^0.20.5
 
 dev_dependencies:
   flutter_test:

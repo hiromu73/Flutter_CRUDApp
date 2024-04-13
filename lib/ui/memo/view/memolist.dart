@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/memo/view_model/firebase_model.dart';
@@ -155,7 +156,7 @@ class MemoList extends HookConsumerWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 4.0,
           mainAxisSpacing: 4.0,
-          childAspectRatio: 0.7),
+          childAspectRatio: 0.8),
       children: query.docs.map((DocumentSnapshot document) {
         return Dismissible(
           key: Key(document.id),
@@ -177,92 +178,112 @@ class MemoList extends HookConsumerWidget {
               }
             }
           },
-          child: Card(
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text(document['text']),
-                  trailing: CupertinoSwitch(
-                      activeColor: Colors.amber,
-                      trackColor: Colors.grey,
-                      value: document['alert'],
-                      onChanged: (value) async {
-                        try {
-                          String docId = document.id;
-                          await FirebaseFirestore.instance
-                              .collection('post')
-                              .doc(docId)
-                              .update({
-                            'alert': value,
-                          });
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error: $e'),
-                              ),
-                            );
-                          }
-                        }
-                      }),
-                  subtitle: Column(
-                    children: [
-                      document['checkName'] != null
-                          ? Text("位置情報:${document['checkName']}".toString())
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      color: Colors.grey,
-                      icon: const Icon(Icons.delete),
-                      onPressed: () async {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return CupertinoAlertDialog(
-                                title: const Text(deleteMemo),
-                                actions: [
-                                  CupertinoDialogAction(
-                                      isDefaultAction: true,
-                                      onPressed: () async {
-                                        try {
-                                          String docId = document.id;
-                                          await FirebaseFirestore.instance
-                                              .collection('post')
-                                              .doc(docId)
-                                              .delete();
-                                          if (context.mounted) {
-                                            Navigator.pop(context);
-                                          }
-                                        } catch (e) {
-                                          if (context.mounted) {
-                                            Navigator.pop(context);
-                                          }
-                                        }
-                                      },
-                                      child: const Text(ok)),
-                                  CupertinoDialogAction(
-                                      child: const Text(no),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      }),
-                                ],
-                              );
-                            });
-                      },
+          child: InkWell(
+            onTap: (() => print("aaaa")), // cardがタップされた時の処理
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 18),
+                    child: Text(
+                      document['text'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  Flexible(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      child: document['checkName'] != null
+                          ? Text("場所\n・${document['checkName']}")
+                          : const SizedBox.shrink(),
+                    ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          color: Colors.grey,
+                          icon: const Icon(Icons.delete),
+                          onPressed: () async {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return CupertinoAlertDialog(
+                                    title: const Text(deleteMemo),
+                                    actions: [
+                                      CupertinoDialogAction(
+                                          isDefaultAction: true,
+                                          onPressed: () async {
+                                            try {
+                                              String docId = document.id;
+                                              await FirebaseFirestore.instance
+                                                  .collection('post')
+                                                  .doc(docId)
+                                                  .delete();
+                                              if (context.mounted) {
+                                                Navigator.pop(context);
+                                              }
+                                            } catch (e) {
+                                              if (context.mounted) {
+                                                Navigator.pop(context);
+                                              }
+                                            }
+                                          },
+                                          child: const Text(ok)),
+                                      CupertinoDialogAction(
+                                          child: const Text(no),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          }),
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
+                        CupertinoSwitch(
+                            activeColor: Colors.amber,
+                            trackColor: Colors.grey,
+                            value: document['alert'],
+                            onChanged: (value) async {
+                              try {
+                                String docId = document.id;
+                                await FirebaseFirestore.instance
+                                    .collection('post')
+                                    .doc(docId)
+                                    .update({
+                                  'alert': value,
+                                });
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: $e'),
+                                    ),
+                                  );
+                                }
+                              }
+                            }),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
