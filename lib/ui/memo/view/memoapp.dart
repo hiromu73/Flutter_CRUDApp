@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:memoplace/ui/memo/view/memolist.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // constants
@@ -24,10 +25,12 @@ class MemoApp extends HookConsumerWidget {
     }
 
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(child: MemoList(viewType.value)),
-        ],
+      body: AnimationLimiter(
+        child: Column(
+          children: [
+            Expanded(child: MemoList(viewType.value)),
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,

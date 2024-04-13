@@ -208,10 +208,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'MemoPlace',
       theme: ThemeData(
-          brightness: Brightness.light, // 明るさ
+          brightness: Brightness.light,
           colorScheme: ColorScheme.light(
-            background: Colors.orange.shade100, // 全体の背景
-            primary: Colors.black, // 主要な色
+            background: Colors.orange.shade100,
+            primary: Colors.black,
             secondary: Colors.grey.shade200,
           )),
       home: const MemoApp(),

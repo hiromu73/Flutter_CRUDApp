@@ -60,6 +60,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   hooks_riverpod: ^2.5.1
   flutter_hooks: ^0.20.5
+  flutter_staggered_animations: ^1.0.0
 
 dev_dependencies:
   flutter_test:
