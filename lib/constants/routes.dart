@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memoplace/ui/map/view/set_googlemap.dart';
 import 'package:memoplace/ui/add/view/addpage.dart';
@@ -20,14 +21,19 @@ final router = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
-        name: 'home', path: '/', builder: (context, state) => const MemoApp()),
+        name: 'home',
+        path: '/',
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const MemoApp())),
     GoRoute(
         name: 'addpage',
         path: '/addpage',
-        builder: (context, state) => AddPage()),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: AddPage())),
     GoRoute(
         name: 'setgooglemap',
         path: '/setgooglemap',
-        builder: (context, state) => SetGoogleMap()),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: SetGoogleMap())),
   ],
 );

@@ -39,7 +39,7 @@ class MemoApp extends HookConsumerWidget {
                 Icons.add,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              onPressed: () => context.go('/addpage')),
+              onPressed: () => context.push('/addpage')),
           const SizedBox(
             width: 100,
           ),

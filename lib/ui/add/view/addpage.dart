@@ -46,7 +46,7 @@ class AddPage extends ConsumerWidget {
               color: Colors.black54,
             ),
             onPressed: () {
-              Navigator.of(context).pop(const MemoApp());
+              context.push('/');
             }),
       ),
       body: Center(
@@ -84,7 +84,7 @@ class AddPage extends ConsumerWidget {
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30))),
-                onPressed: () => context.go('/setgooglemap'),
+                onPressed: () => context.push('/setgooglemap'),
                 child: const Text(positionSearch),
               ),
               const SizedBox(height: 8),
@@ -146,7 +146,7 @@ class AddPage extends ConsumerWidget {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        context.pop();
                                       },
                                       child: const Text('OK'),
                                     ),
