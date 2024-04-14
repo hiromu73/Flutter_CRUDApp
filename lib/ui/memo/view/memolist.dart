@@ -59,7 +59,7 @@ class MemoList extends HookConsumerWidget {
             }
           },
           child: AnimationConfiguration.staggeredList(
-            position: query.docs.length, // 開始のインデックス
+            position: query.docs.length + 1, // 開始のインデックス
             duration: const Duration(milliseconds: 575),
             child: SlideAnimation(
               verticalOffset: 50.0,
@@ -192,7 +192,7 @@ class MemoList extends HookConsumerWidget {
           child: InkWell(
             onTap: (() => print(query.docs.length)), // cardがタップされた時の処理
             child: AnimationConfiguration.staggeredGrid(
-              position: query.docs.length,
+              position: query.docs.length + 1,
               duration: const Duration(milliseconds: 375),
               columnCount: 5,
               child: SlideAnimation(
