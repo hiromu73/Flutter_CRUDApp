@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,7 +84,7 @@ class AddPage extends ConsumerWidget {
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30))),
-                onPressed: () => routes.mapSamplePage(context: context),
+                onPressed: () => context.go('/setgooglemap'),
                 child: const Text(positionSearch),
               ),
               const SizedBox(height: 8),
@@ -133,7 +134,7 @@ class AddPage extends ConsumerWidget {
                             'alert': true,
                           });
                           if (context.mounted) {
-                            Navigator.of(context).pop();
+                            context.go('/');
                           }
                         } else {
                           showDialog(

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // package
 import 'package:firebase_core/firebase_core.dart';
+import 'package:memoplace/constants/routes.dart';
 import 'package:memoplace/ui/firebase_options.dart';
 import 'package:memoplace/ui/memo/view/memoapp.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -204,7 +205,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'MemoPlace',
       theme: ThemeData(
@@ -214,7 +215,10 @@ class MyApp extends StatelessWidget {
             primary: Colors.black,
             secondary: Colors.grey.shade200,
           )),
-      home: const MemoApp(),
+      routerDelegate: router.routerDelegate,
+      routeInformationParser: router.routeInformationParser,
+      routeInformationProvider: router.routeInformationProvider,
+      // home: const MemoApp(),
     );
   }
 }

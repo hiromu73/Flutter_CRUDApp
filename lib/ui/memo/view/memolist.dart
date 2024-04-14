@@ -14,224 +14,101 @@ class MemoList extends HookConsumerWidget {
     // AsyncValueは非同期的に更新されるデータを安全に取り扱うためにRiverPodに内包されている
     final AsyncValue<QuerySnapshot> firebaseCollection =
         ref.watch(firebaseModelProvider);
-    return AnimationLimiter(
-      child: firebaseCollection.when(
-        data: (QuerySnapshot query) {
-          return viewType
-              ? buildListView(query, context)
-              : buildGridView(query, context);
-        },
-        loading: () {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-        error: (e, stackTrace) {
-          return Center(
-            child: Text(e.toString()),
-          );
-        },
-      ),
+    return firebaseCollection.when(
+      data: (QuerySnapshot query) {
+        return viewType
+            ? buildListView(query, context)
+            : buildGridView(query, context);
+      },
+      loading: () {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+      error: (e, stackTrace) {
+        return Center(
+          child: Text(e.toString()),
+        );
+      },
     );
   }
 
   Widget buildListView(QuerySnapshot query, BuildContext context) {
-    return ListView(
-      children: query.docs.map((DocumentSnapshot document) {
-        return Dismissible(
-          key: Key(document.id),
-          background: Container(
-              color: Colors.grey,
-              // alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: const Text("Delete")),
-          onDismissed: (DismissDirection direction) async {
-            try {
-              String docId = document.id;
-              await FirebaseFirestore.instance
-                  .collection('post')
-                  .doc(docId)
-                  .delete();
-            } catch (e) {
-              if (context.mounted) {
-                Navigator.pop(context);
+    int index = 0;
+    return AnimationLimiter(
+      child: ListView(
+        children: query.docs.map((DocumentSnapshot document) {
+          final int staggerPosition = index++;
+          return Dismissible(
+            key: Key(document.id),
+            background: Container(
+                color: Colors.grey,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: const Text("Delete")),
+            onDismissed: (DismissDirection direction) async {
+              try {
+                String docId = document.id;
+                await FirebaseFirestore.instance
+                    .collection('post')
+                    .doc(docId)
+                    .delete();
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
               }
-            }
-          },
-          child: AnimationConfiguration.staggeredList(
-            position: query.docs.length + 1, // 開始のインデックス
-            duration: const Duration(milliseconds: 575),
-            child: SlideAnimation(
-              verticalOffset: 50.0,
-              child: FadeInAnimation(
-                child: Card(
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text(document['text']),
-                        trailing: CupertinoSwitch(
-                            activeColor: Colors.amber,
-                            trackColor: Colors.grey,
-                            value: document['alert'],
-                            onChanged: (value) async {
-                              try {
-                                String docId = document.id;
-                                await FirebaseFirestore.instance
-                                    .collection('post')
-                                    .doc(docId)
-                                    .update({
-                                  'alert': value,
-                                });
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Error: $e'),
-                                    ),
-                                  );
-                                }
-                              }
-                            }),
-                        subtitle: Column(
-                          children: [
-                            document['checkName'] != null
-                                ? Text(
-                                    "位置情報:${document['checkName']}".toString())
-                                : const SizedBox.shrink(),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            color: Colors.grey,
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CupertinoAlertDialog(
-                                      title: const Text(deleteMemo),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                            isDefaultAction: true,
-                                            onPressed: () async {
-                                              try {
-                                                String docId = document.id;
-                                                await FirebaseFirestore.instance
-                                                    .collection('post')
-                                                    .doc(docId)
-                                                    .delete();
-                                                if (context.mounted) {
-                                                  Navigator.pop(context);
-                                                }
-                                              } catch (e) {
-                                                if (context.mounted) {
-                                                  Navigator.pop(context);
-                                                }
-                                              }
-                                            },
-                                            child: const Text(ok)),
-                                        CupertinoDialogAction(
-                                            child: const Text(no),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            }),
-                                      ],
-                                    );
+            },
+            child: AnimationConfiguration.staggeredList(
+              position: staggerPosition,
+              duration: const Duration(milliseconds: 1000),
+              child: FlipAnimation(
+                // verticalOffset: 850.0,
+                child: ScaleAnimation(
+                  child: Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(document['text']),
+                          trailing: CupertinoSwitch(
+                              activeColor: Colors.amber,
+                              trackColor: Colors.grey,
+                              value: document['alert'],
+                              onChanged: (value) async {
+                                try {
+                                  String docId = document.id;
+                                  await FirebaseFirestore.instance
+                                      .collection('post')
+                                      .doc(docId)
+                                      .update({
+                                    'alert': value,
                                   });
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget buildGridView(QuerySnapshot query, BuildContext context) {
-    return GridView(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 4.0,
-          mainAxisSpacing: 4.0,
-          childAspectRatio: 0.8),
-      children: query.docs.map((DocumentSnapshot document) {
-        return Dismissible(
-          key: Key(document.id),
-          background: Container(
-              color: Colors.grey,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: const Text("Delete")),
-          onDismissed: (DismissDirection direction) async {
-            try {
-              String docId = document.id;
-              await FirebaseFirestore.instance
-                  .collection('post')
-                  .doc(docId)
-                  .delete();
-            } catch (e) {
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            }
-          },
-          child: InkWell(
-            onTap: (() => print(query.docs.length)), // cardがタップされた時の処理
-            child: AnimationConfiguration.staggeredGrid(
-              position: query.docs.length + 1,
-              duration: const Duration(milliseconds: 375),
-              columnCount: 5,
-              child: SlideAnimation(
-                child: Card(
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14, horizontal: 18),
-                        child: Text(
-                          document['text'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error: $e'),
+                                      ),
+                                    );
+                                  }
+                                }
+                              }),
+                          subtitle: Column(
+                            children: [
+                              document['checkName'] != null
+                                  ? Text("位置情報:${document['checkName']}"
+                                      .toString())
+                                  : const SizedBox.shrink(),
+                            ],
                           ),
                         ),
-                      ),
-                      Flexible(
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 8),
-                          child: document['checkName'] != null
-                              ? Text("場所\n・${document['checkName']}")
-                              : const SizedBox.shrink(),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             IconButton(
                               color: Colors.grey,
@@ -273,41 +150,173 @@ class MemoList extends HookConsumerWidget {
                                     });
                               },
                             ),
-                            CupertinoSwitch(
-                                activeColor: Colors.amber,
-                                trackColor: Colors.grey,
-                                value: document['alert'],
-                                onChanged: (value) async {
-                                  try {
-                                    String docId = document.id;
-                                    await FirebaseFirestore.instance
-                                        .collection('post')
-                                        .doc(docId)
-                                        .update({
-                                      'alert': value,
-                                    });
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text('Error: $e'),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                }),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget buildGridView(QuerySnapshot query, BuildContext context) {
+    int index = 0;
+    return AnimationLimiter(
+      child: GridView(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 4.0,
+            mainAxisSpacing: 4.0,
+            childAspectRatio: 0.8),
+        children: query.docs.map((DocumentSnapshot document) {
+          final int staggerPosition = index++;
+          return Dismissible(
+            key: Key(document.id),
+            background: Container(
+                color: Colors.grey,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: const Text("Delete")),
+            onDismissed: (DismissDirection direction) async {
+              try {
+                String docId = document.id;
+                await FirebaseFirestore.instance
+                    .collection('post')
+                    .doc(docId)
+                    .delete();
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              }
+            },
+            child: InkWell(
+              onTap: (() => print(query.docs.length)), // cardがタップされた時の処理
+              child: AnimationConfiguration.staggeredGrid(
+                position: staggerPosition,
+                duration: const Duration(milliseconds: 500),
+                delay: const Duration(milliseconds: 520),
+                columnCount: 5,
+                child: FlipAnimation(
+                  // verticalOffset: 550,
+                  child: Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14, horizontal: 18),
+                          child: Text(
+                            document['text'],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 8),
+                            child: document['checkName'] != null
+                                ? Text("場所\n・${document['checkName']}")
+                                : const SizedBox.shrink(),
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                color: Colors.grey,
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return CupertinoAlertDialog(
+                                          title: const Text(deleteMemo),
+                                          actions: [
+                                            CupertinoDialogAction(
+                                                isDefaultAction: true,
+                                                onPressed: () async {
+                                                  try {
+                                                    String docId = document.id;
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('post')
+                                                        .doc(docId)
+                                                        .delete();
+                                                    if (context.mounted) {
+                                                      Navigator.pop(context);
+                                                    }
+                                                  } catch (e) {
+                                                    if (context.mounted) {
+                                                      Navigator.pop(context);
+                                                    }
+                                                  }
+                                                },
+                                                child: const Text(ok)),
+                                            CupertinoDialogAction(
+                                                child: const Text(no),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                }),
+                                          ],
+                                        );
+                                      });
+                                },
+                              ),
+                              CupertinoSwitch(
+                                  activeColor: Colors.amber,
+                                  trackColor: Colors.grey,
+                                  value: document['alert'],
+                                  onChanged: (value) async {
+                                    try {
+                                      String docId = document.id;
+                                      await FirebaseFirestore.instance
+                                          .collection('post')
+                                          .doc(docId)
+                                          .update({
+                                        'alert': value,
+                                      });
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text('Error: $e'),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/googlemap_controller_notifier.dart';
 import 'package:memoplace/model/map/place.dart';
@@ -200,7 +201,7 @@ class SetGoogleMap extends ConsumerWidget {
                               height: 50,
                               child: Icon(Icons.create, color: Colors.white),
                             ),
-                            onTap: () => {Navigator.pop(context)}),
+                            onTap: () => context.go('/addpage')),
                       ),
                     ),
                     const SizedBox(height: 10),
