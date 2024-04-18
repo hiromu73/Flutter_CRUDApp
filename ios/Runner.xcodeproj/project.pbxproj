@@ -533,6 +533,7 @@
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 1.0.0;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MemoPlace;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -671,6 +672,7 @@
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 1.0.0;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MemoPlace;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -696,6 +698,7 @@
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 1.0.0;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MemoPlace;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

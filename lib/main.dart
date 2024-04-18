@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:memoplace/constants/routes.dart';
 import 'package:memoplace/ui/firebase_options.dart';
-import 'package:memoplace/ui/memo/view/memoapp.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -53,7 +53,11 @@ Future<Position> _determinePosition() async {
   }
 
   if (permission == LocationPermission.deniedForever) {
-    return Future.error('デバイスの場所を取得するための許可してください');
+    // return Future.error('デバイスの場所を取得するための許可してください');
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    return position;
   }
 
   // デバイスの現在の場所を返す。
@@ -77,7 +81,6 @@ void main() async {
   );
 
   // バックグラウンドで位置情報の使用を開始
-  print("バックグラウンドスタート");
   await BackgroundTask.instance.start();
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -138,11 +141,9 @@ void main() async {
 
   //  フォアグラウンドで現在位置を取得する。
   final position = await _determinePosition();
-  print("位置情報を取得");
 
   //  位置情報が検知されると発火する
   BackgroundTask.instance.stream.listen((event) async {
-    print("位置情報をListen");
     for (int i = 0; i < latitude.length; i++) {
       print(double.parse(latitude[i].toString()));
       print(double.parse(longiLang[i].toString()));
@@ -152,10 +153,7 @@ void main() async {
         position.latitude,
         position.longitude,
       );
-      print(" $i: $distanceInMeters meters");
-
       if (distanceInMeters < 1000) {
-        print("Distance from document $i: $distanceInMeters meters");
         await pushMessage();
       }
     }
@@ -169,8 +167,7 @@ void main() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification!.android;
-    print('Message data: ${message.data}');
-    print('フォアグラウンドでのメッセージを受信した際の処理');
+
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin.show(
           notification.hashCode,
@@ -192,8 +189,6 @@ void main() async {
           ));
     }
   });
-
-  print('バックグラウンド');
 
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false),

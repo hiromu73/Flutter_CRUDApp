@@ -28,12 +28,30 @@ final router = GoRouter(
     GoRoute(
         name: 'addpage',
         path: '/addpage',
-        pageBuilder: (context, state) =>
-            MaterialPage(key: state.pageKey, child: AddPage())),
+        pageBuilder: (context, state) => _buildPageWithAnimation(AddPage())),
     GoRoute(
         name: 'setgooglemap',
         path: '/setgooglemap',
         pageBuilder: (context, state) =>
-            MaterialPage(key: state.pageKey, child: SetGoogleMap())),
+            _buildPageWithAnimation(SetGoogleMap())),
   ],
 );
+
+CustomTransitionPage<void> _buildPageWithAnimation(Widget page) {
+  return CustomTransitionPage<void>(
+    child: page,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: animation.drive(
+          Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).chain(
+            CurveTween(curve: Curves.easeIn),
+          ),
+        ),
+        child: child,
+      );
+    },
+  );
+}
