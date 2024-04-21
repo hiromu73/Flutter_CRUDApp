@@ -118,7 +118,7 @@ class SetGoogleMap extends HookConsumerWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      content: Text('位置情報が許可されていません。\nデバイスで許可をして下さい'),
+                      content: const Text('位置情報が許可されていません。\nデバイスで許可をして下さい'),
                       actions: <Widget>[
                         CupertinoDialogAction(
                           onPressed: () {
