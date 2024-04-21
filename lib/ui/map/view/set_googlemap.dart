@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/googlemap_controller_notifier.dart';
 import 'package:memoplace/model/map/place.dart';
@@ -9,17 +12,22 @@ import 'package:memoplace/ui/map/view_model/latitude.dart';
 import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
+import 'package:go_router/go_router.dart';
 
 final googleMapControllerProvider =
     StateNotifierProvider<GoogleMapControllerNotifier, GoogleMapController?>(
   (ref) => GoogleMapControllerNotifier(),
 );
 
-class SetGoogleMap extends ConsumerWidget {
+final locationPermissionProvider =
+    FutureProvider<LocationPermission>((ref) async {
+  return await Geolocator.checkPermission();
+});
+
+class SetGoogleMap extends HookConsumerWidget {
   SetGoogleMap({super.key});
   final bool _isFirstBuild = true;
   late GoogleMapController _mapController;
@@ -30,9 +38,12 @@ class SetGoogleMap extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (_isFirstBuild) {
-      _initializeOnes(ref);
-    }
+    useEffect(() {
+      _checkLocationPermission(context, ref);
+      return null;
+    });
+
+    final permission = ref.read(locationPermissionProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -285,6 +296,74 @@ class SetGoogleMap extends ConsumerWidget {
   }
 }
 
+void _checkLocationPermission(context, WidgetRef ref) {
+  _determinePosition().then((position) {
+    if (position != null) {
+      ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
+      ref.read(latitudeProvider.notifier).changeLatitude(position.longitude);
+      print("取得できた");
+    }
+    print("取得できてない");
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text('Error'),
+          content: const Text('Current position data is null.'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () {
+                // final localContext = context;
+                if (context.mounted) {
+                  // Navigator.pop(localContext, true);
+                  context.pop();
+                  // routerConfig.goNamed(LoginPage.routeName) // 
+                }
+                // Navigator.pop(context);
+                // context.pop();
+                // context.goNamed('/addpage');
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  });
+}
+
+Future<Position?> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('ロケーションサービスが無効です。');
+  }
+
+  // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
+  permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    // デバイスの場所へのアクセス許可をリクエストする
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return null;
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return null;
+  }
+
+  // デバイスの現在の場所を返す。
+  Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return position;
+}
+
 // マーカーの情報をcardで表示
 // 今後は写真と現在位置からの距離、ルートを実装する。
 class CardSection extends ConsumerWidget {
@@ -399,45 +478,6 @@ List<Widget> shopTiles(
     },
   ).toList();
   return shopTiles;
-}
-
-// 現在位置を取得するメソッド
-Future<Position> _determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-  // isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('ロケーションサービスが無効です。');
-  }
-
-  // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
-  permission = await Geolocator.checkPermission();
-
-  if (permission == LocationPermission.denied) {
-    // デバイスの場所へのアクセス許可をリクエストする
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('デバイスの場所を取得するための許可がされていません。');
-    }
-  }
-
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error('デバイスの場所を取得するための許可してください');
-  }
-
-  // デバイスの現在の場所を返す。
-  Position position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
-  );
-  return position;
-}
-
-// 起動時に呼ばれる。
-Future _initializeOnes(WidgetRef ref) async {
-  final position = await _determinePosition();
-  ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
-  ref.read(longitudeProvider.notifier).changeLongitude(position.longitude);
 }
 
 // テキスト検索モーダル

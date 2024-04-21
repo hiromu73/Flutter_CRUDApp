@@ -52,14 +52,13 @@ Future<Position> _determinePosition() async {
     }
   }
 
-  if (permission == LocationPermission.deniedForever) {
-    // return Future.error('デバイスの場所を取得するための許可してください');
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    return position;
-  }
-
+  // if (permission == LocationPermission.deniedForever) {
+  //   // return Future.error('デバイスの場所を取得するための許可してください');
+  //   Position position = await Geolocator.getCurrentPosition(
+  //     desiredAccuracy: LocationAccuracy.high,
+  //   );
+  //   return position;
+  // }
   // デバイスの現在の場所を返す。
   Position position = await Geolocator.getCurrentPosition(
     desiredAccuracy: LocationAccuracy.high,
@@ -140,56 +139,59 @@ void main() async {
   }
 
   //  フォアグラウンドで現在位置を取得する。
-  final position = await _determinePosition();
+  // final permission = await Geolocator.checkPermission();
+  // if (permission != LocationPermission.denied) {
+  //   print("許可");
+  //   final position = await _determinePosition();
 
-  //  位置情報が検知されると発火する
-  BackgroundTask.instance.stream.listen((event) async {
-    for (int i = 0; i < latitude.length; i++) {
-      print(double.parse(latitude[i].toString()));
-      print(double.parse(longiLang[i].toString()));
-      double distanceInMeters = Geolocator.distanceBetween(
-        double.parse(latitude[i].toString()),
-        double.parse(longiLang[i].toString()),
-        position.latitude,
-        position.longitude,
-      );
-      if (distanceInMeters < 1000) {
-        await pushMessage();
-      }
-    }
+  //   //  位置情報が検知されると発火する
+  //   BackgroundTask.instance.stream.listen((event) async {
+  //     for (int i = 0; i < latitude.length; i++) {
+  //       print(double.parse(latitude[i].toString()));
+  //       print(double.parse(longiLang[i].toString()));
+  //       double distanceInMeters = Geolocator.distanceBetween(
+  //         double.parse(latitude[i].toString()),
+  //         double.parse(longiLang[i].toString()),
+  //         position.latitude,
+  //         position.longitude,
+  //       );
+  //       if (distanceInMeters < 1000) {
+  //         await pushMessage();
+  //       }
+  //     }
 
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-    );
-  });
+  //     FirebaseFirestore.instance.settings = const Settings(
+  //       persistenceEnabled: true,
+  //     );
+  //   });
 
-  // フォアグラウンドでのメッセージを受信した際の処理
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification!.android;
+  //   // フォアグラウンドでのメッセージを受信した際の処理
+  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //     RemoteNotification? notification = message.notification;
+  //     AndroidNotification? android = message.notification!.android;
 
-    if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              icon: android.smallIcon,
-              // sound: ,
-            ),
-            iOS: const DarwinNotificationDetails(
-              presentAlert: true,
-              presentSound: true,
-              presentBanner: true,
-              // sound:, // 音声ファイル設定する！
-            ),
-          ));
-    }
-  });
-
+  //     if (notification != null && android != null) {
+  //       flutterLocalNotificationsPlugin.show(
+  //           notification.hashCode,
+  //           notification.title,
+  //           notification.body,
+  //           NotificationDetails(
+  //             android: AndroidNotificationDetails(
+  //               channel.id,
+  //               channel.name,
+  //               icon: android.smallIcon,
+  //               // sound: ,
+  //             ),
+  //             iOS: const DarwinNotificationDetails(
+  //               presentAlert: true,
+  //               presentSound: true,
+  //               presentBanner: true,
+  //               // sound:, // 音声ファイル設定する！
+  //             ),
+  //           ));
+  //     }
+  //   });
+  // }
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false),
   ));
@@ -203,6 +205,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'MemoPlace',
+      // routerConfig: router,
       theme: ThemeData(
           brightness: Brightness.light,
           colorScheme: ColorScheme.light(

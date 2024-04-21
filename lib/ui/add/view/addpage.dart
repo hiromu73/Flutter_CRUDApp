@@ -4,9 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../memo/view/memoapp.dart';
-// constants
-import 'package:memoplace/constants/routes.dart' as routes;
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
