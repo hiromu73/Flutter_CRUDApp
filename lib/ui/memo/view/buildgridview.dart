@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -41,7 +42,8 @@ class BuildGridView extends HookConsumerWidget {
               }
             },
             child: InkWell(
-              onTap: (() => print(query.docs.length)), // cardがタップされた時の処理
+              onTap: (() =>
+                  print(query.docs.length)), // cardがタップされた時の処理 // 今後変えていく
               child: AnimationConfiguration.staggeredGrid(
                 position: staggerPosition,
                 duration: const Duration(milliseconds: 500),

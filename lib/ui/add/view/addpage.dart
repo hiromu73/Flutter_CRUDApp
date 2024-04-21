@@ -138,12 +138,11 @@ class AddPage extends ConsumerWidget {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  content: const Text(
-                                      'No content has been entered.'),
+                                  content: const Text('内容を入力して下さい。'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        context.pop();
+                                        Navigator.pop(context);
                                       },
                                       child: const Text('OK'),
                                     ),
@@ -196,7 +195,6 @@ class AddPage extends ConsumerWidget {
 
 Widget markerNames(List<String?> name) {
   if (name.isNotEmpty) {
-    print("isNotEmpty");
     return Column(children: [
       const Text("選択されている位置情報"),
       checkNames(name),

@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class BuildListView extends HookConsumerWidget {
-  const BuildListView(this.query, BuildContext context ,{super.key});
+  const BuildListView(this.query, BuildContext context, {super.key});
   final QuerySnapshot query;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +32,7 @@ class BuildListView extends HookConsumerWidget {
                     .delete();
               } catch (e) {
                 if (context.mounted) {
-                  Navigator.pop(context);
+                  context.pop();
                 }
               }
             },
