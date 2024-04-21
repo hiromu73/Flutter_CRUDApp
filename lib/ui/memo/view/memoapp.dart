@@ -10,6 +10,10 @@ class MemoApp extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    //     useEffect(() {
+    //   _checkLocationPermission(context, ref);
+    //   return null;
+    // });
     final viewType = useState<bool>(true);
     void changeView() {
       viewType.value = !viewType.value;

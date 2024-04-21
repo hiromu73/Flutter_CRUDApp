@@ -10,7 +10,6 @@ class MemoList extends HookConsumerWidget {
   final bool viewType;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // AsyncValueは非同期的に更新されるデータを安全に取り扱うためにRiverPodに内包されている
     final AsyncValue<QuerySnapshot> firebaseCollection =
         ref.watch(firebaseModelProvider);
     return firebaseCollection.when(
