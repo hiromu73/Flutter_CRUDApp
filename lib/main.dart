@@ -79,9 +79,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // バックグラウンドで位置情報の使用を開始
-  await BackgroundTask.instance.start();
-
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -122,12 +119,12 @@ void main() async {
 
   QuerySnapshot querySnapshot = await collectionReference.get();
 
+  // コレクションに保存されている情報をまとめている。
   for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
     dynamic fieldValue = documentSnapshot['latitude'];
     dynamic fieldValues = documentSnapshot['longitude'];
     dynamic fieldNameValue = documentSnapshot['text'];
     dynamic fieldAlert = documentSnapshot['alert'];
-    print(fieldAlert);
 
     if (fieldValue != null && fieldAlert == true) {
       for (int i = 0; i < fieldValue.length; i++) {
@@ -139,59 +136,67 @@ void main() async {
   }
 
   //  フォアグラウンドで現在位置を取得する。
-  // final permission = await Geolocator.checkPermission();
-  // if (permission != LocationPermission.denied) {
-  //   print("許可");
-  //   final position = await _determinePosition();
+  final permission = await Geolocator.checkPermission();
+  if (permission != LocationPermission.denied) {
+    print("許可");
+    final position = await _determinePosition();
 
-  //   //  位置情報が検知されると発火する
-  //   BackgroundTask.instance.stream.listen((event) async {
-  //     for (int i = 0; i < latitude.length; i++) {
-  //       print(double.parse(latitude[i].toString()));
-  //       print(double.parse(longiLang[i].toString()));
-  //       double distanceInMeters = Geolocator.distanceBetween(
-  //         double.parse(latitude[i].toString()),
-  //         double.parse(longiLang[i].toString()),
-  //         position.latitude,
-  //         position.longitude,
-  //       );
-  //       if (distanceInMeters < 1000) {
-  //         await pushMessage();
-  //       }
-  //     }
+    //  位置情報が検知されると発火する
+    BackgroundTask.instance.stream.listen((event) async {
+      for (int i = 0; i < latitude.length; i++) {
+        print("位置情報が検知1");
+        print(double.parse(latitude[i].toString()));
+        print(double.parse(longiLang[i].toString()));
+        print("位置情報が検知2");
+        double distanceInMeters = Geolocator.distanceBetween(
+          double.parse(latitude[i].toString()),
+          double.parse(longiLang[i].toString()),
+          position.latitude,
+          position.longitude,
+        );
+        if (distanceInMeters < 1000) {
+          print("distanceInMeters < 1000になったのでプッシュ通知します。");
+          // print(name);
+          await pushMessage();
+        }
+      }
 
-  //     FirebaseFirestore.instance.settings = const Settings(
-  //       persistenceEnabled: true,
-  //     );
-  //   });
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
+      );
+    });
 
-  //   // フォアグラウンドでのメッセージを受信した際の処理
-  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //     RemoteNotification? notification = message.notification;
-  //     AndroidNotification? android = message.notification!.android;
+    // フォアグラウンドでのメッセージを受信した際の処理
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification!.android;
 
-  //     if (notification != null && android != null) {
-  //       flutterLocalNotificationsPlugin.show(
-  //           notification.hashCode,
-  //           notification.title,
-  //           notification.body,
-  //           NotificationDetails(
-  //             android: AndroidNotificationDetails(
-  //               channel.id,
-  //               channel.name,
-  //               icon: android.smallIcon,
-  //               // sound: ,
-  //             ),
-  //             iOS: const DarwinNotificationDetails(
-  //               presentAlert: true,
-  //               presentSound: true,
-  //               presentBanner: true,
-  //               // sound:, // 音声ファイル設定する！
-  //             ),
-  //           ));
-  //     }
-  //   });
-  // }
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                icon: android.smallIcon,
+                // sound: ,
+              ),
+              iOS: const DarwinNotificationDetails(
+                presentAlert: true,
+                presentSound: true,
+                presentBanner: true,
+                // sound:, // 音声ファイル設定する！
+              ),
+            ));
+      }
+    });
+
+    // バックグラウンドで位置情報の使用を開始
+    await BackgroundTask.instance.start();
+    print("バックグラウンドで位置情報の使用");
+  }
   runApp(const ProviderScope(
     child: MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false),
   ));

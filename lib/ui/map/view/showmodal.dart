@@ -1,5 +1,3 @@
-
-
 // 簡易検索モーダル
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +15,11 @@ class ShowModal extends ConsumerWidget {
     final selectItem = ref.read(selectItemsProvider);
     final latitude = ref.read(latitudeProvider);
     final longitude = ref.read(longitudeProvider);
+    print(latitude);
+    print(longitude);
+    print(selectItem);
+    final currentPositionFuture = ref.watch(currentPositionProvider);
+    print(currentPositionFuture);
 
     return Container(
       padding: const EdgeInsets.all(10),

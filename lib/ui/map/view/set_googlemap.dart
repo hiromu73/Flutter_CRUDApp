@@ -25,14 +25,14 @@ final googleMapControllerProvider =
   (ref) => GoogleMapControllerNotifier(),
 );
 
-final locationPermissionProvider =
-    FutureProvider<LocationPermission>((ref) async {
-  return await Geolocator.checkPermission();
-});
+// final locationPermissionProvider =
+//     FutureProvider<LocationPermission>((ref) async {
+//   return await Geolocator.checkPermission();
+// });
 
 class SetGoogleMap extends HookConsumerWidget {
   SetGoogleMap({super.key});
-  final bool _isFirstBuild = true;
+  // final bool _isFirstBuild = true;
   late GoogleMapController _mapController;
 
   final pageController = PageController(
@@ -41,12 +41,12 @@ class SetGoogleMap extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final permission = ref.read(locationPermissionProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
+    print(currentPositionFuture);
     // final latitude = ref.watch(latitudeProvider);
     // final longitude = ref.watch(longitudeProvider);
     print("ビルド");
@@ -122,15 +122,12 @@ class SetGoogleMap extends HookConsumerWidget {
                       actions: <Widget>[
                         CupertinoDialogAction(
                           onPressed: () {
-                            // final localContext = context;
                             if (context.mounted) {
-                              // Navigator.pop(localContext, true);
-                              context.pop();
-                              // routerConfig.goNamed(LoginPage.routeName) //
+                              Navigator.of(context).pop(); // ダイアログを閉じる
+                              // Navigator.of(context).pop(); // 前の画面に戻る
+                              // final router = GoRouter.of(context);
+                              // print(router);
                             }
-                            // Navigator.pop(context);
-                            // context.pop();
-                            // context.goNamed('/addpage');
                           },
                           child: const Text('OK'),
                         ),

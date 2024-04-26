@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/model/map/place.dart';
-import 'package:memoplace/ui/map/view/set_googlemap.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';

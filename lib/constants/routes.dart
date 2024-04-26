@@ -37,14 +37,16 @@ final router = GoRouter(
   ],
 );
 
+// 遷移をアニメーションにする。pageBuilder
 CustomTransitionPage<void> _buildPageWithAnimation(Widget page) {
   return CustomTransitionPage<void>(
     child: page,
+    // transitionDuration: const Duration(milliseconds: 500),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return SlideTransition(
         position: animation.drive(
           Tween<Offset>(
-            begin: const Offset(1, 0),
+            begin: const Offset(0, 10),
             end: Offset.zero,
           ).chain(
             CurveTween(curve: Curves.easeIn),

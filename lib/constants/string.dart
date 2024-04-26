@@ -12,6 +12,8 @@ const String newRegistration = "新規登録";
 const String addPage = "AddPage";
 const String serach = "この条件で検索";
 const String serachPosition = "検索したい場所を入力";
+const String searchPermission =
+    "デバイスが位置情報の許可がされていません。\n 位置情報を許可することでマップが表示でき、プッシュ通知も行えます。";
 
 final Map<String, String> categoryList = {
   'スーパー': 'supermarket',

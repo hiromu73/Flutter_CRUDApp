@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -15,9 +16,9 @@ class BuildGridView extends HookConsumerWidget {
       child: GridView(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            crossAxisSpacing: 4.0,
-            mainAxisSpacing: 4.0,
-            childAspectRatio: 0.8),
+            crossAxisSpacing: 10.0,
+            mainAxisSpacing: 10.0,
+            childAspectRatio: 0.6),
         children: query.docs.map((DocumentSnapshot document) {
           final int staggerPosition = index++;
           return Dismissible(
@@ -51,7 +52,7 @@ class BuildGridView extends HookConsumerWidget {
                 child: FlipAnimation(
                   // verticalOffset: 550,
                   child: Card(
-                    elevation: 5,
+                    elevation: 20,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

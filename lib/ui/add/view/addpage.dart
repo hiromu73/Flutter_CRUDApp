@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
@@ -78,12 +80,36 @@ class AddPage extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30))),
-                onPressed: () => context.push('/setgooglemap'),
-                child: const Text(positionSearch),
-              ),
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  child: const Text(positionSearch),
+                  onPressed: () async {
+                    final permission = await Geolocator.checkPermission();
+                    print(permission);
+                    if (permission != LocationPermission.denied &&
+                        context.mounted) {
+                      context.push('/setgooglemap');
+                    } else {
+                      if (context.mounted) {
+                        return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return CupertinoAlertDialog(
+                                title: const Text(searchPermission),
+                                actions: [
+                                  CupertinoDialogAction(
+                                      isDefaultAction: true,
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(ok)),
+                                ],
+                              );
+                            });
+                      }
+                    }
+                  }),
               const SizedBox(height: 8),
               Center(
                 child: Column(
