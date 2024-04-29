@@ -17,80 +17,96 @@ class ShowTextModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
-    final latitude = ref.watch(latitudeProvider);
-    final longitude = ref.watch(longitudeProvider);
+    // final latitude = ref.watch(latitudeProvider);
+    // final longitude = ref.watch(longitudeProvider);
+    final currentPositionFuture = ref.watch(currentPositionProvider);
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(20),
       color: Colors.white,
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height * 0.8,
       child: Column(
         children: [
-          TextFormField(
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
-            controller: textController,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
-              iconColor: Colors.grey,
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.grey,
-                size: 20,
-              ),
-              hintText: "検索したい場所",
-              hintStyle: const TextStyle(
-                color: Colors.grey,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: const BorderSide(color: Colors.white),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              fillColor: Colors.white,
-              filled: true,
-            ),
-            onChanged: (value) async {
-              if (value.isNotEmpty && ref.watch(selectItemsProvider) != "") {
-                List<String> japaneseNames =
-                    ref.watch(selectItemsProvider).split(',');
-                List<String> englishNames = [];
-                for (String japaneseName in japaneseNames) {
-                  String trimmedJapaneseName = japaneseName.trim();
-                  if (categoryList.containsKey(trimmedJapaneseName)) {
-                    englishNames.add(categoryList[trimmedJapaneseName]!);
-                  }
-                }
-                // タイプあり検索処理
-                await ref
-                    .read(autoCompleteSearchProvider.notifier)
-                    .autoCompleteTypeSearch(
-                        value, englishNames, latitude, longitude);
-              } else if (value.isNotEmpty &&
-                  ref.watch(selectItemsProvider) == "") {
-                // タイプ無し検索処理
-                await ref
-                    .read(autoCompleteSearchProvider.notifier)
-                    .autoCompleteSearch(value, latitude, longitude);
-              } else {
-                await ref
-                    .read(autoCompleteSearchProvider.notifier)
-                    .noneAutoCompleteSearch();
-                // 前の結果が残る。(速さによる)(更新はされている。非同期の問題？) 質問Zoom②
-              }
-            },
-          ),
-          Expanded(
-            child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: autoCompleteSearch.length,
-                itemBuilder: (context, index) {
-                  return menuItem(
-                      autoCompleteSearch[index], latitude, longitude, ref);
-                }),
-          ),
+          currentPositionFuture.maybeWhen(
+              data: (data) => TextFormField(
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    controller: textController,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      iconColor: Colors.grey,
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      hintText: "検索したい場所",
+                      hintStyle: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                    onChanged: (value) async {
+                      if (value.isNotEmpty &&
+                          ref.watch(selectItemsProvider) != "") {
+                        List<String> japaneseNames =
+                            ref.watch(selectItemsProvider).split(',');
+                        List<String> englishNames = [];
+                        for (String japaneseName in japaneseNames) {
+                          String trimmedJapaneseName = japaneseName.trim();
+                          if (categoryList.containsKey(trimmedJapaneseName)) {
+                            englishNames
+                                .add(categoryList[trimmedJapaneseName]!);
+                          }
+                        }
+                        // タイプあり検索処理
+                        await ref
+                            .read(autoCompleteSearchProvider.notifier)
+                            .autoCompleteTypeSearch(value, englishNames,
+                                data.latitude, data.longitude);
+                      } else if (value.isNotEmpty &&
+                          ref.watch(selectItemsProvider) == "") {
+                        // タイプ無し検索処理
+                        await ref
+                            .read(autoCompleteSearchProvider.notifier)
+                            .autoCompleteSearch(
+                                value, data.latitude, data.longitude);
+                      } else {
+                        await ref
+                            .read(autoCompleteSearchProvider.notifier)
+                            .noneAutoCompleteSearch();
+                        // 前の結果が残る。(速さによる)(更新はされている。非同期の問題？) 質問Zoom②
+                      }
+                    },
+                  ),
+              orElse: () {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }),
+          currentPositionFuture.maybeWhen(
+              data: (data) => Expanded(
+                    child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: autoCompleteSearch.length,
+                        itemBuilder: (context, index) {
+                          return menuItem(autoCompleteSearch[index],
+                              data.latitude, data.longitude, ref);
+                        }),
+                  ),
+              orElse: () {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

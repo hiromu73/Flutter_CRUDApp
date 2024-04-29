@@ -18,7 +18,6 @@ import 'package:memoplace/ui/map/view_model/select_item.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
-import 'package:go_router/go_router.dart';
 
 final googleMapControllerProvider =
     StateNotifierProvider<GoogleMapControllerNotifier, GoogleMapController?>(
@@ -46,10 +45,12 @@ class SetGoogleMap extends HookConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    print(currentPositionFuture);
-    // final latitude = ref.watch(latitudeProvider);
-    // final longitude = ref.watch(longitudeProvider);
+    final latitude = ref.watch(latitudeProvider);
+    final longitude = ref.watch(longitudeProvider);
+          print(latitude);
+    print(longitude);
     print("ビルド");
+    print(currentPositionFuture);
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),
@@ -74,7 +75,6 @@ class SetGoogleMap extends HookConsumerWidget {
     }
     idList.add(newId);
 
-    //
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
@@ -85,7 +85,7 @@ class SetGoogleMap extends HookConsumerWidget {
       child: Scaffold(
         body: Stack(
           children: <Widget>[
-            currentPositionFuture.when(
+            currentPositionFuture.maybeWhen(
               data: (data) => GoogleMap(
                 onMapCreated: (GoogleMapController controller) {
                   _mapController = controller;
@@ -113,31 +113,7 @@ class SetGoogleMap extends HookConsumerWidget {
                 },
                 zoomGesturesEnabled: true,
               ),
-              error: (Object error, StackTrace stackTrace) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      content: const Text('位置情報が許可されていません。\nデバイスで許可をして下さい'),
-                      actions: <Widget>[
-                        CupertinoDialogAction(
-                          onPressed: () {
-                            if (context.mounted) {
-                              Navigator.of(context).pop(); // ダイアログを閉じる
-                              // Navigator.of(context).pop(); // 前の画面に戻る
-                              // final router = GoRouter.of(context);
-                              // print(router);
-                            }
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    ),
-                  );
-                });
-                return Text(error.toString());
-              },
-              loading: () {
+              orElse: () {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );

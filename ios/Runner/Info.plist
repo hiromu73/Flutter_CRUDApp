@@ -33,11 +33,11 @@
 	<key>NSAllowsArbitraryLoads</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Used to monitor location in the background and notify to app.</string>
+	<string>位置情報の登録、プッシュ通知機能を使用する為に、位置情報の許可を選択して下さい。/n却下をした場合,位置情報の登録とプッシュ通知が行うことができません。</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Used to monitor location in the background and notify to app.</string>
+	<string>位置情報の登録、プッシュ通知機能を使用する為に、位置情報の許可を選択して下さい。/n却下をした場合,位置情報の登録とプッシュ通知が行うことができません。</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Used to monitor location in the background and notify to app.</string>
+	<string>位置情報の登録、プッシュ通知機能を使用する為に、位置情報の許可を選択して下さい。/n却下をした場合,位置情報の登録とプッシュ通知が行うことができません。</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

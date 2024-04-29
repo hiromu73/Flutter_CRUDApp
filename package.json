@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "https://github.com/hiromu73/Flutter_CRUDApp.git",
   "author": "hiromu73 <hiromu.camera@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "firebase-functions": "^4.9.0"
+  }
 }

@@ -7,11 +7,9 @@ admin.initializeApp();
 exports.pushTalk = functions
   .region("asia-northeast1")
   .https.onCall(async (data, response) => {
-    const title = data.title; //通知のタイトル
-    const body = data.body; //通知の内容
-    const token = data.token; //送り先のトークン
-    print(data);
-    print(title);
+    const title = data.title; // 通知のタイトル
+    const body = data.body; // 通知の内容
+    const token = data.token; // 送り先のトークン
     const message = {
       notification: {
         title: title,

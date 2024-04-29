@@ -86,7 +86,6 @@ class AddPage extends ConsumerWidget {
                   child: const Text(positionSearch),
                   onPressed: () async {
                     final permission = await Geolocator.checkPermission();
-                    print(permission);
                     if (permission != LocationPermission.denied &&
                         context.mounted) {
                       context.push('/setgooglemap');
@@ -164,13 +163,13 @@ class AddPage extends ConsumerWidget {
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  content: const Text('内容を入力して下さい。'),
+                                  content: const Text(memo),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.pop(context);
                                       },
-                                      child: const Text('OK'),
+                                      child: const Text(ok),
                                     ),
                                   ],
                                 );

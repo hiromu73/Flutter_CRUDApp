@@ -7,7 +7,10 @@ part 'firebase_model.g.dart';
 class FirebaseModel extends _$FirebaseModel {
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> build() =>
-      FirebaseFirestore.instance.collection('post').orderBy('date').snapshots();
+      FirebaseFirestore.instance
+          .collection('post')
+          .orderBy('date', descending: true)
+          .snapshots();
 
   Future<bool> changeView() async {
     return true;

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -14,11 +13,12 @@ class BuildGridView extends HookConsumerWidget {
     int index = 0;
     return AnimationLimiter(
       child: GridView(
+        padding: const EdgeInsets.only(top: 40, right: 10, left: 10),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10.0,
             mainAxisSpacing: 10.0,
-            childAspectRatio: 0.6),
+            childAspectRatio: 0.8),
         children: query.docs.map((DocumentSnapshot document) {
           final int staggerPosition = index++;
           return Dismissible(
@@ -58,6 +58,7 @@ class BuildGridView extends HookConsumerWidget {
                     ),
                     clipBehavior: Clip.hardEdge,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           width: double.infinity,
@@ -71,14 +72,15 @@ class BuildGridView extends HookConsumerWidget {
                             ),
                           ),
                         ),
-                        Flexible(
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 8),
-                            child: document['checkName'] != null
-                                ? Text("場所\n・${document['checkName']}")
-                                : const SizedBox.shrink(),
+                        Expanded(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: SingleChildScrollView(
+                              child: document['checkName'] != null
+                                  ? Text("場所\n・${document['checkName']}")
+                                  : const SizedBox.shrink(),
+                            ),
                           ),
                         ),
                         Container(

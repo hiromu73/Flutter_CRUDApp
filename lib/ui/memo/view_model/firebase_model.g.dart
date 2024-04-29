@@ -6,7 +6,7 @@ part of 'firebase_model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$firebaseModelHash() => r'0d2f5e6f553a8aceacc9851c207a03b87125c543';
+String _$firebaseModelHash() => r'0435b7de73a0cddbc27c82cea83a4cda9cddfdb4';
 
 /// See also [FirebaseModel].
 @ProviderFor(FirebaseModel)

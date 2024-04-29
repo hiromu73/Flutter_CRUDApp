@@ -12,14 +12,12 @@ class ShowModal extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectItem = ref.read(selectItemsProvider);
-    final latitude = ref.read(latitudeProvider);
-    final longitude = ref.read(longitudeProvider);
-    print(latitude);
-    print(longitude);
-    print(selectItem);
+    print("簡易選択モーダル");
+    final selectItem = ref.watch(selectItemsProvider);
+    // final latitude = ref.watch(latitudeProvider);
+    // final longitude = ref.watch(longitudeProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
-    print(currentPositionFuture);
+    // print(latitude);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -27,75 +25,93 @@ class ShowModal extends ConsumerWidget {
       height: 250,
       child: Column(
         children: [
-          Wrap(
-            runSpacing: 16,
-            spacing: 16,
-            children: categoryList.keys.map((item) {
-              return InkWell(
-                borderRadius: const BorderRadius.all(Radius.circular(32)),
-                onTap: () async {
-                  if (selectItem.contains(item)) {
-                    await ref.read(selectItemsProvider.notifier).remove(item);
-                    if (ref.watch(selectItemsProvider).isNotEmpty) {
-                      List<String> japaneseNames =
-                          ref.watch(selectItemsProvider).split(',');
-                      List<String> englishNames = [];
-                      for (String japaneseName in japaneseNames) {
-                        String trimmedJapaneseName = japaneseName.trim();
-                        if (categoryList.containsKey(trimmedJapaneseName)) {
-                          englishNames.add(categoryList[trimmedJapaneseName]!);
-                        }
-                      }
-                      await ref
-                          .read(autoCompleteSearchTypeProvider.notifier)
-                          .autoCompleteSearchType(
-                              englishNames, latitude, longitude);
-                    } else {
-                      await ref
-                          .read(autoCompleteSearchTypeProvider.notifier)
-                          .noneAutoCompleteSearch();
-                    }
-                  } else {
-                    await ref.read(selectItemsProvider.notifier).add(item);
-                    List<String> japaneseNames =
-                        ref.watch(selectItemsProvider).split(',');
-                    List<String> englishNames = [];
-                    for (String japaneseName in japaneseNames) {
-                      String trimmedJapaneseName = japaneseName.trim();
-                      if (categoryList.containsKey(trimmedJapaneseName)) {
-                        englishNames.add(categoryList[trimmedJapaneseName]!);
-                      }
-                    }
-                    await ref
-                        .read(autoCompleteSearchTypeProvider.notifier)
-                        .autoCompleteSearchType(
-                            englishNames, latitude, longitude);
-                  }
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 100),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(32)),
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                    color:
-                        selectItem.contains(item) ? Colors.blue : Colors.white,
+          currentPositionFuture.maybeWhen(
+              data: (date) => Wrap(
+                    runSpacing: 16,
+                    spacing: 16,
+                    children: categoryList.keys.map((item) {
+                      return InkWell(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(32)),
+                        onTap: () async {
+                          if (selectItem.contains(item)) {
+                            await ref
+                                .read(selectItemsProvider.notifier)
+                                .remove(item);
+                            if (ref.watch(selectItemsProvider).isNotEmpty) {
+                              List<String> japaneseNames =
+                                  ref.watch(selectItemsProvider).split(',');
+                              List<String> englishNames = [];
+                              for (String japaneseName in japaneseNames) {
+                                String trimmedJapaneseName =
+                                    japaneseName.trim();
+                                if (categoryList
+                                    .containsKey(trimmedJapaneseName)) {
+                                  englishNames
+                                      .add(categoryList[trimmedJapaneseName]!);
+                                }
+                              }
+                              await ref
+                                  .read(autoCompleteSearchTypeProvider.notifier)
+                                  .autoCompleteSearchType(englishNames,
+                                      date.latitude, date.longitude);
+                            } else {
+                              await ref
+                                  .read(autoCompleteSearchTypeProvider.notifier)
+                                  .noneAutoCompleteSearch();
+                            }
+                          } else {
+                            await ref
+                                .read(selectItemsProvider.notifier)
+                                .add(item);
+                            List<String> japaneseNames =
+                                ref.watch(selectItemsProvider).split(',');
+                            List<String> englishNames = [];
+                            for (String japaneseName in japaneseNames) {
+                              String trimmedJapaneseName = japaneseName.trim();
+                              if (categoryList
+                                  .containsKey(trimmedJapaneseName)) {
+                                englishNames
+                                    .add(categoryList[trimmedJapaneseName]!);
+                              }
+                            }
+                            await ref
+                                .read(autoCompleteSearchTypeProvider.notifier)
+                                .autoCompleteSearchType(englishNames,
+                                    date.latitude, date.longitude);
+                          }
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 100),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(32)),
+                            border: Border.all(
+                              color: Colors.grey,
+                            ),
+                            color: selectItem.contains(item)
+                                ? Colors.blue
+                                : Colors.white,
+                          ),
+                          child: Text(
+                            item,
+                            style: TextStyle(
+                                color: selectItem.contains(item)
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                  child: Text(
-                    item,
-                    style: TextStyle(
-                        color: selectItem.contains(item)
-                            ? Colors.white
-                            : Colors.black,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+              orElse: () {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }),
           Expanded(
               child: Center(
             child: Row(
