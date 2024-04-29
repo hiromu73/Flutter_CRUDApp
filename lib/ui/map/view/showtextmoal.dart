@@ -7,7 +7,6 @@ import 'package:memoplace/model/map/place.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
-import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
 
 class ShowTextModal extends ConsumerWidget {
@@ -17,8 +16,6 @@ class ShowTextModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
-    // final latitude = ref.watch(latitudeProvider);
-    // final longitude = ref.watch(longitudeProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
 
     return Container(

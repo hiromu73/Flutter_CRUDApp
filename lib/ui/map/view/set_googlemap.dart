@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view/cardsection.dart';
 import 'package:memoplace/ui/map/view/showmodal.dart';
 import 'package:memoplace/ui/map/view/showtextmoal.dart';
@@ -29,8 +26,8 @@ final googleMapControllerProvider =
 //   return await Geolocator.checkPermission();
 // });
 
-class SetGoogleMap extends HookConsumerWidget {
-  SetGoogleMap({super.key});
+class SetGoogleMap extends ConsumerWidget {
+  SetGoogleMap({Key? key}) : super(key: key);
   // final bool _isFirstBuild = true;
   late GoogleMapController _mapController;
 
@@ -47,7 +44,7 @@ class SetGoogleMap extends HookConsumerWidget {
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-          print(latitude);
+    print(latitude);
     print(longitude);
     print("ビルド");
     print(currentPositionFuture);
