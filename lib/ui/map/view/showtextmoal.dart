@@ -79,7 +79,6 @@ class ShowTextModal extends ConsumerWidget {
                         await ref
                             .read(autoCompleteSearchProvider.notifier)
                             .noneAutoCompleteSearch();
-                        // 前の結果が残る。(速さによる)(更新はされている。非同期の問題？) 質問Zoom②
                       }
                     },
                   ),
@@ -109,17 +108,11 @@ class ShowTextModal extends ConsumerWidget {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  // 非同期後にcontextが変わってしまう為、現在のcontextを取得しておく。
                   final localContext = context;
-
-                  // チェックされたPlaceオブジェクトのリストを取得
                   final checkedPlaces = await ref
                       .read(autoCompleteSearchProvider.notifier)
                       .getCheckedPlaces();
-
-                  // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
                   for (final place in checkedPlaces) {
-                    // 既にcheckがtrueになっている要素のnameを取得し、一致指定あたら追加しない。
                     if (!ref.watch(autoCompleteSearchTypeProvider).any(
                         (element) =>
                             element.name == place.name &&
@@ -142,8 +135,6 @@ class ShowTextModal extends ConsumerWidget {
               const SizedBox(width: 50),
               ElevatedButton(
                   onPressed: () async {
-                    // マップ上のマーカーも全て消す。
-                    // リスト上のtrueをfalseにする。
                     await ref
                         .read(autoCompleteSearchTypeProvider.notifier)
                         .noneAutoCompleteSearch();

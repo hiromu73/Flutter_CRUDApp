@@ -48,7 +48,6 @@ class MemoApp extends HookConsumerWidget {
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        // crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           FloatingActionButton(
               backgroundColor: Theme.of(context).colorScheme.background,
@@ -59,7 +58,7 @@ class MemoApp extends HookConsumerWidget {
               ),
               onPressed: () => context.push('/addpage')),
           const SizedBox(
-            width: 88,
+            width: 98,
           ),
           FloatingActionButton(
               backgroundColor: Theme.of(context).colorScheme.background,
@@ -104,17 +103,13 @@ class MemoApp extends HookConsumerWidget {
 
     await messaging.requestPermission(
       alert: true,
-      announcement: false,
-      badge: true,
+      announcement: true,
+      badge: false,
       carPlay: false,
       criticalAlert: false,
       provisional: false,
       sound: true,
     );
-
-    final fcm = FirebaseMessaging.instance;
-    final token = await fcm.getToken();
-    print(token);
 
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
@@ -122,7 +117,6 @@ class MemoApp extends HookConsumerWidget {
 
     // 通知バナーをタップ時の処理
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("フォアグラウンド時にバナーをタップ");
       context.push('/');
     });
 
@@ -134,8 +128,6 @@ class MemoApp extends HookConsumerWidget {
       final position = await _determinePosition();
       if (permission == LocationPermission.denied && position.latitude != 0.0 ||
           position.longitude != 0.0) {
-        print("許可している");
-
         ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
         ref
             .read(longitudeProvider.notifier)
@@ -172,7 +164,6 @@ class MemoApp extends HookConsumerWidget {
         //  位置情報が検知されると発火する
         BackgroundTask.instance.stream.listen((event) async {
           for (int i = 0; i < latitude.length; i++) {
-            print(i);
             double distanceInMeters = Geolocator.distanceBetween(
                 position.latitude,
                 position.longitude,
@@ -180,17 +171,16 @@ class MemoApp extends HookConsumerWidget {
                 double.parse(longiLang[i].toString()));
             if (distanceInMeters < 1000) {
               print("distanceInMeters < 1000になったのでプッシュ通知します。");
-              await pushMessage(text);
+              await pushMessage(text[i]);
             }
           }
         });
 
-        // バックグラウンドで位置情報の使用を開始
+        // // バックグラウンドで位置情報の使用を開始
         await BackgroundTask.instance.start();
-        print("バックグラウンドで位置情報の使用を開始");
 
         // フォアグラウンドでのメッセージを受信した際の処理
-        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
           RemoteNotification? notification = message.notification;
           AndroidNotification? android = message.notification!.android;
 

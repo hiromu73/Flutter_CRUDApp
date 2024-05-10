@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'MemoPlace',
-      // routerConfig: router,
       theme: ThemeData(
           brightness: Brightness.light,
           colorScheme: ColorScheme.light(

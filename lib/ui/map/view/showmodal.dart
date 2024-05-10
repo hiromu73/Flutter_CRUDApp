@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
-import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
 
 class ShowModal extends ConsumerWidget {
@@ -14,10 +13,7 @@ class ShowModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     print("簡易選択モーダル");
     final selectItem = ref.watch(selectItemsProvider);
-    // final latitude = ref.watch(latitudeProvider);
-    // final longitude = ref.watch(longitudeProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
-    // print(latitude);
 
     return Container(
       padding: const EdgeInsets.all(10),

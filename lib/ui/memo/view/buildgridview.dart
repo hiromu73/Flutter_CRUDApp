@@ -13,7 +13,7 @@ class BuildGridView extends HookConsumerWidget {
     int index = 0;
     return AnimationLimiter(
       child: GridView(
-        padding: const EdgeInsets.only(top: 40, right: 10, left: 10),
+        padding: const EdgeInsets.only(top: 50, right: 10, left: 10),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10.0,
@@ -59,6 +59,7 @@ class BuildGridView extends HookConsumerWidget {
                     clipBehavior: Clip.hardEdge,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           width: double.infinity,
@@ -78,7 +79,7 @@ class BuildGridView extends HookConsumerWidget {
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: SingleChildScrollView(
                               child: document['checkName'] != null
-                                  ? Text("場所\n・${document['checkName']}")
+                                  ? Text("場所\n${document['checkName']}")
                                   : const SizedBox.shrink(),
                             ),
                           ),

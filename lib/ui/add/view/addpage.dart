@@ -31,6 +31,8 @@ class AddPage extends ConsumerWidget {
         checkList.map((marker) => marker.longitude).toList();
 
     final textMemo = ref.watch(memoProvider);
+    // フォーカスの状態を管理するFocusNode
+    final FocusNode _focusNode = FocusNode();
 
     return Scaffold(
       appBar: AppBar(
@@ -48,152 +50,161 @@ class AddPage extends ConsumerWidget {
               context.push('/');
             }),
       ),
-      body: Center(
-        child: Container(
-          color: Colors.yellow[50],
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              TextFormField(
-                controller: editController,
-                maxLength: null,
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
-                  fillColor: Colors.grey[100],
-                  filled: true,
-                  isDense: true,
-                  hintText: memo,
-                  hintStyle: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w100),
-                  prefixIcon: const Icon(Icons.create),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(32),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                textAlign: TextAlign.left,
-                onChanged: (String value) async {
-                  ref.read(memoProvider.notifier).state = value;
-                },
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30))),
-                  child: const Text(positionSearch),
-                  onPressed: () async {
-                    final permission = await Geolocator.checkPermission();
-                    if (permission != LocationPermission.denied &&
-                        context.mounted) {
-                      context.push('/setgooglemap');
-                    } else {
-                      if (context.mounted) {
-                        return showDialog(
-                            context: context,
-                            builder: (context) {
-                              return CupertinoAlertDialog(
-                                title: const Text(searchPermission),
-                                actions: [
-                                  CupertinoDialogAction(
-                                      isDefaultAction: true,
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(ok)),
-                                ],
-                              );
-                            });
-                      }
-                    }
-                  }),
-              const SizedBox(height: 8),
-              Center(
-                child: Column(
-                  children: [
-                    const Text("選択されている位置情報"),
-                    ListView.builder(
-                      itemCount: checkedMarkerNames.length,
-                      itemBuilder: (context, index) {
-                        return Text("・${checkedMarkerNames[index]!}");
-                      },
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+      body: InkWell(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Center(
+          child: Container(
+            color: Colors.yellow[50],
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                  focusNode: _focusNode,
+                  controller: editController,
+                  maxLength: null,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    fillColor: Colors.grey[100],
+                    filled: true,
+                    isDense: true,
+                    hintText: memo,
+                    hintStyle: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w100),
+                    prefixIcon: const Icon(Icons.create),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(32),
+                      borderSide: BorderSide.none,
                     ),
-                  ],
+                  ),
+                  textAlign: TextAlign.left,
+                  onChanged: (String value) async {
+                    ref.read(memoProvider.notifier).state = value;
+                  },
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30))),
-                      child: const Text(registration),
-                      onPressed: () async {
-                        if (textMemo != "") {
-                          final date =
-                              DateTime.now().toLocal().toIso8601String();
-                          await FirebaseFirestore.instance
-                              .collection('post')
-                              .doc()
-                              .set({
-                            'text': textMemo,
-                            'checkName': checkedMarkerNames.isNotEmpty
-                                ? checkedMarkerNames
-                                : null,
-                            'latitude': checkedMarkerLatitudes.isNotEmpty
-                                ? checkedMarkerLatitudes
-                                : null,
-                            'longitude': checkedMarkerLongitudes.isNotEmpty
-                                ? checkedMarkerLongitudes
-                                : null,
-                            'date': date,
-                            'alert': true,
-                          });
-                          if (context.mounted) {
-                            context.go('/');
-                          }
-                        } else {
-                          showDialog(
+                const SizedBox(height: 8),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30))),
+                    child: const Text(positionSearch),
+                    onPressed: () async {
+                      final permission = await Geolocator.checkPermission();
+                      if ((permission == LocationPermission.always ||
+                              permission == LocationPermission.whileInUse) &&
+                          context.mounted) {
+                        context.push('/setgooglemap');
+                      } else {
+                        if (context.mounted) {
+                          return showDialog(
                               context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  content: const Text(memo),
+                              builder: (context) {
+                                return CupertinoAlertDialog(
+                                  title: const Text(searchPermission),
                                   actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(ok),
-                                    ),
+                                    CupertinoDialogAction(
+                                        isDefaultAction: true,
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(ok)),
                                   ],
                                 );
                               });
                         }
-                      }),
-                  const SizedBox(
-                    width: 50,
+                      }
+                    }),
+                const SizedBox(height: 8),
+                Center(
+                  child: Column(
+                    children: [
+                      const Text("選択されている位置情報"),
+                      const SizedBox(height: 10),
+                      ListView.builder(
+                        itemCount: checkedMarkerNames.length,
+                        itemBuilder: (context, index) {
+                          // 削除ボタンを作っていく。
+                          return Text("・${checkedMarkerNames[index]!}");
+                        },
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30))),
-                    onPressed: () async {
-                      editController.clear();
-                      ref
-                          .read(autoCompleteSearchTypeProvider.notifier)
-                          .noneAutoCompleteSearch();
-                    },
-                    child: const Text(clear),
-                  ),
-                ],
-              )
-            ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30))),
+                        child: const Text(registration),
+                        onPressed: () async {
+                          if (textMemo != "") {
+                            final date =
+                                DateTime.now().toLocal().toIso8601String();
+                            await FirebaseFirestore.instance
+                                .collection('post')
+                                .doc()
+                                .set({
+                              'text': textMemo,
+                              'checkName': checkedMarkerNames.isNotEmpty
+                                  ? checkedMarkerNames
+                                  : null,
+                              'latitude': checkedMarkerLatitudes.isNotEmpty
+                                  ? checkedMarkerLatitudes
+                                  : null,
+                              'longitude': checkedMarkerLongitudes.isNotEmpty
+                                  ? checkedMarkerLongitudes
+                                  : null,
+                              'date': date,
+                              'alert': true,
+                            });
+                            if (context.mounted) {
+                              context.go('/');
+                            }
+                          } else {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: const Text(memo),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(ok),
+                                      ),
+                                    ],
+                                  );
+                                });
+                          }
+                        }),
+                    const SizedBox(
+                      width: 50,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30))),
+                      onPressed: () async {
+                        editController.clear();
+                        ref
+                            .read(autoCompleteSearchTypeProvider.notifier)
+                            .noneAutoCompleteSearch();
+                      },
+                      child: const Text(clear),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
