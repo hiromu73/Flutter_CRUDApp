@@ -145,9 +145,7 @@ class BuildListView extends HookConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    )
+                    const SizedBox(height: 5)
                   ]),
                 ),
               ),

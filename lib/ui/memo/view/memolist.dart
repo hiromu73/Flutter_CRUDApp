@@ -14,6 +14,7 @@ class MemoList extends HookConsumerWidget {
         ref.watch(firebaseModelProvider);
     return firebaseCollection.when(
       data: (QuerySnapshot query) {
+        
         return viewType
             ? BuildListView(query, context)
             : BuildGridView(query, context);

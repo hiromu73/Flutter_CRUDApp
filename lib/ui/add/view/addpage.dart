@@ -1,21 +1,23 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
 
-class AddPage extends ConsumerWidget {
+class AddPage extends HookConsumerWidget {
   AddPage({super.key});
-  final TextEditingController editController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController editController = useTextEditingController();
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
         .where((marker) => marker.check == true)
@@ -32,7 +34,7 @@ class AddPage extends ConsumerWidget {
 
     final textMemo = ref.watch(memoProvider);
     // フォーカスの状態を管理するFocusNode
-    final FocusNode _focusNode = FocusNode();
+    final FocusNode _focusNode = useFocusNode();
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +49,7 @@ class AddPage extends ConsumerWidget {
               color: Colors.black54,
             ),
             onPressed: () {
-              context.push('/');
+              context.push('/memolist');
             }),
       ),
       body: InkWell(
@@ -101,16 +103,25 @@ class AddPage extends ConsumerWidget {
                         if (context.mounted) {
                           return showDialog(
                               context: context,
-                              builder: (context) {
-                                return CupertinoAlertDialog(
-                                  title: const Text(searchPermission),
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: const Text(
+                                      "デバイスの位置情報が許可されていません。\n位置情報を許可することでマップを表示でき、プッシュ通知も行えます。"),
                                   actions: [
-                                    CupertinoDialogAction(
-                                        isDefaultAction: true,
-                                        onPressed: () async {
+                                    TextButton(
+                                      onPressed: () {
+                                        openAppSettings();
+                                      },
+                                      child: const Text("設定"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        if (context.mounted) {
                                           Navigator.pop(context);
-                                        },
-                                        child: const Text(ok)),
+                                        }
+                                      },
+                                      child: const Text(ok),
+                                    ),
                                   ],
                                 );
                               });

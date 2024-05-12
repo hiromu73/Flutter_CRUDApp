@@ -145,7 +145,6 @@ class MemoApp extends HookConsumerWidget {
 
         QuerySnapshot querySnapshot = await collectionReference.get();
 
-        // コレクションに保存されている情報をまとめている。
         for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
           dynamic checkLatitudes = documentSnapshot['latitude'];
           dynamic checkLongitudes = documentSnapshot['longitude'];

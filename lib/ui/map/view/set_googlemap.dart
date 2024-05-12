@@ -21,11 +21,6 @@ final googleMapControllerProvider =
   (ref) => GoogleMapControllerNotifier(),
 );
 
-// final locationPermissionProvider =
-//     FutureProvider<LocationPermission>((ref) async {
-//   return await Geolocator.checkPermission();
-// });
-
 class SetGoogleMap extends ConsumerWidget {
   SetGoogleMap({Key? key}) : super(key: key);
   // final bool _isFirstBuild = true;
@@ -80,6 +75,7 @@ class SetGoogleMap extends ConsumerWidget {
       height: height,
       width: width,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: <Widget>[
             currentPositionFuture.maybeWhen(
