@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:clay_containers/clay_containers.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
+
+final userIdProvider = StateProvider<String>((ref) => "");
+final passwordProvider = StateProvider<bool>((ref) => true);
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
@@ -18,19 +20,16 @@ class LoginPage extends HookConsumerWidget {
     final email = useState<String>("");
     final password = useState<String>("");
     final infoText = useState<String>("");
+    final _obscureText = useState(true);
     Color baseColor = Colors.orange.shade100;
     return Scaffold(
-      body: InkWell(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Center(
+      body: Center(
+        child: Form(
           child: Container(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                // メールアドレス入力
                 Container(
                     color: baseColor,
                     child: Center(
@@ -45,14 +44,13 @@ class LoginPage extends HookConsumerWidget {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(
-                                -3, -3), // changes position of shadow
+                            offset: const Offset(-3, -3),
                           ),
                           const BoxShadow(
                             color: Colors.white,
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: Offset(3, 3), // changes position of shadow
+                            offset: Offset(3, 3),
                           ),
                         ],
                       ),
@@ -62,6 +60,13 @@ class LoginPage extends HookConsumerWidget {
                         maxLength: null,
                         maxLines: null,
                         keyboardType: TextInputType.multiline,
+                        autofillHints: const [AutofillHints.email],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return '値を入力してください';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration(
                           fillColor: Colors.orange.shade100,
                           filled: true,
@@ -81,7 +86,6 @@ class LoginPage extends HookConsumerWidget {
                       ),
                     ))),
                 const SizedBox(height: 30),
-                // パスワード入力
                 Container(
                     color: baseColor,
                     child: Center(
@@ -96,23 +100,22 @@ class LoginPage extends HookConsumerWidget {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(
-                                -3, -3), // changes position of shadow
+                            offset: const Offset(-3, -3),
                           ),
                           const BoxShadow(
                             color: Colors.white,
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: Offset(3, 3), // changes position of shadow
+                            offset: Offset(3, 3),
                           ),
                         ],
                       ),
                       child: TextFormField(
                         focusNode: passwordFocusNode,
                         controller: passwordController,
-                        maxLength: null,
-                        maxLines: null,
+                        obscureText: _obscureText.value,
                         keyboardType: TextInputType.multiline,
+                        autofillHints: const [AutofillHints.password],
                         decoration: InputDecoration(
                           fillColor: Colors.orange.shade100,
                           filled: true,
@@ -124,6 +127,14 @@ class LoginPage extends HookConsumerWidget {
                             borderRadius: BorderRadius.circular(32),
                             borderSide: BorderSide.none,
                           ),
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscureText.value
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              _obscureText.value = !_obscureText.value;
+                            },
+                          ),
                         ),
                         textAlign: TextAlign.left,
                         onChanged: (String value) async {
@@ -131,13 +142,10 @@ class LoginPage extends HookConsumerWidget {
                         },
                       ),
                     ))),
-
                 Container(
                   padding: const EdgeInsets.all(20),
-                  // メッセージ表示
                   child: Text(infoText.value),
                 ),
-                // ユーザー登録ボタン
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -174,7 +182,6 @@ class LoginPage extends HookConsumerWidget {
                               child: const Text('登録'),
                               onPressed: () async {
                                 try {
-                                  // メール/パスワードでユーザー登録
                                   final FirebaseAuth auth =
                                       FirebaseAuth.instance;
                                   final result =
@@ -182,9 +189,11 @@ class LoginPage extends HookConsumerWidget {
                                     email: email.value,
                                     password: password.value,
                                   );
-                                  await ref
+                                  ref
                                       .read(loginUserProvider.notifier)
-                                      .getLoginUser(result.user!);
+                                      .setLoginUser(result.user!.uid);
+                                  final uid = ref.watch(loginUserProvider);
+                                  ref.read(userIdProvider.notifier).state = uid;
                                   if (context.mounted) {
                                     await context.push('/memolist');
                                   }
@@ -233,66 +242,18 @@ class LoginPage extends HookConsumerWidget {
                                 );
                                 await ref
                                     .read(loginUserProvider.notifier)
-                                    .getLoginUser(result.user!);
+                                    .setLoginUser(result.user!.uid);
+                                final uid = ref.watch(loginUserProvider);
+                                ref.read(userIdProvider.notifier).state = uid;
                                 if (context.mounted) {
                                   await context.push('/memolist');
                                 }
                               } catch (e) {
-                                // ユーザー登録に失敗した場合
                                 infoText.value = "ログインに失敗しました：${e.toString()}";
                               }
                             },
                           ),
                         ))),
-
-                    // ElevatedButton(
-                    //   child: const Text('登録'),
-                    //   onPressed: () async {
-                    //     try {
-                    //       // メール/パスワードでユーザー登録
-                    //       // final FirebaseAuth auth = FirebaseAuth.instance;
-                    //       // await auth.createUserWithEmailAndPassword(
-                    //       //   email: email,
-                    //       //   password: password,
-                    //       // );
-                    //       // ユーザー登録に成功した場合
-                    //       // チャット画面に遷移＋ログイン画面を破棄
-                    //       if (context.mounted) {
-                    //         print("b");
-                    //         await context.push('/memolist');
-                    //       }
-
-                    //       print("a");
-                    //     } catch (e) {
-                    //       // ユーザー登録に失敗した場合
-                    //       print("c");
-                    //     }
-                    //   },
-                    // ),
-                    // ログインボタン
-                    // ClayContainer(
-                    //   color: baseColor,
-                    //   child: ElevatedButton(
-                    //     child: const Text('ログイン'),
-                    //     onPressed: () async {
-                    //       try {
-                    //         // メール/パスワードでユーザー登録
-                    //         final FirebaseAuth auth = FirebaseAuth.instance;
-                    //         await auth.createUserWithEmailAndPassword(
-                    //           email: email,
-                    //           password: password,
-                    //         );
-                    //         // ユーザー登録に成功した場合
-                    //         // チャット画面に遷移＋ログイン画面を破棄
-                    //         if (context.mounted) {
-                    //           await context.push('/memolist');
-                    //         }
-                    //       } catch (e) {
-                    //         // ユーザー登録に失敗した場合
-                    //       }
-                    //     },
-                    //   ),
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 20)

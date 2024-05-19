@@ -6,6 +6,23 @@ part of 'firebase_model.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$getUserCollectionHash() => r'ed424cc6ab5736987c24bfba2a578ce462a61329';
+
+/// See also [getUserCollection].
+@ProviderFor(getUserCollection)
+final getUserCollectionProvider = AutoDisposeFutureProvider<
+    Stream<QuerySnapshot<Map<String, dynamic>>>>.internal(
+  getUserCollection,
+  name: r'getUserCollectionProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$getUserCollectionHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef GetUserCollectionRef
+    = AutoDisposeFutureProviderRef<Stream<QuerySnapshot<Map<String, dynamic>>>>;
 String _$firebaseModelHash() => r'0435b7de73a0cddbc27c82cea83a4cda9cddfdb4';
 
 /// See also [FirebaseModel].

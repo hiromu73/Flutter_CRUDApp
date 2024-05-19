@@ -11,8 +11,20 @@ class FirebaseModel extends _$FirebaseModel {
           .collection('post')
           .orderBy('date', descending: true)
           .snapshots();
-
   Future<bool> changeView() async {
     return true;
   }
+}
+
+@riverpod
+Future<Stream<QuerySnapshot<Map<String, dynamic>>>> getUserCollection(
+  userId,
+) async {
+  final collection = FirebaseFirestore.instance
+      .collection('post')
+      .doc(userId)
+      .collection('documents')
+      .orderBy('date', descending: true)
+      .snapshots();
+  return collection;
 }

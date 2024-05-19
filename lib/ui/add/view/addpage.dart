@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -6,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
+import 'package:memoplace/ui/login/view/loginpage.dart';
+import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -33,6 +34,9 @@ class AddPage extends HookConsumerWidget {
         checkList.map((marker) => marker.longitude).toList();
 
     final textMemo = ref.watch(memoProvider);
+    final userId = ref.watch(loginUserProvider);
+    print(userId);
+
     // フォーカスの状態を管理するFocusNode
     final FocusNode _focusNode = useFocusNode();
 
@@ -161,8 +165,9 @@ class AddPage extends HookConsumerWidget {
                                 DateTime.now().toLocal().toIso8601String();
                             await FirebaseFirestore.instance
                                 .collection('post')
-                                .doc()
-                                .set({
+                                .doc(userId)
+                                .collection('documents')
+                                .add({
                               'text': textMemo,
                               'checkName': checkedMarkerNames.isNotEmpty
                                   ? checkedMarkerNames
@@ -177,7 +182,7 @@ class AddPage extends HookConsumerWidget {
                               'alert': true,
                             });
                             if (context.mounted) {
-                              context.go('/');
+                              context.go('/memolist');
                             }
                           } else {
                             showDialog(

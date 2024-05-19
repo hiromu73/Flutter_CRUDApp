@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:memoplace/ui/login/view_model/loginuser.dart';
 
 class BuildListView extends HookConsumerWidget {
   const BuildListView(this.query, BuildContext context, {super.key});
@@ -12,6 +13,8 @@ class BuildListView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
+    final userId = ref.watch(loginUserProvider);
+    Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: ListView(
         padding: const EdgeInsets.only(top: 50, right: 5, left: 5),
@@ -29,6 +32,8 @@ class BuildListView extends HookConsumerWidget {
                 String docId = document.id;
                 await FirebaseFirestore.instance
                     .collection('post')
+                    .doc(userId)
+                    .collection('documents')
                     .doc(docId)
                     .delete();
               } catch (e) {
@@ -41,7 +46,6 @@ class BuildListView extends HookConsumerWidget {
               position: staggerPosition,
               duration: const Duration(milliseconds: 1000),
               child: FlipAnimation(
-                // verticalOffset: 850.0,
                 child: ScaleAnimation(
                   child: Column(children: [
                     Card(
@@ -66,10 +70,12 @@ class BuildListView extends HookConsumerWidget {
                                   trackColor: Colors.grey,
                                   value: document['alert'],
                                   onChanged: (value) async {
+                                    String docId = document.id;
                                     try {
-                                      String docId = document.id;
                                       await FirebaseFirestore.instance
                                           .collection('post')
+                                          .doc(userId)
+                                          .collection('documents')
                                           .doc(docId)
                                           .update({
                                         'alert': value,
@@ -117,6 +123,9 @@ class BuildListView extends HookConsumerWidget {
                                                       await FirebaseFirestore
                                                           .instance
                                                           .collection('post')
+                                                          .doc(userId)
+                                                          .collection(
+                                                              'documents')
                                                           .doc(docId)
                                                           .delete();
                                                       if (context.mounted) {

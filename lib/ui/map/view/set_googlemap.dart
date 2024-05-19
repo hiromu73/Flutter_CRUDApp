@@ -9,7 +9,6 @@ import 'package:memoplace/ui/map/view_model/googlemap_controller_notifier.dart';
 import 'package:memoplace/model/map/place.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
-import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -37,12 +36,7 @@ class SetGoogleMap extends ConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    final latitude = ref.watch(latitudeProvider);
-    final longitude = ref.watch(longitudeProvider);
-    print(latitude);
-    print(longitude);
-    print("ビルド");
-    print(currentPositionFuture);
+
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),

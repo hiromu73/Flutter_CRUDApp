@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
 import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/memo/view/memolist.dart';
@@ -139,11 +140,13 @@ class MemoApp extends HookConsumerWidget {
         List<double> latitude = [];
         List<double> longiLang = [];
         List<String> text = [];
+        final userId = ref.watch(loginUserProvider);
 
-        CollectionReference collectionReference =
-            FirebaseFirestore.instance.collection('post');
-
-        QuerySnapshot querySnapshot = await collectionReference.get();
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('post')
+            .doc(userId)
+            .collection('documents')
+            .get();
 
         for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
           dynamic checkLatitudes = documentSnapshot['latitude'];

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:memoplace/ui/login/view_model/loginuser.dart';
 
 class BuildGridView extends HookConsumerWidget {
   const BuildGridView(this.query, BuildContext context, {super.key});
@@ -11,6 +12,8 @@ class BuildGridView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
+    final userId = ref.watch(loginUserProvider);
+    Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: GridView(
         padding: const EdgeInsets.only(top: 50, right: 10, left: 10),
@@ -31,8 +34,11 @@ class BuildGridView extends HookConsumerWidget {
             onDismissed: (DismissDirection direction) async {
               try {
                 String docId = document.id;
+                print(userId);
                 await FirebaseFirestore.instance
                     .collection('post')
+                    .doc(userId)
+                    .collection('documents')
                     .doc(docId)
                     .delete();
               } catch (e) {
@@ -109,6 +115,8 @@ class BuildGridView extends HookConsumerWidget {
                                                     await FirebaseFirestore
                                                         .instance
                                                         .collection('post')
+                                                        .doc(userId)
+                                                        .collection('documents')
                                                         .doc(docId)
                                                         .delete();
                                                     if (context.mounted) {
@@ -140,6 +148,8 @@ class BuildGridView extends HookConsumerWidget {
                                       String docId = document.id;
                                       await FirebaseFirestore.instance
                                           .collection('post')
+                                          .doc(userId)
+                                          .collection('documents')
                                           .doc(docId)
                                           .update({
                                         'alert': value,

@@ -6,12 +6,12 @@ part of 'loginuser.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loginUserHash() => r'13ffa50d2fdb0fa7663d3198f0f2713cfbaef548';
+String _$loginUserHash() => r'9faaa684d149a0d1eb57abb0dc75e1a3cd9d7ee6';
 
 /// See also [LoginUser].
 @ProviderFor(LoginUser)
 final loginUserProvider =
-    AutoDisposeNotifierProvider<LoginUser, User?>.internal(
+    AutoDisposeNotifierProvider<LoginUser, String>.internal(
   LoginUser.new,
   name: r'loginUserProvider',
   debugGetCreateSourceHash:
@@ -20,6 +20,6 @@ final loginUserProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$LoginUser = AutoDisposeNotifier<User?>;
+typedef _$LoginUser = AutoDisposeNotifier<String>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
