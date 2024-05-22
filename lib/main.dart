@@ -17,6 +17,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static const Color mainColor = Color(0xFFFFE0B2);
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +25,26 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'MemoPlace',
       theme: ThemeData(
-          brightness: Brightness.light,
-          colorScheme: ColorScheme.light(
-            background: Colors.orange.shade100,
-            primary: Colors.black,
-            secondary: Colors.grey.shade200,
-          )),
+        primarySwatch: Colors.orange,
+        brightness: Brightness.light,
+        primaryColor: mainColor,
+        cardColor: mainColor,
+        colorScheme: ColorScheme.light(
+          background: mainColor,
+          primary: Colors.black,
+          secondary: Colors.grey.shade200,
+        ),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: mainColor,
+        cardColor: Colors.orange.shade100,
+        colorScheme: ColorScheme.dark(
+          background: mainColor,
+          primary: Colors.black,
+          secondary: Colors.grey.shade200,
+        ),
+      ),
       routerDelegate: router.routerDelegate,
       routeInformationParser: router.routeInformationParser,
       routeInformationProvider: router.routeInformationProvider,

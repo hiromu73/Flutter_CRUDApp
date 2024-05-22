@@ -20,7 +20,8 @@ class LoginPage extends HookConsumerWidget {
     final email = useState<String>("");
     final password = useState<String>("");
     final infoText = useState<String>("");
-    final _obscureText = useState(true);
+    useFocusNode();
+    final obscureText = useState(true);
     Color baseColor = Colors.orange.shade100;
     return Scaffold(
       body: Center(
@@ -41,16 +42,16 @@ class LoginPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
+                            color: Colors.orange.withOpacity(0.4),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(3, 3),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
                             offset: const Offset(-3, -3),
-                          ),
-                          const BoxShadow(
-                            color: Colors.white,
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: Offset(3, 3),
                           ),
                         ],
                       ),
@@ -97,23 +98,23 @@ class LoginPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
+                            color: Colors.orange.withOpacity(0.4),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(3, 3),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
                             offset: const Offset(-3, -3),
-                          ),
-                          const BoxShadow(
-                            color: Colors.white,
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: Offset(3, 3),
                           ),
                         ],
                       ),
                       child: TextFormField(
                         focusNode: passwordFocusNode,
                         controller: passwordController,
-                        obscureText: _obscureText.value,
+                        obscureText: obscureText.value,
                         keyboardType: TextInputType.multiline,
                         autofillHints: const [AutofillHints.password],
                         decoration: InputDecoration(
@@ -128,11 +129,11 @@ class LoginPage extends HookConsumerWidget {
                             borderSide: BorderSide.none,
                           ),
                           suffixIcon: IconButton(
-                            icon: Icon(_obscureText.value
+                            icon: Icon(obscureText.value
                                 ? Icons.visibility_off
                                 : Icons.visibility),
                             onPressed: () {
-                              _obscureText.value = !_obscureText.value;
+                              obscureText.value = !obscureText.value;
                             },
                           ),
                         ),
@@ -160,18 +161,16 @@ class LoginPage extends HookConsumerWidget {
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
+                                color: Colors.orange.withOpacity(0.4),
                                 spreadRadius: 5,
                                 blurRadius: 7,
-                                offset: const Offset(
-                                    -3, -3), // changes position of shadow
+                                offset: const Offset(3, 3),
                               ),
-                              const BoxShadow(
-                                color: Colors.white,
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.5),
                                 spreadRadius: 5,
                                 blurRadius: 7,
-                                offset:
-                                    Offset(3, 3), // changes position of shadow
+                                offset: const Offset(-3, -3),
                               ),
                             ],
                           ),
@@ -214,16 +213,16 @@ class LoginPage extends HookConsumerWidget {
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
+                                color: Colors.orange.withOpacity(0.4),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: const Offset(3, 3),
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.5),
                                 spreadRadius: 5,
                                 blurRadius: 7,
                                 offset: const Offset(-3, -3),
-                              ),
-                              const BoxShadow(
-                                color: Colors.white,
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: Offset(3, 3),
                               ),
                             ],
                           ),

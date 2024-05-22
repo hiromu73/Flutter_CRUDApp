@@ -67,6 +67,7 @@ dependencies:
   clay_containers: ^0.3.4
   shared_preferences: ^2.0.0
   spring_button: ^2.0.0
+  flutter_neumorphic: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -5,7 +5,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
-import 'package:memoplace/ui/login/view/loginpage.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,7 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 final memoProvider = StateProvider.autoDispose((ref) => "");
 
 class AddPage extends HookConsumerWidget {
-  AddPage({super.key});
+  const AddPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,10 +34,7 @@ class AddPage extends HookConsumerWidget {
 
     final textMemo = ref.watch(memoProvider);
     final userId = ref.watch(loginUserProvider);
-    print(userId);
-
-    // フォーカスの状態を管理するFocusNode
-    final FocusNode _focusNode = useFocusNode();
+    final FocusNode focusNode = useFocusNode();
 
     return Scaffold(
       appBar: AppBar(
@@ -67,29 +63,33 @@ class AddPage extends HookConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                TextFormField(
-                  focusNode: _focusNode,
-                  controller: editController,
-                  maxLength: null,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    fillColor: Colors.grey[100],
-                    filled: true,
-                    isDense: true,
-                    hintText: memo,
-                    hintStyle: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w100),
-                    prefixIcon: const Icon(Icons.create),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(32),
-                      borderSide: BorderSide.none,
+                Focus(
+                  child: InkWell(
+                    child: TextFormField(
+                      focusNode: focusNode,
+                      controller: editController,
+                      maxLength: null,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        fillColor: Colors.grey[100],
+                        filled: true,
+                        isDense: true,
+                        hintText: memo,
+                        hintStyle: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w100),
+                        prefixIcon: const Icon(Icons.create),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(32),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      textAlign: TextAlign.left,
+                      onChanged: (String value) async {
+                        ref.read(memoProvider.notifier).state = value;
+                      },
                     ),
                   ),
-                  textAlign: TextAlign.left,
-                  onChanged: (String value) async {
-                    ref.read(memoProvider.notifier).state = value;
-                  },
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(

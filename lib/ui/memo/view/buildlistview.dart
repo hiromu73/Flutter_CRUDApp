@@ -14,7 +14,6 @@ class BuildListView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
     final userId = ref.watch(loginUserProvider);
-    Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: ListView(
         padding: const EdgeInsets.only(top: 50, right: 5, left: 5),
@@ -49,6 +48,7 @@ class BuildListView extends HookConsumerWidget {
                 child: ScaleAnimation(
                   child: Column(children: [
                     Card(
+                      // color: Theme.of(context).cardColor,
                       margin: const EdgeInsets.all(10),
                       elevation: 5,
                       shape: RoundedRectangleBorder(
