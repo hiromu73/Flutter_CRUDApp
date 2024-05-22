@@ -42,16 +42,16 @@ class LoginPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.4),
+                            color: Colors.orange.withOpacity(0.3),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(3, 3),
+                            offset: const Offset(-3, -3),
                           ),
                           BoxShadow(
                             color: Colors.white.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(-3, -3),
+                            offset: const Offset(3, 3),
                           ),
                         ],
                       ),
@@ -98,16 +98,16 @@ class LoginPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.4),
+                            color: Colors.orange.withOpacity(0.3),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(3, 3),
+                            offset: const Offset(-3, -3),
                           ),
                           BoxShadow(
                             color: Colors.white.withOpacity(0.5),
                             spreadRadius: 5,
                             blurRadius: 7,
-                            offset: const Offset(-3, -3),
+                            offset: const Offset(3, 3),
                           ),
                         ],
                       ),
