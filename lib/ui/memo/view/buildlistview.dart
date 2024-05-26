@@ -13,10 +13,13 @@ class BuildListView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
+    print("ビルド");
     final userId = ref.watch(loginUserProvider);
+    Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: ListView(
-        padding: const EdgeInsets.only(top: 50, right: 5, left: 5),
+        padding:
+            const EdgeInsets.only(top: 50, right: 5, left: 5, bottom: 110.0),
         children: query.docs.map((DocumentSnapshot document) {
           final int staggerPosition = index++;
           return Dismissible(
@@ -47,113 +50,273 @@ class BuildListView extends HookConsumerWidget {
               child: FlipAnimation(
                 child: ScaleAnimation(
                   child: Column(children: [
-                    Card(
-                      // color: Theme.of(context).cardColor,
-                      margin: const EdgeInsets.all(10),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      clipBehavior: Clip.hardEdge,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                document['text'],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                    document['alert'] == true
+                        ? Card(
+                            // color: baseColor,
+                            margin: const EdgeInsets.all(10),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            // clipBehavior: Clip.hardEdge,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: baseColor,
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.4),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(3, 3),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.5),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(-3, -3),
+                                  ),
+                                ],
                               ),
-                              trailing: CupertinoSwitch(
-                                  activeColor: Colors.amber,
-                                  trackColor: Colors.grey,
-                                  value: document['alert'],
-                                  onChanged: (value) async {
-                                    String docId = document.id;
-                                    try {
-                                      await FirebaseFirestore.instance
-                                          .collection('post')
-                                          .doc(userId)
-                                          .collection('documents')
-                                          .doc(docId)
-                                          .update({
-                                        'alert': value,
-                                      });
-                                    } catch (e) {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text('Error: $e'),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  }),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
                                 children: [
-                                  document['checkName'] != null
-                                      ? Text("場所\n${document['checkName']}"
-                                          .toString())
-                                      : const SizedBox.shrink(),
+                                  ListTile(
+                                    title: Text(
+                                      document['text'],
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    trailing: CupertinoSwitch(
+                                        activeColor: Colors.amber,
+                                        trackColor: Colors.grey,
+                                        value: document['alert'],
+                                        onChanged: (value) async {
+                                          String docId = document.id;
+                                          try {
+                                            await FirebaseFirestore.instance
+                                                .collection('post')
+                                                .doc(userId)
+                                                .collection('documents')
+                                                .doc(docId)
+                                                .update({
+                                              'alert': value,
+                                            });
+                                          } catch (e) {
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Error: $e'),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        }),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        document['checkName'] != null
+                                            ? Text(
+                                                "場所\n${document['checkName']}"
+                                                    .toString())
+                                            : const SizedBox.shrink(),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                          color: Colors.grey,
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () async {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  content:
+                                                      const Text(deleteMemo),
+                                                  actions: [
+                                                    TextButton(
+                                                        // isDefaultAction: true,
+                                                        onPressed: () async {
+                                                          try {
+                                                            String docId =
+                                                                document.id;
+                                                            await FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'post')
+                                                                .doc(userId)
+                                                                .collection(
+                                                                    'documents')
+                                                                .doc(docId)
+                                                                .delete();
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }
+                                                          } catch (e) {
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }
+                                                          }
+                                                        },
+                                                        child: const Text(ok)),
+                                                    TextButton(
+                                                        child: const Text(no),
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        }),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          }),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  color: Colors.grey,
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () async {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return CupertinoAlertDialog(
-                                            title: const Text(deleteMemo),
-                                            actions: [
-                                              CupertinoDialogAction(
-                                                  isDefaultAction: true,
-                                                  onPressed: () async {
-                                                    try {
-                                                      String docId =
-                                                          document.id;
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection('post')
-                                                          .doc(userId)
-                                                          .collection(
-                                                              'documents')
-                                                          .doc(docId)
-                                                          .delete();
-                                                      if (context.mounted) {
-                                                        Navigator.pop(context);
-                                                      }
-                                                    } catch (e) {
-                                                      if (context.mounted) {
-                                                        Navigator.pop(context);
-                                                      }
-                                                    }
-                                                  },
-                                                  child: const Text(ok)),
-                                              CupertinoDialogAction(
-                                                  child: const Text(no),
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  }),
-                                            ],
-                                          );
-                                        });
-                                  },
-                                ),
-                              ],
+                          )
+                        : Card(
+                            // color: baseColor,
+                            margin: const EdgeInsets.all(10),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
+                            // clipBehavior: Clip.hardEdge,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: baseColor,
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.4),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(-3, -3),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.6),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(3, 3),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    title: Text(
+                                      document['text'],
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    trailing: CupertinoSwitch(
+                                        activeColor: Colors.amber,
+                                        trackColor: Colors.grey,
+                                        value: document['alert'],
+                                        onChanged: (value) async {
+                                          String docId = document.id;
+                                          try {
+                                            await FirebaseFirestore.instance
+                                                .collection('post')
+                                                .doc(userId)
+                                                .collection('documents')
+                                                .doc(docId)
+                                                .update({
+                                              'alert': value,
+                                            });
+                                          } catch (e) {
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Error: $e'),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        }),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        document['checkName'] != null
+                                            ? Text(
+                                                "場所\n${document['checkName']}"
+                                                    .toString())
+                                            : const SizedBox.shrink(),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        color: Colors.grey,
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () async {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: const Text(deleteMemo),
+                                                  actions: [
+                                                    TextButton(
+                                                        onPressed: () async {
+                                                          try {
+                                                            String docId =
+                                                                document.id;
+                                                            await FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'post')
+                                                                .doc(userId)
+                                                                .collection(
+                                                                    'documents')
+                                                                .doc(docId)
+                                                                .delete();
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }
+                                                          } catch (e) {
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }
+                                                          }
+                                                        },
+                                                        child: const Text(ok)),
+                                                    TextButton(
+                                                        child: const Text(no),
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        }),
+                                                  ],
+                                                );
+                                              });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                     const SizedBox(height: 5)
                   ]),
                 ),

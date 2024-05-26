@@ -58,9 +58,16 @@ class LoginPage extends HookConsumerWidget {
                             height: 40,
                             width: 250,
                             alignment: Alignment.center,
-                            child: const Text("Login Page"))))),
+                            child: const Text(
+                              "Login Page",
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ))))),
             Lottie.network(
-              'https://lottie.host/b2a1e31a-b933-4937-b2a9-a570792a273e/ZtKvOFsIpk.json',
+              'https://lottie.host/538e41a6-d2d6-4b94-a605-79720152ba00/zMGzw7cSL2.json',
               errorBuilder: (context, error, stackTrace) {
                 return const Padding(
                   padding: EdgeInsets.all(0.0),
@@ -85,13 +92,13 @@ class LoginPage extends HookConsumerWidget {
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.orange.withOpacity(0.3),
+                                color: Colors.orange.withOpacity(0.4),
                                 spreadRadius: 5,
                                 blurRadius: 7,
                                 offset: const Offset(-3, -3),
                               ),
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withOpacity(0.6),
                                 spreadRadius: 5,
                                 blurRadius: 7,
                                 offset: const Offset(3, 3),
@@ -141,13 +148,13 @@ class LoginPage extends HookConsumerWidget {
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.orange.withOpacity(0.3),
+                                color: Colors.orange.withOpacity(0.4),
                                 spreadRadius: 5,
                                 blurRadius: 7,
                                 offset: const Offset(-3, -3),
                               ),
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withOpacity(0.6),
                                 spreadRadius: 5,
                                 blurRadius: 7,
                                 offset: const Offset(3, 3),
@@ -221,7 +228,13 @@ class LoginPage extends HookConsumerWidget {
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.orange.shade100,
                                   ),
-                                  child: const Text('登録'),
+                                  child: const Text(
+                                    '登録',
+                                    style: TextStyle(
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   onPressed: () async {
                                     try {
                                       final FirebaseAuth auth =
@@ -274,7 +287,13 @@ class LoginPage extends HookConsumerWidget {
                                 style: TextButton.styleFrom(
                                   backgroundColor: Colors.orange.shade100,
                                 ),
-                                child: const Text('ログイン'),
+                                child: const Text(
+                                  'ログイン',
+                                  style: TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 onPressed: () async {
                                   try {
                                     final FirebaseAuth auth =

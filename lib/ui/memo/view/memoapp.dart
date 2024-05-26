@@ -31,6 +31,7 @@ class MemoApp extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Color baseColor = Colors.orange.shade100;
     useEffect(() {
       _checkLocationPermission(context, ref);
       return null;
@@ -50,25 +51,62 @@ class MemoApp extends HookConsumerWidget {
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.background,
-              heroTag: "add",
-              child: Icon(
-                Icons.add,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () => context.push('/addpage')),
-          const SizedBox(
-            width: 98,
+          Container(
+            decoration: BoxDecoration(
+              color: baseColor,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.4),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(3, 3),
+                ),
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(-3, -3),
+                ),
+              ],
+            ),
+            child: TextButton(
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.orange,
+                ),
+                onPressed: () => context.push('/addpage')),
           ),
-          FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.background,
-              heroTag: "change",
-              child: Icon(
+          const SizedBox(
+            width: 85,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: baseColor,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.4),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(3, 3),
+                ),
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(-3, -3),
+                ),
+              ],
+            ),
+            child: TextButton(
+              child: const Icon(
                 Icons.apps,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.orange,
               ),
-              onPressed: () => changeView()),
+              onPressed: () => changeView(),
+            ),
+          ),
         ],
       ),
     );
