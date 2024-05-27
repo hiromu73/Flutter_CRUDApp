@@ -15,8 +15,6 @@ final userCollectionProvider =
 });
 
 class MemoList extends HookConsumerWidget {
-  const MemoList(this.viewType, {super.key});
-  final bool viewType;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.watch(userIdProvider);
@@ -24,9 +22,7 @@ class MemoList extends HookConsumerWidget {
         ref.watch(userCollectionProvider(userId));
     return userCollection.when(
       data: (QuerySnapshot query) {
-        return viewType
-            ? BuildListView(query, context)
-            : BuildGridView(query, context);
+        return BuildListView(query, context);
       },
       loading: () {
         return const Center(

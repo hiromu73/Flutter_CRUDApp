@@ -16,7 +16,8 @@ class BuildGridView extends HookConsumerWidget {
     Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: GridView(
-        padding: const EdgeInsets.only(top: 50, right: 10, left: 10),
+        padding:
+            const EdgeInsets.only(top: 50, right: 10, left: 10, bottom: 130),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10.0,

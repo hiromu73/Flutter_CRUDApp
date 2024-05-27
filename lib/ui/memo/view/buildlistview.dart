@@ -18,8 +18,7 @@ class BuildListView extends HookConsumerWidget {
     Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: ListView(
-        padding:
-            const EdgeInsets.only(top: 50, right: 5, left: 5, bottom: 110.0),
+        padding: const EdgeInsets.only(top: 50, right: 5, left: 5, bottom: 110),
         children: query.docs.map((DocumentSnapshot document) {
           final int staggerPosition = index++;
           return Dismissible(

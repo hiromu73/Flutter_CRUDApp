@@ -37,15 +37,15 @@ class MemoApp extends HookConsumerWidget {
       return null;
     });
 
-    final viewTypes = useState<bool>(true);
-    void changeView() {
-      viewTypes.value = !viewTypes.value;
-    }
+    // final viewTypes = useState<bool>(true);
+    // void changeView() {
+    //   viewTypes.value = !viewTypes.value;
+    // }
 
     return Scaffold(
       body: Column(
         children: [
-          Expanded(child: MemoList(viewTypes.value)),
+          Expanded(child: MemoList()),
         ],
       ),
       floatingActionButton: Row(
@@ -100,12 +100,12 @@ class MemoApp extends HookConsumerWidget {
               ],
             ),
             child: TextButton(
-              child: const Icon(
-                Icons.apps,
-                color: Colors.orange,
-              ),
-              onPressed: () => changeView(),
-            ),
+                // 検討中
+                child: const Icon(
+                  Icons.apps,
+                  color: Colors.orange,
+                ),
+                onPressed: () => {}),
           ),
         ],
       ),
