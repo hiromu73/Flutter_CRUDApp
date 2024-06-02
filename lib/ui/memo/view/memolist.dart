@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/ui/login/view/loginpage.dart';
-import 'package:memoplace/ui/memo/view/buildgridview.dart';
 import 'package:memoplace/ui/memo/view/buildlistview.dart';
 
 final userCollectionProvider =
@@ -15,6 +14,8 @@ final userCollectionProvider =
 });
 
 class MemoList extends HookConsumerWidget {
+  const MemoList({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.watch(userIdProvider);
