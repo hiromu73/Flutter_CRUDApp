@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         brightness: Brightness.light,
         primaryColor: mainColor,
-        cardColor: mainColor,
         colorScheme: ColorScheme.light(
           background: mainColor,
           primary: Colors.black,

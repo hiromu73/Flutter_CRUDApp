@@ -8,6 +8,7 @@ import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:lottie/lottie.dart';
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
@@ -35,8 +36,12 @@ class AddPage extends HookConsumerWidget {
     final textMemo = ref.watch(memoProvider);
     final userId = ref.watch(loginUserProvider);
     final FocusNode focusNode = useFocusNode();
+    bool shouldDisplayContainer = checkedMarkerNames.isNotEmpty &&
+        checkedMarkerNames.any((name) => name != null && name.isNotEmpty);
+    Color baseColor = Colors.orange.shade100;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text(
           addPage,
@@ -58,142 +63,125 @@ class AddPage extends HookConsumerWidget {
         },
         child: Center(
           child: Container(
-            color: Colors.yellow[50],
             padding: const EdgeInsets.all(32),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Focus(
-                  child: InkWell(
-                    child: TextFormField(
-                      focusNode: focusNode,
-                      controller: editController,
-                      maxLength: null,
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        fillColor: Colors.grey[100],
-                        filled: true,
-                        isDense: true,
-                        hintText: memo,
-                        hintStyle: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w100),
-                        prefixIcon: const Icon(Icons.create),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(32),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      textAlign: TextAlign.left,
-                      onChanged: (String value) async {
-                        ref.read(memoProvider.notifier).state = value;
-                      },
-                    ),
-                  ),
+                Lottie.network(
+                  'https://lottie.host/c65f6558-60de-499a-94bc-d4de3cf2c407/J7PMtKk4Rs.json',
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Padding(
+                      padding: EdgeInsets.all(0.0),
+                      child: CircularProgressIndicator(),
+                    );
+                  },
                 ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30))),
-                    child: const Text(positionSearch),
-                    onPressed: () async {
-                      final permission = await Geolocator.checkPermission();
-                      if ((permission == LocationPermission.always ||
-                              permission == LocationPermission.whileInUse) &&
-                          context.mounted) {
-                        context.push('/setgooglemap');
-                      } else {
-                        if (context.mounted) {
-                          return showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  content: const Text(
-                                      "デバイスの位置情報が許可されていません。\n位置情報を許可することでマップを表示でき、プッシュ通知も行えます。"),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        openAppSettings();
-                                      },
-                                      child: const Text("設定"),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        if (context.mounted) {
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                      child: const Text(ok),
-                                    ),
-                                  ],
-                                );
-                              });
-                        }
-                      }
-                    }),
-                const SizedBox(height: 8),
-                Center(
-                  child: Column(
-                    children: [
-                      const Text("選択されている位置情報"),
-                      const SizedBox(height: 10),
-                      ListView.builder(
-                        itemCount: checkedMarkerNames.length,
-                        itemBuilder: (context, index) {
-                          // 削除ボタンを作っていく。
-                          return Text("・${checkedMarkerNames[index]!}");
-                        },
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                const SizedBox(height: 20),
+                Container(
+                  height: 55,
+                  width: 350,
+                  decoration: BoxDecoration(
+                    color: baseColor,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.4),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(-3, -3),
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.6),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(3, 3),
                       ),
                     ],
                   ),
+                  child: TextFormField(
+                    focusNode: focusNode,
+                    controller: editController,
+                    maxLength: null,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      fillColor: Colors.orange.shade100,
+                      filled: true,
+                      isDense: true,
+                      hintText: memo,
+                      hintStyle: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w100),
+                      prefixIcon: const Icon(Icons.create),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(32),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    textAlign: TextAlign.left,
+                    onChanged: (String value) async {
+                      ref.read(memoProvider.notifier).state = value;
+                    },
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30))),
-                        child: const Text(registration),
-                        onPressed: () async {
-                          if (textMemo != "") {
-                            final date =
-                                DateTime.now().toLocal().toIso8601String();
-                            await FirebaseFirestore.instance
-                                .collection('post')
-                                .doc(userId)
-                                .collection('documents')
-                                .add({
-                              'text': textMemo,
-                              'checkName': checkedMarkerNames.isNotEmpty
-                                  ? checkedMarkerNames
-                                  : null,
-                              'latitude': checkedMarkerLatitudes.isNotEmpty
-                                  ? checkedMarkerLatitudes
-                                  : null,
-                              'longitude': checkedMarkerLongitudes.isNotEmpty
-                                  ? checkedMarkerLongitudes
-                                  : null,
-                              'date': date,
-                              'alert': true,
-                            });
-                            if (context.mounted) {
-                              context.go('/memolist');
-                            }
-                          } else {
-                            showDialog(
+                const SizedBox(height: 40),
+                Container(
+                  height: 60,
+                  width: 200,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: baseColor,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.4),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(3, 3),
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(-3, -3),
+                      ),
+                    ],
+                  ),
+                  child: TextButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30))),
+                      child: const Text(
+                        positionSearch,
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () async {
+                        final permission = await Geolocator.checkPermission();
+                        if ((permission == LocationPermission.always ||
+                                permission == LocationPermission.whileInUse) &&
+                            context.mounted) {
+                          context.push('/setgooglemap');
+                        } else {
+                          if (context.mounted) {
+                            return showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    content: const Text(memo),
+                                    content: const Text(
+                                        "デバイスの位置情報が許可されていません。\n位置情報を許可することでマップを表示でき、プッシュ通知も行えます。"),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
-                                          Navigator.pop(context);
+                                          openAppSettings();
+                                        },
+                                        child: const Text("設定"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          if (context.mounted) {
+                                            Navigator.pop(context);
+                                          }
                                         },
                                         child: const Text(ok),
                                       ),
@@ -201,21 +189,180 @@ class AddPage extends HookConsumerWidget {
                                   );
                                 });
                           }
-                        }),
+                        }
+                      }),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Column(
+                    children: [
+                      const Text(
+                        "選択されている位置情報",
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      shouldDisplayContainer == true
+                          ? Container(
+                              padding: const EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(
+                                color: baseColor,
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.4),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(-3, -3),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.6),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(3, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ListView.builder(
+                                itemCount: checkedMarkerNames.length,
+                                itemBuilder: (context, index) {
+                                  // 削除ボタンを作っていく。
+                                  return Text("・${checkedMarkerNames[index]!}");
+                                },
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                              ),
+                            )
+                          : const SizedBox(height: 10)
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: baseColor,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.4),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(3, 3),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(-3, -3),
+                          ),
+                        ],
+                      ),
+                      child: TextButton(
+                          style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
+                          child: const Text(
+                            registration,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (textMemo != "") {
+                              final date =
+                                  DateTime.now().toLocal().toIso8601String();
+                              await FirebaseFirestore.instance
+                                  .collection('post')
+                                  .doc(userId)
+                                  .collection('documents')
+                                  .add({
+                                'text': textMemo,
+                                'checkName': checkedMarkerNames.isNotEmpty
+                                    ? checkedMarkerNames
+                                    : null,
+                                'latitude': checkedMarkerLatitudes.isNotEmpty
+                                    ? checkedMarkerLatitudes
+                                    : null,
+                                'longitude': checkedMarkerLongitudes.isNotEmpty
+                                    ? checkedMarkerLongitudes
+                                    : null,
+                                'date': date,
+                                'alert': true,
+                              });
+                              if (context.mounted) {
+                                context.go('/memolist');
+                              }
+                            } else {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: const Text(memo),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(ok),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            }
+                          }),
+                    ),
                     const SizedBox(
                       width: 50,
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30))),
-                      onPressed: () async {
-                        editController.clear();
-                        ref
-                            .read(autoCompleteSearchTypeProvider.notifier)
-                            .noneAutoCompleteSearch();
-                      },
-                      child: const Text(clear),
+                    Container(
+                      height: 50,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: baseColor,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.4),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(3, 3),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(-3, -3),
+                          ),
+                        ],
+                      ),
+                      child: TextButton(
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30))),
+                        onPressed: () async {
+                          editController.clear();
+                          ref
+                              .read(autoCompleteSearchTypeProvider.notifier)
+                              .noneAutoCompleteSearch();
+                        },
+                        child: const Text(
+                          clear,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 )

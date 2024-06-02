@@ -64,8 +64,6 @@ dependencies:
   go_router: ^13.2.4
   app_settings: ^5.1.1
   permission_handler: ^11.3.1
-  clay_containers: ^0.3.4
-  shared_preferences: ^2.0.0
   spring_button: ^2.0.0
   flutter_neumorphic: ^3.0.3
   lottie: ^3.0.0

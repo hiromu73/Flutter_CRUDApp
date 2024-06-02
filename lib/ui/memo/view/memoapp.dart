@@ -78,35 +78,35 @@ class MemoApp extends HookConsumerWidget {
                 onPressed: () => context.push('/addpage')),
           ),
           const SizedBox(
-            width: 85,
+            width: 145,
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: baseColor,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withOpacity(0.4),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(3, 3),
-                ),
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(-3, -3),
-                ),
-              ],
-            ),
-            child: TextButton(
-                // 検討中
-                child: const Icon(
-                  Icons.apps,
-                  color: Colors.orange,
-                ),
-                onPressed: () => {}),
-          ),
+          // Container(
+          //   decoration: BoxDecoration(
+          //     color: baseColor,
+          //     borderRadius: BorderRadius.circular(30),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.orange.withOpacity(0.4),
+          //         spreadRadius: 5,
+          //         blurRadius: 7,
+          //         offset: const Offset(3, 3),
+          //       ),
+          //       BoxShadow(
+          //         color: Colors.white.withOpacity(0.5),
+          //         spreadRadius: 5,
+          //         blurRadius: 7,
+          //         offset: const Offset(-3, -3),
+          //       ),
+          //     ],
+          //   ),
+          //   child: TextButton(
+          //       // 検討中
+          //       child: const Icon(
+          //         Icons.apps,
+          //         color: Colors.orange,
+          //       ),
+          //       onPressed: () => {}),
+          // ),
         ],
       ),
     );
