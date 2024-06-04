@@ -209,8 +209,8 @@ class MemoApp extends HookConsumerWidget {
                 position.longitude,
                 double.parse(latitude[i].toString()),
                 double.parse(longiLang[i].toString()));
-            if (distanceInMeters < 1000) {
-              print("distanceInMeters < 1000になったのでプッシュ通知します。");
+            if (distanceInMeters < 100) {
+              print("distanceInMeters < 100になったのでプッシュ通知します。");
               await pushMessage(text[i]);
             }
           }

@@ -8,7 +8,6 @@ import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:lottie/lottie.dart';
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
@@ -57,7 +56,7 @@ class AddPage extends HookConsumerWidget {
               context.push('/memolist');
             }),
       ),
-      body: InkWell(
+      body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
         },
@@ -66,16 +65,7 @@ class AddPage extends HookConsumerWidget {
             padding: const EdgeInsets.all(32),
             child: Column(
               children: <Widget>[
-                Lottie.network(
-                  'https://lottie.host/c65f6558-60de-499a-94bc-d4de3cf2c407/J7PMtKk4Rs.json',
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Padding(
-                      padding: EdgeInsets.all(0.0),
-                      child: CircularProgressIndicator(),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 100),
                 Container(
                   height: 55,
                   width: 350,

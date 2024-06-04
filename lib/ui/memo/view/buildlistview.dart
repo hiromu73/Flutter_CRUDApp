@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class BuildListView extends HookConsumerWidget {
   const BuildListView(this.query, BuildContext context, {super.key});
@@ -21,28 +22,41 @@ class BuildListView extends HookConsumerWidget {
         padding: const EdgeInsets.only(top: 50, right: 5, left: 5, bottom: 110),
         children: query.docs.map((DocumentSnapshot document) {
           final int staggerPosition = index++;
-          return Dismissible(
+          return Slidable(
             key: Key(document.id),
-            background: Container(
-                color: Colors.grey,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: const Text("Delete")),
-            onDismissed: (DismissDirection direction) async {
-              try {
-                String docId = document.id;
-                await FirebaseFirestore.instance
-                    .collection('post')
-                    .doc(userId)
-                    .collection('documents')
-                    .doc(docId)
-                    .delete();
-              } catch (e) {
-                if (context.mounted) {
-                  context.pop();
-                }
-              }
-            },
+            startActionPane: ActionPane(
+              motion: const StretchMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (BuildContext context) async {
+                    try {
+                      String docId = document.id;
+                      await FirebaseFirestore.instance
+                          .collection('post')
+                          .doc(userId)
+                          .collection('documents')
+                          .doc(docId)
+                          .delete();
+                    } catch (e) {
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    }
+                  },
+                  backgroundColor: const Color(0xFFFE4A49),
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  label: 'Delete',
+                ),
+                SlidableAction(
+                  onPressed: (context) async {},
+                  backgroundColor: const Color(0xFF21B7CA),
+                  foregroundColor: Colors.white,
+                  icon: Icons.create,
+                  label: 'Editing',
+                ),
+              ],
+            ),
             child: AnimationConfiguration.staggeredList(
               position: staggerPosition,
               duration: const Duration(milliseconds: 1000),
@@ -51,13 +65,11 @@ class BuildListView extends HookConsumerWidget {
                   child: Column(children: [
                     document['alert'] == true
                         ? Card(
-                            // color: baseColor,
                             margin: const EdgeInsets.all(10),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            // clipBehavior: Clip.hardEdge,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: baseColor,
@@ -124,74 +136,72 @@ class BuildListView extends HookConsumerWidget {
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                          color: Colors.grey,
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () async {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  content:
-                                                      const Text(deleteMemo),
-                                                  actions: [
-                                                    TextButton(
-                                                        // isDefaultAction: true,
-                                                        onPressed: () async {
-                                                          try {
-                                                            String docId =
-                                                                document.id;
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'post')
-                                                                .doc(userId)
-                                                                .collection(
-                                                                    'documents')
-                                                                .doc(docId)
-                                                                .delete();
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            }
-                                                          } catch (e) {
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            }
-                                                          }
-                                                        },
-                                                        child: const Text(ok)),
-                                                    TextButton(
-                                                        child: const Text(no),
-                                                        onPressed: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                        }),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          }),
-                                    ],
-                                  ),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.end,
+                                  //   children: [
+                                  //     IconButton(
+                                  //         color: Colors.grey,
+                                  //         icon: const Icon(Icons.delete),
+                                  //         onPressed: () async {
+                                  //           showDialog(
+                                  //             context: context,
+                                  //             builder: (BuildContext context) {
+                                  //               return AlertDialog(
+                                  //                 content:
+                                  //                     const Text(deleteMemo),
+                                  //                 actions: [
+                                  //                   TextButton(
+                                  //                       // isDefaultAction: true,
+                                  //                       onPressed: () async {
+                                  //                         try {
+                                  //                           String docId =
+                                  //                               document.id;
+                                  //                           await FirebaseFirestore
+                                  //                               .instance
+                                  //                               .collection(
+                                  //                                   'post')
+                                  //                               .doc(userId)
+                                  //                               .collection(
+                                  //                                   'documents')
+                                  //                               .doc(docId)
+                                  //                               .delete();
+                                  //                           if (context
+                                  //                               .mounted) {
+                                  //                             Navigator.pop(
+                                  //                                 context);
+                                  //                           }
+                                  //                         } catch (e) {
+                                  //                           if (context
+                                  //                               .mounted) {
+                                  //                             Navigator.pop(
+                                  //                                 context);
+                                  //                           }
+                                  //                         }
+                                  //                       },
+                                  //                       child: const Text(ok)),
+                                  //                   TextButton(
+                                  //                       child: const Text(no),
+                                  //                       onPressed: () {
+                                  //                         Navigator.pop(
+                                  //                             context);
+                                  //                       }),
+                                  //                 ],
+                                  //               );
+                                  //             },
+                                  //           );
+                                  //         }),
+                                  //   ],
+                                  // ),
                                 ],
                               ),
                             ),
                           )
                         : Card(
-                            // color: baseColor,
                             margin: const EdgeInsets.all(10),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            // clipBehavior: Clip.hardEdge,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: baseColor,
@@ -258,60 +268,60 @@ class BuildListView extends HookConsumerWidget {
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                        color: Colors.grey,
-                                        icon: const Icon(Icons.delete),
-                                        onPressed: () async {
-                                          showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text(deleteMemo),
-                                                  actions: [
-                                                    TextButton(
-                                                        onPressed: () async {
-                                                          try {
-                                                            String docId =
-                                                                document.id;
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'post')
-                                                                .doc(userId)
-                                                                .collection(
-                                                                    'documents')
-                                                                .doc(docId)
-                                                                .delete();
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            }
-                                                          } catch (e) {
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            }
-                                                          }
-                                                        },
-                                                        child: const Text(ok)),
-                                                    TextButton(
-                                                        child: const Text(no),
-                                                        onPressed: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                        }),
-                                                  ],
-                                                );
-                                              });
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.end,
+                                  //   children: [
+                                  //     IconButton(
+                                  //       color: Colors.grey,
+                                  //       icon: const Icon(Icons.delete),
+                                  //       onPressed: () async {
+                                  //         showDialog(
+                                  //             context: context,
+                                  //             builder: (BuildContext context) {
+                                  //               return AlertDialog(
+                                  //                 title: const Text(deleteMemo),
+                                  //                 actions: [
+                                  //                   TextButton(
+                                  //                       onPressed: () async {
+                                  //                         try {
+                                  //                           String docId =
+                                  //                               document.id;
+                                  //                           await FirebaseFirestore
+                                  //                               .instance
+                                  //                               .collection(
+                                  //                                   'post')
+                                  //                               .doc(userId)
+                                  //                               .collection(
+                                  //                                   'documents')
+                                  //                               .doc(docId)
+                                  //                               .delete();
+                                  //                           if (context
+                                  //                               .mounted) {
+                                  //                             Navigator.pop(
+                                  //                                 context);
+                                  //                           }
+                                  //                         } catch (e) {
+                                  //                           if (context
+                                  //                               .mounted) {
+                                  //                             Navigator.pop(
+                                  //                                 context);
+                                  //                           }
+                                  //                         }
+                                  //                       },
+                                  //                       child: const Text(ok)),
+                                  //                   TextButton(
+                                  //                       child: const Text(no),
+                                  //                       onPressed: () {
+                                  //                         Navigator.pop(
+                                  //                             context);
+                                  //                       }),
+                                  //                 ],
+                                  //               );
+                                  //             });
+                                  //       },
+                                  //     ),
+                                  //   ],
+                                  // ),
                                 ],
                               ),
                             ),

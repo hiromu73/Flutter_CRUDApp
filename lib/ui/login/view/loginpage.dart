@@ -1,10 +1,11 @@
+import 'dart:html';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
-import 'package:lottie/lottie.dart';
 
 final userIdProvider = StateProvider<String>((ref) => "");
 final passwordProvider = StateProvider<bool>((ref) => true);
@@ -22,21 +23,20 @@ class LoginPage extends HookConsumerWidget {
     final password = useState<String>("");
     final infoText = useState<String>("");
     useFocusNode();
-
     final obscureText = useState(true);
     Color baseColor = Colors.orange.shade100;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: InkWell(
+      body: GestureDetector(
         onTap: () => primaryFocus?.unfocus(),
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 80),
+              const SizedBox(height: 100),
               Container(
                   color: baseColor,
                   child: Center(
-                      // 浮き出ている感じにする
                       child: Container(
                           height: 60,
                           width: 300,
@@ -71,17 +71,17 @@ class LoginPage extends HookConsumerWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ))))),
-              const SizedBox(height: 40),
-              Lottie.network(
-                'https://lottie.host/319cef29-c187-4dec-9c69-a070a1d3b12c/b9PILPSa3H.json',
-                errorBuilder: (context, error, stackTrace) {
-                  return const Padding(
-                    padding: EdgeInsets.all(0.0),
-                    child: CircularProgressIndicator(),
-                  );
-                },
-              ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 140),
+              // Lottie.network(
+              //   'https://lottie.host/319cef29-c187-4dec-9c69-a070a1d3b12c/b9PILPSa3H.json',
+              //   errorBuilder: (context, error, stackTrace) {
+              //     return const Padding(
+              //       padding: EdgeInsets.all(0.0),
+              //       child: CircularProgressIndicator(),
+              //     );
+              //   },
+              // ),
+              const SizedBox(height: 100),
               Form(
                 child: Container(
                   padding: const EdgeInsets.all(24),
