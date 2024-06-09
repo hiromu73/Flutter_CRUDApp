@@ -7,12 +7,7 @@ part 'latitude.g.dart';
 class Latitude extends _$Latitude {
   @override
   double build() => 0.0;
-
-  Future<void> changeLatitude(double latitude) async {
-    state = latitude;
-  }
 }
-
 
 @riverpod
 Future<Position> currentPosition(CurrentPositionRef ref) async {

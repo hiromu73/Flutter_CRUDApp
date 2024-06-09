@@ -21,7 +21,7 @@ final currentPositionProvider = AutoDisposeFutureProvider<Position>.internal(
 );
 
 typedef CurrentPositionRef = AutoDisposeFutureProviderRef<Position>;
-String _$latitudeHash() => r'600adb2a11c199b8d6fa24689145e543dbf5d036';
+String _$latitudeHash() => r'8010bd2e4d282b57411bf0fca4fe3647d54f05d8';
 
 /// See also [Latitude].
 @ProviderFor(Latitude)

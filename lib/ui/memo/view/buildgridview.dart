@@ -13,7 +13,6 @@ class BuildGridView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
     final userId = ref.watch(loginUserProvider);
-    Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
       child: GridView(
         padding:

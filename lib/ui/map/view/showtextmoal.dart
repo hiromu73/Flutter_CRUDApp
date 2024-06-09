@@ -18,142 +18,145 @@ class ShowTextModal extends ConsumerWidget {
     final autoCompleteSearch = ref.watch(autoCompleteSearchProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      color: Colors.white,
-      height: MediaQuery.of(context).size.height * 0.8,
-      child: Column(
-        children: [
-          currentPositionFuture.maybeWhen(
-              data: (data) => TextFormField(
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
-                    controller: textController,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      iconColor: Colors.grey,
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                        size: 20,
+    return GestureDetector(
+      onTap: () => primaryFocus?.unfocus(),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        color: Colors.white,
+        height: MediaQuery.of(context).size.height / 1.1,
+        child: Column(
+          children: [
+            currentPositionFuture.maybeWhen(
+                data: (data) => TextFormField(
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                      controller: textController,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10),
+                        iconColor: Colors.grey,
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
+                        hintText: "検索したい場所",
+                        hintStyle: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: const BorderSide(color: Colors.white),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        fillColor: Colors.white,
+                        filled: true,
                       ),
-                      hintText: "検索したい場所",
-                      hintStyle: const TextStyle(
-                        color: Colors.grey,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.white),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      fillColor: Colors.white,
-                      filled: true,
-                    ),
-                    onChanged: (value) async {
-                      if (value.isNotEmpty &&
-                          ref.watch(selectItemsProvider) != "") {
-                        List<String> japaneseNames =
-                            ref.watch(selectItemsProvider).split(',');
-                        List<String> englishNames = [];
-                        for (String japaneseName in japaneseNames) {
-                          String trimmedJapaneseName = japaneseName.trim();
-                          if (categoryList.containsKey(trimmedJapaneseName)) {
-                            englishNames
-                                .add(categoryList[trimmedJapaneseName]!);
+                      onChanged: (value) async {
+                        if (value.isNotEmpty &&
+                            ref.watch(selectItemsProvider) != "") {
+                          List<String> japaneseNames =
+                              ref.watch(selectItemsProvider).split(',');
+                          List<String> englishNames = [];
+                          for (String japaneseName in japaneseNames) {
+                            String trimmedJapaneseName = japaneseName.trim();
+                            if (categoryList.containsKey(trimmedJapaneseName)) {
+                              englishNames
+                                  .add(categoryList[trimmedJapaneseName]!);
+                            }
                           }
+                          // タイプあり検索処理
+                          await ref
+                              .read(autoCompleteSearchProvider.notifier)
+                              .autoCompleteTypeSearch(value, englishNames,
+                                  data.latitude, data.longitude);
+                        } else if (value.isNotEmpty &&
+                            ref.watch(selectItemsProvider) == "") {
+                          // タイプ無し検索処理
+                          await ref
+                              .read(autoCompleteSearchProvider.notifier)
+                              .autoCompleteSearch(
+                                  value, data.latitude, data.longitude);
+                        } else {
+                          await ref
+                              .read(autoCompleteSearchProvider.notifier)
+                              .noneAutoCompleteSearch();
                         }
-                        // タイプあり検索処理
-                        await ref
-                            .read(autoCompleteSearchProvider.notifier)
-                            .autoCompleteTypeSearch(value, englishNames,
-                                data.latitude, data.longitude);
-                      } else if (value.isNotEmpty &&
-                          ref.watch(selectItemsProvider) == "") {
-                        // タイプ無し検索処理
-                        await ref
-                            .read(autoCompleteSearchProvider.notifier)
-                            .autoCompleteSearch(
-                                value, data.latitude, data.longitude);
-                      } else {
-                        await ref
-                            .read(autoCompleteSearchProvider.notifier)
-                            .noneAutoCompleteSearch();
-                      }
-                    },
-                  ),
-              orElse: () {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }),
-          currentPositionFuture.maybeWhen(
-              data: (data) => Expanded(
-                    child: ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: autoCompleteSearch.length,
-                        itemBuilder: (context, index) {
-                          return menuItem(autoCompleteSearch[index],
-                              data.latitude, data.longitude, ref);
-                        }),
-                  ),
-              orElse: () {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final localContext = context;
-                  final checkedPlaces = await ref
-                      .read(autoCompleteSearchProvider.notifier)
-                      .getCheckedPlaces();
-                  for (final place in checkedPlaces) {
-                    if (!ref.watch(autoCompleteSearchTypeProvider).any(
-                        (element) =>
-                            element.name == place.name &&
-                            element.check == true)) {
-                      await ref
-                          .read(autoCompleteSearchTypeProvider.notifier)
-                          .addMarker(place.name!, place.latitude,
-                              place.longitude, place.uid, place.check);
-                    }
-                  }
-                  if (context.mounted) {
-                    Navigator.pop(localContext, true);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30))),
-                child: const Text(serach),
-              ),
-              const SizedBox(width: 50),
-              ElevatedButton(
+                      },
+                    ),
+                orElse: () {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+            currentPositionFuture.maybeWhen(
+                data: (data) => Expanded(
+                      child: ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: autoCompleteSearch.length,
+                          itemBuilder: (context, index) {
+                            return menuItem(autoCompleteSearch[index],
+                                data.latitude, data.longitude, ref);
+                          }),
+                    ),
+                orElse: () {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
                   onPressed: () async {
-                    await ref
-                        .read(autoCompleteSearchTypeProvider.notifier)
-                        .noneAutoCompleteSearch();
-                    textController.clear();
+                    final localContext = context;
+                    final checkedPlaces = await ref
+                        .read(autoCompleteSearchProvider.notifier)
+                        .getCheckedPlaces();
+                    for (final place in checkedPlaces) {
+                      if (!ref.watch(autoCompleteSearchTypeProvider).any(
+                          (element) =>
+                              element.name == place.name &&
+                              element.check == true)) {
+                        await ref
+                            .read(autoCompleteSearchTypeProvider.notifier)
+                            .addMarker(place.name!, place.latitude,
+                                place.longitude, place.uid, place.check);
+                      }
+                    }
+                    if (context.mounted) {
+                      Navigator.pop(localContext, true);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
-                  child: const Text(clear))
-            ],
-          )
-        ],
+                  child: const Text(serach),
+                ),
+                const SizedBox(width: 50),
+                ElevatedButton(
+                    onPressed: () async {
+                      await ref
+                          .read(autoCompleteSearchTypeProvider.notifier)
+                          .noneAutoCompleteSearch();
+                      textController.clear();
+                    },
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30))),
+                    child: const Text(clear))
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget menuItem(Place place, double currentLatitude, double currentLongitude,
       WidgetRef ref) {
-    // 現在地からの距離を計算する
     double distanceInMeters = Geolocator.distanceBetween(
       currentLatitude,
       currentLongitude,

@@ -1,5 +1,5 @@
 const String memo = "内容を記載して下さい。";
-const String positionSearch = "場所の検索";
+const String positionSearch = "Search";
 const String registration = "登録";
 const String clear = "Clear";
 const String ok = "OK";

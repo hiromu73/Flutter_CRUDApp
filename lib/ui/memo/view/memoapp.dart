@@ -8,8 +8,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
-import 'package:memoplace/ui/map/view_model/latitude.dart';
-import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/memo/view/memolist.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -36,14 +34,14 @@ class MemoApp extends HookConsumerWidget {
       _checkLocationPermission(context, ref);
       return null;
     });
-
+    print(MediaQuery.of(context).size.width);
     // final viewTypes = useState<bool>(true);
     // void changeView() {
     //   viewTypes.value = !viewTypes.value;
     // }
 
     return Scaffold(
-      body: Column(
+      body: const Column(
         children: [
           Expanded(child: MemoList()),
         ],
@@ -77,8 +75,8 @@ class MemoApp extends HookConsumerWidget {
                 ),
                 onPressed: () => context.push('/addpage')),
           ),
-          const SizedBox(
-            width: 145,
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 2.7,
           ),
           // Container(
           //   decoration: BoxDecoration(
@@ -167,11 +165,6 @@ class MemoApp extends HookConsumerWidget {
       final position = await _determinePosition();
       if (permission == LocationPermission.denied && position.latitude != 0.0 ||
           position.longitude != 0.0) {
-        ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
-        ref
-            .read(longitudeProvider.notifier)
-            .changeLongitude(position.longitude);
-
         // トピック作成
         FirebaseMessaging.instance.subscribeToTopic('locationsMemo');
 

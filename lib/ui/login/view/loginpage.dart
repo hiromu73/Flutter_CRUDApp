@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -26,11 +24,11 @@ class LoginPage extends HookConsumerWidget {
     final obscureText = useState(true);
     Color baseColor = Colors.orange.shade100;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: GestureDetector(
-        onTap: () => primaryFocus?.unfocus(),
-        child: Center(
+    return GestureDetector(
+      onTap: () => primaryFocus?.unfocus(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Center(
           child: Column(
             children: [
               const SizedBox(height: 100),
@@ -59,28 +57,14 @@ class LoginPage extends HookConsumerWidget {
                               ),
                             ],
                           ),
-                          child: Container(
-                              height: 40,
-                              width: 250,
-                              alignment: Alignment.center,
-                              child: const Text(
-                                "Login Page",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ))))),
-              const SizedBox(height: 140),
-              // Lottie.network(
-              //   'https://lottie.host/319cef29-c187-4dec-9c69-a070a1d3b12c/b9PILPSa3H.json',
-              //   errorBuilder: (context, error, stackTrace) {
-              //     return const Padding(
-              //       padding: EdgeInsets.all(0.0),
-              //       child: CircularProgressIndicator(),
-              //     );
-              //   },
-              // ),
+                          child: const Text(
+                            "Login Page",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )))),
               const SizedBox(height: 100),
               Form(
                 child: Container(
@@ -91,7 +75,6 @@ class LoginPage extends HookConsumerWidget {
                       Container(
                           color: baseColor,
                           child: Center(
-                              // 凹んだいる感じにする。
                               child: Container(
                             height: 55,
                             width: 350,
@@ -265,7 +248,7 @@ class LoginPage extends HookConsumerWidget {
                                         }
                                       } catch (e) {
                                         infoText.value =
-                                            "ログインに失敗しました：${e.toString()}";
+                                            "ログインに失敗しました\n既に登録されているメールアドレスです。";
                                       }
                                     }),
                               ))),
@@ -324,7 +307,7 @@ class LoginPage extends HookConsumerWidget {
                                       }
                                     } catch (e) {
                                       infoText.value =
-                                          "ログインに失敗しました：${e.toString()}";
+                                          "ログインに失敗しました\ne-mailまたはpasswordが間違っています。";
                                     }
                                   },
                                 ),

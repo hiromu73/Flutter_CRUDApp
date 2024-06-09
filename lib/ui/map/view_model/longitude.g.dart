@@ -6,7 +6,7 @@ part of 'longitude.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$longitudeHash() => r'b52e440e6908658479448e392d8f8a4b28facc01';
+String _$longitudeHash() => r'a6df4f54bdfee385ca795e0d1f8362bfcfd54491';
 
 /// See also [Longitude].
 @ProviderFor(Longitude)

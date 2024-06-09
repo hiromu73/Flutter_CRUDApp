@@ -6,13 +6,12 @@ import 'package:memoplace/ui/map/view/cardsection.dart';
 import 'package:memoplace/ui/map/view/showmodal.dart';
 import 'package:memoplace/ui/map/view/showtextmoal.dart';
 import 'package:memoplace/ui/map/view_model/googlemap_controller_notifier.dart';
-import 'package:memoplace/model/map/place.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search.dart';
+import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 
 final googleMapControllerProvider =
@@ -22,7 +21,6 @@ final googleMapControllerProvider =
 
 class SetGoogleMap extends ConsumerWidget {
   SetGoogleMap({Key? key}) : super(key: key);
-  // final bool _isFirstBuild = true;
   late GoogleMapController _mapController;
 
   final pageController = PageController(
@@ -36,6 +34,8 @@ class SetGoogleMap extends ConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
+    double currentLatitude = ref.watch(latitudeProvider);
+    double currentlongitudeProvider = ref.watch(longitudeProvider);
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -79,6 +79,8 @@ class SetGoogleMap extends ConsumerWidget {
                   ref
                       .read(googleMapControllerProvider.notifier)
                       .setController(controller);
+                  ref.read(latitudeProvider.notifier).state = data.latitude;
+                  ref.read(longitudeProvider.notifier).state = data.longitude;
                 },
                 markers: markers,
                 mapType: MapType.normal,
@@ -106,7 +108,7 @@ class SetGoogleMap extends ConsumerWidget {
                 );
               },
             ),
-            // 簡易選択モーダル表示
+            // 簡易選択
             Align(
               alignment: const Alignment(0.8, -0.85),
               child: InkWell(
@@ -134,7 +136,7 @@ class SetGoogleMap extends ConsumerWidget {
                         });
                   }),
             ),
-            //テキスト検索モーダル
+            //テキスト検索
             Align(
                 alignment: const Alignment(-0.6, -0.85),
                 child: SizedBox(
@@ -174,107 +176,75 @@ class SetGoogleMap extends ConsumerWidget {
                           enableDrag: true,
                           barrierColor: Colors.black.withOpacity(0.6),
                           builder: (context) {
-                            // テキスト検索モーダル
                             return ShowTextModal();
                           });
                     },
                   ),
                 )),
+
             Align(
-                alignment: const Alignment(0.0, 0.95),
-                child: CardSection(pageController: pageController)),
-            Align(
-              alignment: const Alignment(0.95, 0.1),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10.0, bottom: 30.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ClipOval(
-                      child: Material(
-                        color: Colors.blue[400],
-                        child: InkWell(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ClipOval(
+                        child: Material(
+                          color: Colors.blue[400],
+                          child: InkWell(
+                              splashColor: Colors.blue[400],
+                              child: const SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: Icon(Icons.create, color: Colors.white),
+                              ),
+                              onTap: () => context.go('/addpage')),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // 現在位置ボタン
+                      ClipOval(
+                        child: Material(
+                          color: Colors.blue[400],
+                          child: InkWell(
                             splashColor: Colors.blue[400],
                             child: const SizedBox(
                               width: 50,
                               height: 50,
-                              child: Icon(Icons.create, color: Colors.white),
+                              child:
+                                  Icon(Icons.my_location, color: Colors.white),
                             ),
-                            onTap: () => context.go('/addpage')),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // 現在位置ボタン
-                    ClipOval(
-                      child: Material(
-                        color: Colors.blue[400],
-                        child: InkWell(
-                          splashColor: Colors.blue[400],
-                          child: const SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Icon(Icons.my_location, color: Colors.white),
+                            onTap: () async {
+                              print("現在位置 $currentPositionFuture");
+                              await _mapController
+                                  .animateCamera(CameraUpdate.newCameraPosition(
+                                currentPositionFuture.maybeWhen(
+                                  data: (data) => CameraPosition(
+                                    target:
+                                        LatLng(data.latitude, data.longitude),
+                                    zoom: 15.0,
+                                  ),
+                                  orElse: () => const CameraPosition(
+                                    target: LatLng(0, 0),
+                                    zoom: 15.0,
+                                  ),
+                                ),
+                              ));
+                            },
                           ),
-                          onTap: () async {
-                            print("現在位置 $currentPositionFuture.latitude");
-                            await _mapController
-                                .animateCamera(CameraUpdate.newCameraPosition(
-                              currentPositionFuture.maybeWhen(
-                                data: (data) => CameraPosition(
-                                  target: LatLng(data.latitude, data.longitude),
-                                  zoom: 15.0,
-                                ),
-                                orElse: () => const CameraPosition(
-                                  target: LatLng(0, 0),
-                                  zoom: 15.0,
-                                ),
-                              ),
-                            ));
-                          },
                         ),
                       ),
-                    ),
-                    // // ズームインボタン // 必要か検討？
-                    // ClipOval(
-                    //   child: Material(
-                    //     color: Colors.blue[400], // ボタンを押す前のカラー
-                    //     child: InkWell(
-                    //       splashColor: Colors.blue[100], // ボタンを押した後のカラー
-                    //       child: const SizedBox(
-                    //         width: 50,
-                    //         height: 50,
-                    //         child: Icon(Icons.add, color: Colors.white),
-                    //       ),
-                    //       onTap: () async {
-                    //         await _mapController.animateCamera(
-                    //           CameraUpdate.zoomIn(),
-                    //         );
-                    //       },
-                    //     ),
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 10),
-                    // // ズームアウトボタン
-                    // ClipOval(
-                    //   child: Material(
-                    //     color: Colors.blue[400], // ボタンを押す前のカラー
-                    //     child: InkWell(
-                    //       splashColor: Colors.blue[100], // ボタンを押した後のカラー
-                    //       child: const SizedBox(
-                    //         width: 50,
-                    //         height: 50,
-                    //         child: Icon(Icons.remove, color: Colors.white),
-                    //       ),
-                    //       onTap: () async {
-                    //         await _mapController.animateCamera(
-                    //           CameraUpdate.zoomOut(),
-                    //         );
-                    //       },
-                    //     ),
-                    //   ),
-                    // )
-                  ],
-                ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                      alignment: const Alignment(0.0, 0.95),
+                      child: CardSection(pageController: pageController)),
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
               ),
             ),
           ],
@@ -282,101 +252,6 @@ class SetGoogleMap extends ConsumerWidget {
       ),
     );
   }
-}
-
-// void _checkLocationPermission(context, WidgetRef ref) {
-//   _determinePosition().then((position) {
-//     if (position != null) {
-//       ref.read(latitudeProvider.notifier).changeLatitude(position.latitude);
-//       ref.read(latitudeProvider.notifier).changeLatitude(position.longitude);
-//       print("取得できた");
-//     }
-
-//     print(position);
-//   });
-// }
-
-// Future<Position?> _determinePosition() async {
-//   bool serviceEnabled;
-//   LocationPermission permission;
-
-// isLocationServiceEnabledはロケーションサービスが有効かどうかを確認
-//   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//   if (!serviceEnabled) {
-//     return Future.error('ロケーションサービスが無効です。');
-//   }
-
-//   // ユーザーがデバイスの場所を取得するための許可をすでに付与しているかどうかを確認
-//   permission = await Geolocator.checkPermission();
-
-//   if (permission == LocationPermission.denied) {
-//     // デバイスの場所へのアクセス許可をリクエストする
-//     permission = await Geolocator.requestPermission();
-//     if (permission == LocationPermission.denied) {
-//       return null;
-//     }
-//   }
-
-//   if (permission == LocationPermission.deniedForever) {
-//     return null;
-//   }
-
-//   // デバイスの現在の場所を返す。
-//   Position position = await Geolocator.getCurrentPosition(
-//     desiredAccuracy: LocationAccuracy.high,
-//   );
-//   return position;
-// }
-
-// マーカーの情報をcardで表示
-// 今後は写真と現在位置からの距離、ルートを実装する。
-
-//カード1枚1枚について
-List<Widget> shopTiles(
-    List<Place> items, double currentLatitude, double currentLongitude) {
-  // final items = ref.watch(autoCompleteSearchTypeProvider);
-
-  List<double> distances = items.map((place) {
-    double distanceInMeters = Geolocator.distanceBetween(
-      currentLatitude,
-      currentLongitude,
-      place.latitude,
-      place.longitude,
-    );
-    return distanceInMeters;
-  }).toList();
-
-  final shopTiles = items.asMap().entries.map(
-    (entry) {
-      final index = entry.key;
-      final place = entry.value;
-      return Align(
-        alignment: const Alignment(-3.5, 0.1),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: SizedBox(
-            height: 150,
-            width: 300,
-            child: Center(
-              child: Column(children: [
-                ...(place.name == null)
-                    ? [
-                        const SizedBox.shrink(),
-                      ]
-                    : [
-                        Text(place.name as String),
-                        Text('現在地から${distances[index].ceilToDouble()} m')
-                      ]
-              ]),
-            ),
-          ),
-        ),
-      );
-    },
-  ).toList();
-  return shopTiles;
 }
 
 Future<void> setMarkder(WidgetRef ref) async {

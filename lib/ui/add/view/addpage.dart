@@ -39,33 +39,33 @@ class AddPage extends HookConsumerWidget {
         checkedMarkerNames.any((name) => name != null && name.isNotEmpty);
     Color baseColor = Colors.orange.shade100;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text(
-          addPage,
-          style: TextStyle(color: Colors.black54),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: const Text(
+            addPage,
+            style: TextStyle(color: Colors.black54),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.background,
+          leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black54,
+              ),
+              onPressed: () {
+                context.push('/memolist');
+              }),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
-        leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.black54,
-            ),
-            onPressed: () {
-              context.push('/memolist');
-            }),
-      ),
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Center(
+        body: Center(
           child: Container(
             padding: const EdgeInsets.all(32),
             child: Column(
               children: <Widget>[
-                const SizedBox(height: 100),
+                SizedBox(height: MediaQuery.of(context).size.height / 12),
                 Container(
                   height: 55,
                   width: 350,
@@ -112,10 +112,10 @@ class AddPage extends HookConsumerWidget {
                     },
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: MediaQuery.of(context).size.height / 16),
                 Container(
-                  height: 60,
-                  width: 200,
+                  height: 50,
+                  width: 100,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: baseColor,
@@ -182,7 +182,7 @@ class AddPage extends HookConsumerWidget {
                         }
                       }),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: MediaQuery.of(context).size.height / 33),
                 Center(
                   child: Column(
                     children: [
@@ -193,7 +193,7 @@ class AddPage extends HookConsumerWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: MediaQuery.of(context).size.height / 33),
                       shouldDisplayContainer == true
                           ? Container(
                               padding: const EdgeInsets.all(10.0),
@@ -225,16 +225,17 @@ class AddPage extends HookConsumerWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                               ),
                             )
-                          : const SizedBox(height: 10)
+                          : SizedBox(
+                              height: MediaQuery.of(context).size.height / 66),
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: MediaQuery.of(context).size.height / 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      height: 50,
+                      height: 40,
                       width: 100,
                       decoration: BoxDecoration(
                         color: baseColor,
@@ -310,11 +311,9 @@ class AddPage extends HookConsumerWidget {
                             }
                           }),
                     ),
-                    const SizedBox(
-                      width: 50,
-                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width / 10),
                     Container(
-                      height: 50,
+                      height: 40,
                       width: 100,
                       decoration: BoxDecoration(
                         color: baseColor,
@@ -360,24 +359,25 @@ class AddPage extends HookConsumerWidget {
             ),
           ),
         ),
+
+        // 今後つけたい機能？写真？カメラ？
+        // floatingActionButton: Row(
+        //   mainAxisAlignment: MainAxisAlignment.end,
+        //   children: [
+        //     FloatingActionButton(
+        //         heroTag: "hero2",
+        //         child: const Icon(Icons.photo),
+        //         onPressed: () => {}), //写真を選択して保存ができる。
+        //     const SizedBox(
+        //       width: 10,
+        //     ),
+        //     FloatingActionButton(
+        //         heroTag: "hero3",
+        //         child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
+        //         onPressed: () => {}),
+        //   ],
+        // ),
       ),
-      // 今後つけたい機能？写真？カメラ？
-      // floatingActionButton: Row(
-      //   mainAxisAlignment: MainAxisAlignment.end,
-      //   children: [
-      //     FloatingActionButton(
-      //         heroTag: "hero2",
-      //         child: const Icon(Icons.photo),
-      //         onPressed: () => {}), //写真を選択して保存ができる。
-      //     const SizedBox(
-      //       width: 10,
-      //     ),
-      //     FloatingActionButton(
-      //         heroTag: "hero3",
-      //         child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
-      //         onPressed: () => {}),
-      //   ],
-      // ),
     );
   }
 }

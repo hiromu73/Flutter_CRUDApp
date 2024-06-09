@@ -14,6 +14,7 @@ class ShowModal extends ConsumerWidget {
     print("簡易選択モーダル");
     final selectItem = ref.watch(selectItemsProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
+    print(currentPositionFuture);
 
     return Container(
       padding: const EdgeInsets.all(10),
