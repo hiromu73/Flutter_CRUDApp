@@ -76,7 +76,7 @@ class LoginPage extends HookConsumerWidget {
                           color: baseColor,
                           child: Center(
                               child: Container(
-                            height: 55,
+                            height: 60,
                             width: 350,
                             decoration: BoxDecoration(
                               color: baseColor,
@@ -132,7 +132,7 @@ class LoginPage extends HookConsumerWidget {
                           color: baseColor,
                           child: Center(
                               child: Container(
-                            height: 55,
+                            height: 60,
                             width: 350,
                             decoration: BoxDecoration(
                               color: baseColor,
@@ -246,9 +246,19 @@ class LoginPage extends HookConsumerWidget {
                                         if (context.mounted) {
                                           await context.push('/memolist');
                                         }
+                                      } on FirebaseAuthException catch (e) {
+                                        if (e.code == 'weak-password') {
+                                          infoText.value =
+                                              "passwordは6桁以上にして下さい";
+                                        } else if (e.code ==
+                                            'email-already-in-use') {
+                                          infoText.value =
+                                              'このメールアドレスは既に登録されています。';
+                                        } else {
+                                          infoText.value = 'e-mailが誤っています';
+                                        }
                                       } catch (e) {
-                                        infoText.value =
-                                            "ログインに失敗しました\n既に登録されているメールアドレスです。";
+                                        infoText.value = 'アカウント登録できませんでした。';
                                       }
                                     }),
                               ))),
@@ -305,9 +315,16 @@ class LoginPage extends HookConsumerWidget {
                                       if (context.mounted) {
                                         await context.push('/memolist');
                                       }
+                                    } on FirebaseAuthException catch (e) {
+                                      if (e.code == 'invalid-email') {
+                                        infoText.value = 'e-mailが誤っています';
+                                      } else if (e.code == 'wrong-password') {
+                                        infoText.value = 'passwordが誤っています';
+                                      } else if (e.code == 'user-not-found') {
+                                        infoText.value = 'ユーザーが存在しません';
+                                      }
                                     } catch (e) {
-                                      infoText.value =
-                                          "ログインに失敗しました\ne-mailまたはpasswordが間違っています。";
+                                      infoText.value = 'ログインできませんでした';
                                     }
                                   },
                                 ),

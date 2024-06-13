@@ -235,6 +235,7 @@ class SetGoogleMap extends ConsumerWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 10),
                     ],
                   ),
                   const SizedBox(height: 10),

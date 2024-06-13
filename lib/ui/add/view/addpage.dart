@@ -67,7 +67,7 @@ class AddPage extends HookConsumerWidget {
               children: <Widget>[
                 SizedBox(height: MediaQuery.of(context).size.height / 12),
                 Container(
-                  height: 55,
+                  height: 60,
                   width: 350,
                   decoration: BoxDecoration(
                     color: baseColor,

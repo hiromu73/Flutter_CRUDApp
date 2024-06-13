@@ -35,10 +35,10 @@ class MyApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData(
-        brightness: Brightness.dark,
+        primarySwatch: Colors.orange,
+        brightness: Brightness.light,
         primaryColor: mainColor,
-        cardColor: Colors.orange.shade100,
-        colorScheme: ColorScheme.dark(
+        colorScheme: ColorScheme.light(
           background: mainColor,
           primary: Colors.black,
           secondary: Colors.grey.shade200,
