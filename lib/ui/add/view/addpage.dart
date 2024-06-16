@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
+import 'package:memoplace/ui/login/view/loginpage.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -51,14 +53,25 @@ class AddPage extends HookConsumerWidget {
             style: TextStyle(color: Colors.black54),
           ),
           backgroundColor: Theme.of(context).colorScheme.background,
-          leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black54,
-              ),
-              onPressed: () {
-                context.push('/memolist');
-              }),
+        ),
+        endDrawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              ListTile(
+                  title: const Text('ログアウト'),
+                  onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    // ログイン画面に遷移＋チャット画面を破棄
+                    await context.push('/');
+                  }),
+              ListTile(
+                  title: const Text('アカウント削除'),
+                  onTap: () async {
+                    await deleteUser(userId);
+                    await context.push('/');
+                  }),
+            ],
+          ),
         ),
         body: Center(
           child: Container(
@@ -400,4 +413,15 @@ Widget checkNames(List<String?> name) {
       return Text(name[index]!);
     },
   );
+}
+
+Future deleteUser(String userId) async {
+  final user = FirebaseAuth.instance.currentUser;
+  print(userId);
+  await FirebaseFirestore.instance.collection('post').doc(userId).delete();
+
+  // ユーザーを削除
+  await user?.delete();
+  await FirebaseAuth.instance.signOut();
+  print('ユーザーを削除しました!');
 }

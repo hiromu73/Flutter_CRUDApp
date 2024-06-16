@@ -22,7 +22,8 @@ final router = GoRouter(
     GoRoute(
         name: 'addpage',
         path: '/addpage',
-        pageBuilder: (context, state) => _buildPageWithAnimation(AddPage())),
+        pageBuilder: (context, state) =>
+            _buildPageWithAnimation(const AddPage())),
     GoRoute(
         name: 'setgooglemap',
         path: '/setgooglemap',

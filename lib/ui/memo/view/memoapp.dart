@@ -34,7 +34,8 @@ class MemoApp extends HookConsumerWidget {
       _checkLocationPermission(context, ref);
       return null;
     });
-    print(MediaQuery.of(context).size.width);
+    final w = MediaQuery.sizeOf(context).width;
+    final h = MediaQuery.sizeOf(context).height;
     // final viewTypes = useState<bool>(true);
     // void changeView() {
     //   viewTypes.value = !viewTypes.value;
@@ -46,7 +47,8 @@ class MemoApp extends HookConsumerWidget {
           Expanded(child: MemoList()),
         ],
       ),
-      floatingActionButton: Row(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
@@ -75,9 +77,6 @@ class MemoApp extends HookConsumerWidget {
                 ),
                 onPressed: () => context.push('/addpage')),
           ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 2.7,
-          ),
           // Container(
           //   decoration: BoxDecoration(
           //     color: baseColor,
@@ -105,6 +104,9 @@ class MemoApp extends HookConsumerWidget {
           //       ),
           //       onPressed: () => {}),
           // ),
+          const SizedBox(
+            height: 20,
+          )
         ],
       ),
     );

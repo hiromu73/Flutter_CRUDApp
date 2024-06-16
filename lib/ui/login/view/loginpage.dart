@@ -23,7 +23,11 @@ class LoginPage extends HookConsumerWidget {
     useFocusNode();
     final obscureText = useState(true);
     Color baseColor = Colors.orange.shade100;
+    final w = MediaQuery.sizeOf(context).width;
+    final h = MediaQuery.sizeOf(context).height;
 
+    print(h);
+    print(w);
     return GestureDetector(
       onTap: () => primaryFocus?.unfocus(),
       child: Scaffold(

@@ -7,7 +7,6 @@ class LoginUser extends _$LoginUser {
   String build() => "test";
 
   Future<void> setLoginUser(String uid) async {
-    print(uid);
     state = uid;
   }
 }

@@ -23,6 +23,7 @@ class CardSection extends ConsumerWidget {
     final items = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
+
 // 画面が戻った時,cardがあればcardの1番目にする。
 // 画面が戻った時にCardSectionの最初の要素にスクロールする
     // void scrollToFirstElement() {
@@ -35,7 +36,7 @@ class CardSection extends ConsumerWidget {
     List<String?> checkedMarkerNames =
         items.map((marker) => marker.name).toList();
 
-    bool nameBool = checkedMarkerNames.length > 1;
+    bool nameBool = checkedMarkerNames.isNotEmpty;
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
