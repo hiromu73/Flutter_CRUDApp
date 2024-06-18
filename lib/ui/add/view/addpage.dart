@@ -6,10 +6,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
-import 'package:memoplace/ui/login/view/loginpage.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
@@ -40,6 +40,10 @@ class AddPage extends HookConsumerWidget {
     bool shouldDisplayContainer = checkedMarkerNames.isNotEmpty &&
         checkedMarkerNames.any((name) => name != null && name.isNotEmpty);
     Color baseColor = Colors.orange.shade100;
+    final Uri url = Uri.parse(
+        'https://six-entrance-6bc.notion.site/memoPlace-edb72efeb04e4f478402670048de001e?pvs=4');
+    final Uri googleFromurl = Uri.parse(
+        'https://docs.google.com/forms/d/e/1FAIpQLSfGWcIVLPMoAI-YhooVh5GwOLftMWj9RzHFUwjagB0zkEYlsA/viewform?usp=sf_link');
 
     return GestureDetector(
       onTap: () {
@@ -70,6 +74,35 @@ class AddPage extends HookConsumerWidget {
                     await deleteUser(userId);
                     await context.push('/');
                   }),
+              ListTile(
+                  title: const Text('プライバシーポリシー'),
+                  onTap: () async {
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url);
+                    } else {
+                      throw 'Could not Launch $url';
+                    }
+                  }),
+              ListTile(title: const Text('利用規約'), onTap: () async {}),
+              ListTile(
+                  title: const Text('ライセンス'),
+                  onTap: () async {
+                    await context.push('/licensepage');
+                  }),
+              ListTile(
+                  title: const Text('問い合わせ'),
+                  onTap: () async {
+                    if (await canLaunchUrl(googleFromurl)) {
+                      print("test");
+                      await launchUrl(googleFromurl);
+                    } else {
+                      print("test1");
+                      throw 'Could not Launch $googleFromurl';
+                    }
+                  }),
+              const ListTile(
+                title: Text('バージョン 1.0.2'),
+              ),
             ],
           ),
         ),

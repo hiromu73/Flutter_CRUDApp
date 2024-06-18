@@ -25,6 +25,15 @@ final router = GoRouter(
         pageBuilder: (context, state) =>
             _buildPageWithAnimation(const AddPage())),
     GoRoute(
+        name: 'licensepage',
+        path: '/licensepage',
+        pageBuilder: (context, state) =>
+            _buildPageWithAnimation(const LicensePage(
+              applicationName: 'MemoPlace', // アプリの名前
+              applicationVersion: '1.0.2', // バージョン
+              applicationLegalese: 'All rights reserved', // 著作権表示
+            ))),
+    GoRoute(
         name: 'setgooglemap',
         path: '/setgooglemap',
         pageBuilder: (context, state) =>
