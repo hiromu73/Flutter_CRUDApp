@@ -34,6 +34,7 @@ class MemoApp extends HookConsumerWidget {
       _checkLocationPermission(context, ref);
       return null;
     });
+    print("aaa");
     final w = MediaQuery.sizeOf(context).width;
     final h = MediaQuery.sizeOf(context).height;
     // final viewTypes = useState<bool>(true);

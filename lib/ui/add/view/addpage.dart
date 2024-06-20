@@ -41,9 +41,11 @@ class AddPage extends HookConsumerWidget {
         checkedMarkerNames.any((name) => name != null && name.isNotEmpty);
     Color baseColor = Colors.orange.shade100;
     final Uri url = Uri.parse(
-        'https://six-entrance-6bc.notion.site/memoPlace-edb72efeb04e4f478402670048de001e?pvs=4');
+        'https://six-entrance-6bc.notion.site/MemoPlace-edb72efeb04e4f478402670048de001e');
     final Uri googleFromurl = Uri.parse(
         'https://docs.google.com/forms/d/e/1FAIpQLSfGWcIVLPMoAI-YhooVh5GwOLftMWj9RzHFUwjagB0zkEYlsA/viewform?usp=sf_link');
+    final Uri kiyaku = Uri.parse(
+        'https://six-entrance-6bc.notion.site/bee86251f2614d959c66e7ef2372b306');
 
     return GestureDetector(
       onTap: () {
@@ -56,6 +58,14 @@ class AddPage extends HookConsumerWidget {
             addPage,
             style: TextStyle(color: Colors.black54),
           ),
+          leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black54,
+              ),
+              onPressed: () {
+                context.push('/memolist');
+              }),
           backgroundColor: Theme.of(context).colorScheme.background,
         ),
         endDrawer: Drawer(
@@ -83,7 +93,15 @@ class AddPage extends HookConsumerWidget {
                       throw 'Could not Launch $url';
                     }
                   }),
-              ListTile(title: const Text('利用規約'), onTap: () async {}),
+              ListTile(
+                  title: const Text('利用規約'),
+                  onTap: () async {
+                    if (await canLaunchUrl(kiyaku)) {
+                      await launchUrl(kiyaku);
+                    } else {
+                      throw 'Could not Launch $url';
+                    }
+                  }),
               ListTile(
                   title: const Text('ライセンス'),
                   onTap: () async {

@@ -14,7 +14,7 @@ class BuildListView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
-    print("ビルド");
+    print("再ビルド確認");
     final userId = ref.watch(loginUserProvider);
     Color baseColor = Colors.orange.shade100;
     return AnimationLimiter(
