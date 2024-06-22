@@ -104,7 +104,7 @@ class LoginPage extends HookConsumerWidget {
                               focusNode: emailFocusNode,
                               controller: emailController,
                               maxLength: null,
-                              maxLines: null,
+                              maxLines: 1,
                               keyboardType: TextInputType.multiline,
                               autofillHints: const [AutofillHints.email],
                               validator: (value) {
@@ -118,6 +118,10 @@ class LoginPage extends HookConsumerWidget {
                                 filled: true,
                                 isDense: true,
                                 hintText: "e-mail",
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 30,
+                                  horizontal: 15,
+                                ),
                                 hintStyle: const TextStyle(
                                     fontSize: 12, fontWeight: FontWeight.w100),
                                 border: OutlineInputBorder(
@@ -161,12 +165,17 @@ class LoginPage extends HookConsumerWidget {
                               controller: passwordController,
                               obscureText: obscureText.value,
                               keyboardType: TextInputType.multiline,
+                              maxLines: 1,
                               autofillHints: const [AutofillHints.password],
                               decoration: InputDecoration(
                                 fillColor: Colors.orange.shade100,
                                 filled: true,
                                 isDense: true,
                                 hintText: "password",
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 30,
+                                  horizontal: 15,
+                                ),
                                 hintStyle: const TextStyle(
                                     fontSize: 12, fontWeight: FontWeight.w100),
                                 border: OutlineInputBorder(
@@ -248,7 +257,7 @@ class LoginPage extends HookConsumerWidget {
                                             .read(userIdProvider.notifier)
                                             .state = uid;
                                         if (context.mounted) {
-                                          await context.push('/memolist');
+                                          await context.push('/');
                                         }
                                       } on FirebaseAuthException catch (e) {
                                         if (e.code == 'weak-password') {

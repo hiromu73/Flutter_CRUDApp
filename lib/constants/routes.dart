@@ -7,15 +7,15 @@ import '../ui/login/view/loginpage.dart';
 
 final router = GoRouter(
   debugLogDiagnostics: true,
-  initialLocation: '/',
+  initialLocation: '/login',
   routes: [
     GoRoute(
         name: 'login',
-        path: '/',
+        path: '/login',
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const LoginPage())),
     GoRoute(
-        name: 'memolist',
+        name: '/m',
         path: '/memolist',
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const MemoApp())),
@@ -40,6 +40,22 @@ final router = GoRouter(
             _buildPageWithAnimation(SetGoogleMap())),
   ],
 );
+
+class AuthService {
+  // シングルトンパターンの簡易実装
+  AuthService._privateConstructor();
+  static final AuthService instance = AuthService._privateConstructor();
+
+  bool isLoggedIn = false;
+
+  void login() {
+    isLoggedIn = true;
+  }
+
+  void logout() {
+    isLoggedIn = false;
+  }
+}
 
 // 遷移をアニメーションにする。pageBuilder
 CustomTransitionPage<void> _buildPageWithAnimation(Widget page) {

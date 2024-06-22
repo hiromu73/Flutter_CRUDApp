@@ -71,18 +71,24 @@ class AddPage extends HookConsumerWidget {
         endDrawer: Drawer(
           child: ListView(
             children: <Widget>[
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                ),
+                child: Center(child: Text("Setting")),
+              ),
               ListTile(
                   title: const Text('ログアウト'),
                   onTap: () async {
                     await FirebaseAuth.instance.signOut();
                     // ログイン画面に遷移＋チャット画面を破棄
-                    await context.push('/');
+                    await context.push('/login');
                   }),
               ListTile(
                   title: const Text('アカウント削除'),
                   onTap: () async {
                     await deleteUser(userId);
-                    await context.push('/');
+                    await context.push('/login');
                   }),
               ListTile(
                   title: const Text('プライバシーポリシー'),
@@ -229,7 +235,7 @@ class AddPage extends HookConsumerWidget {
                                         onPressed: () {
                                           openAppSettings();
                                         },
-                                        child: const Text("設定"),
+                                        child: const Text("Setting"),
                                       ),
                                       TextButton(
                                         onPressed: () {
