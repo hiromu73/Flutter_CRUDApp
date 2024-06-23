@@ -22,6 +22,8 @@ final googleMapControllerProvider =
 class SetGoogleMap extends ConsumerWidget {
   SetGoogleMap({Key? key}) : super(key: key);
   late GoogleMapController _mapController;
+  static String get routeName => 'setgooglemap';
+  static String get routeLocation => '/setgooglemap';
 
   final pageController = PageController(
     viewportFraction: 0.85,

@@ -16,6 +16,8 @@ final memoProvider = StateProvider.autoDispose((ref) => "");
 
 class AddPage extends HookConsumerWidget {
   const AddPage({super.key});
+  static String get routeName => 'addpage';
+  static String get routeLocation => '/$routeName';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

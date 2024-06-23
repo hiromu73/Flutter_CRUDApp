@@ -14,6 +14,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // メモの一覧を表示
 class MemoApp extends HookConsumerWidget {
   const MemoApp({super.key});
+  static String get routeName => 'memolist';
+  static String get routeLocation => '/$routeName';
 
   Future<void> pushMessage(text) async {
     HttpsCallable callable =

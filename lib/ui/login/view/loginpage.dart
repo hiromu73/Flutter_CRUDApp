@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:memoplace/ui/login/view_model/anonymous_class.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 
 final userIdProvider = StateProvider<String>((ref) => "");
@@ -10,6 +11,8 @@ final passwordProvider = StateProvider<bool>((ref) => true);
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
+  static String get routeName => 'loginpage';
+  static String get routeLocation => '/$routeName';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,6 +28,13 @@ class LoginPage extends HookConsumerWidget {
     Color baseColor = Colors.orange.shade100;
     final w = MediaQuery.sizeOf(context).width;
     final h = MediaQuery.sizeOf(context).height;
+    final authState = useState<User?>(FirebaseAuth.instance.currentUser);
+    useEffect(() {
+      final listener = FirebaseAuth.instance.authStateChanges().listen((user) {
+        authState.value = user;
+      });
+      return listener.cancel;
+    }, []);
 
     print(h);
     print(w);
@@ -110,6 +120,9 @@ class LoginPage extends HookConsumerWidget {
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return '値を入力してください';
+                                } else if (!value.contains('@') ||
+                                    !value.contains('.')) {
+                                  return 'メールアドレスの形式が正しくありません';
                                 }
                                 return null;
                               },
@@ -195,6 +208,14 @@ class LoginPage extends HookConsumerWidget {
                               onChanged: (String value) async {
                                 password.value = value;
                               },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return '入力欄が空欄です';
+                                } else if (value.length < 6) {
+                                  return '6文字以上で入力してください';
+                                }
+                                return null;
+                              },
                             ),
                           ))),
                       Container(
@@ -268,7 +289,8 @@ class LoginPage extends HookConsumerWidget {
                                           infoText.value =
                                               'このメールアドレスは既に登録されています。';
                                         } else {
-                                          infoText.value = 'e-mailが誤っています';
+                                          infoText.value =
+                                              'e-mailまたはpasswordが誤っています';
                                         }
                                       } catch (e) {
                                         infoText.value = 'アカウント登録できませんでした。';
@@ -344,7 +366,61 @@ class LoginPage extends HookConsumerWidget {
                               ))),
                         ],
                       ),
-                      const SizedBox(height: 20)
+                      const SizedBox(height: 40),
+                      Container(
+                          color: baseColor,
+                          child: Center(
+                              child: Container(
+                            height: 40,
+                            width: 140,
+                            decoration: BoxDecoration(
+                              color: baseColor,
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.orange.withOpacity(0.4),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: const Offset(3, 3),
+                                ),
+                                BoxShadow(
+                                  color: Colors.white.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: const Offset(-3, -3),
+                                ),
+                              ],
+                            ),
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.orange.shade100,
+                              ),
+                              onPressed: () async {
+                                ref
+                                    .read(anonymousClassProvider.notifier)
+                                    .state
+                                    .signInAnonymous();
+                                User? user = FirebaseAuth.instance.currentUser;
+
+                                await ref
+                                    .read(loginUserProvider.notifier)
+                                    .setLoginUser(user!.uid);
+                                final uid = ref.watch(loginUserProvider);
+                                ref.read(userIdProvider.notifier).state = uid;
+                                print("匿名遷移");
+                                if (context.mounted) {
+                                  await context.push('/memolist');
+                                }
+                              },
+                              child: const Text(
+                                "登録せずに利用",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ))),
                     ],
                   ),
                 ),

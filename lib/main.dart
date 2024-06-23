@@ -15,12 +15,14 @@ void main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   static const Color mainColor = Color(0xFFFFE0B2);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'MemoPlace',

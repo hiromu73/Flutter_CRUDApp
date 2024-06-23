@@ -18,7 +18,7 @@ class BuildListView extends HookConsumerWidget {
     print("再ビルド確認");
     final userId = ref.watch(loginUserProvider);
     Color baseColor = Colors.orange.shade100;
-
+    
     return FutureBuilder(
       future: checkPermission(query, context),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
