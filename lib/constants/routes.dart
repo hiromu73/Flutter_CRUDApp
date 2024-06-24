@@ -79,8 +79,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ),
     redirect: (context, state) async {
-      // if (_isFirstLaunch) {
-      // _isFirstLaunch = false;
       if (authState.isLoading || authState.hasError) return null;
       final isAuth = authState.valueOrNull != null;
       final isLogin = state.fullPath == LoginPage.routeLocation;

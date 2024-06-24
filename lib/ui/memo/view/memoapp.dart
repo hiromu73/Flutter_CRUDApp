@@ -36,9 +36,8 @@ class MemoApp extends HookConsumerWidget {
       _checkLocationPermission(context, ref);
       return null;
     });
-    print("aaa");
-    final w = MediaQuery.sizeOf(context).width;
-    final h = MediaQuery.sizeOf(context).height;
+    // final w = MediaQuery.sizeOf(context).width;
+    // final h = MediaQuery.sizeOf(context).height;
     // final viewTypes = useState<bool>(true);
     // void changeView() {
     //   viewTypes.value = !viewTypes.value;
@@ -159,7 +158,7 @@ class MemoApp extends HookConsumerWidget {
 
     // 通知バナーをタップ時の処理
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      context.push('/');
+      context.push('/memolist');
     });
 
     // 位置情報サービスが有効かチェック

@@ -37,7 +37,8 @@ class AddPage extends HookConsumerWidget {
         checkList.map((marker) => marker.longitude).toList();
 
     final textMemo = ref.watch(memoProvider);
-    final userId = ref.watch(loginUserProvider);
+    // final userId = ref.watch(loginUserProvider);
+    User? user = FirebaseAuth.instance.currentUser;
     final FocusNode focusNode = useFocusNode();
     bool shouldDisplayContainer = checkedMarkerNames.isNotEmpty &&
         checkedMarkerNames.any((name) => name != null && name.isNotEmpty);
@@ -77,7 +78,7 @@ class AddPage extends HookConsumerWidget {
                 decoration: BoxDecoration(
                   color: Colors.orange,
                 ),
-                child: Center(child: Text("Setting")),
+                child: Center(child: Text("アプリについて")),
               ),
               ListTile(
                   title: const Text('ログアウト'),
@@ -89,7 +90,7 @@ class AddPage extends HookConsumerWidget {
               ListTile(
                   title: const Text('アカウント削除'),
                   onTap: () async {
-                    await deleteUser(userId);
+                    await deleteUser(user!.uid);
                     await context.push('/login');
                   }),
               ListTile(
@@ -345,7 +346,7 @@ class AddPage extends HookConsumerWidget {
                                   DateTime.now().toLocal().toIso8601String();
                               await FirebaseFirestore.instance
                                   .collection('post')
-                                  .doc(userId)
+                                  .doc(user!.uid)
                                   .collection('documents')
                                   .add({
                                 'text': textMemo,

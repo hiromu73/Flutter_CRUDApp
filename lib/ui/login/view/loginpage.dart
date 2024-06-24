@@ -396,18 +396,16 @@ class LoginPage extends HookConsumerWidget {
                                 backgroundColor: Colors.orange.shade100,
                               ),
                               onPressed: () async {
-                                ref
+                                await ref
                                     .read(anonymousClassProvider.notifier)
                                     .state
                                     .signInAnonymous();
                                 User? user = FirebaseAuth.instance.currentUser;
-
                                 await ref
                                     .read(loginUserProvider.notifier)
                                     .setLoginUser(user!.uid);
                                 final uid = ref.watch(loginUserProvider);
                                 ref.read(userIdProvider.notifier).state = uid;
-                                print("匿名遷移");
                                 if (context.mounted) {
                                   await context.push('/memolist');
                                 }

@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -16,15 +16,16 @@ class BuildListView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
     print("再ビルド確認");
-    final userId = ref.watch(loginUserProvider);
+    // final userId = ref.watch(loginUserProvider);
     Color baseColor = Colors.orange.shade100;
-    
+    User? user = FirebaseAuth.instance.currentUser;
+
     return FutureBuilder(
       future: checkPermission(query, context),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         return ListView(
           padding:
-              const EdgeInsets.only(top: 50, right: 5, left: 5, bottom: 110),
+              const EdgeInsets.only(top: 60, right: 5, left: 5, bottom: 110),
           children: query.docs.map((DocumentSnapshot document) {
             final int staggerPosition = index++;
             return Slidable(
@@ -38,7 +39,7 @@ class BuildListView extends HookConsumerWidget {
                         String docId = document.id;
                         await FirebaseFirestore.instance
                             .collection('post')
-                            .doc(userId)
+                            .doc(user!.uid)
                             .collection('documents')
                             .doc(docId)
                             .delete();
@@ -112,7 +113,7 @@ class BuildListView extends HookConsumerWidget {
                                             try {
                                               await FirebaseFirestore.instance
                                                   .collection('post')
-                                                  .doc(userId)
+                                                  .doc(user!.uid)
                                                   .collection('documents')
                                                   .doc(docId)
                                                   .update({
@@ -241,10 +242,11 @@ class BuildListView extends HookConsumerWidget {
                                           value: document['alert'],
                                           onChanged: (value) async {
                                             String docId = document.id;
+
                                             try {
                                               await FirebaseFirestore.instance
                                                   .collection('post')
-                                                  .doc(userId)
+                                                  .doc(user!.uid)
                                                   .collection('documents')
                                                   .doc(docId)
                                                   .update({

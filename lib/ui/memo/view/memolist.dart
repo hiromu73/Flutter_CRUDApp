@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:memoplace/ui/login/view/loginpage.dart';
 import 'package:memoplace/ui/memo/view/buildlistview.dart';
 
 final userCollectionProvider =
@@ -24,8 +23,9 @@ class MemoList extends HookConsumerWidget {
     if (user != null) {
       userCollection = ref.watch(userCollectionProvider(user.uid));
     } else {
-      final userId = ref.watch(userIdProvider);
-      userCollection = ref.watch(userCollectionProvider(userId));
+      // final userId = ref.watch(userIdProvider);
+      User? user = FirebaseAuth.instance.currentUser;
+      userCollection = ref.watch(userCollectionProvider(user!.uid));
     }
 
     return userCollection.when(
