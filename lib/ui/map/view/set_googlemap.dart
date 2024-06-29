@@ -36,8 +36,8 @@ class SetGoogleMap extends ConsumerWidget {
     var width = MediaQuery.of(context).size.width;
     final selectItems = ref.watch(selectItemsProvider);
     final selectItemeMakers = ref.watch(autoCompleteSearchTypeProvider);
-    double currentLatitude = ref.watch(latitudeProvider);
-    double currentlongitudeProvider = ref.watch(longitudeProvider);
+    // double currentLatitude = ref.watch(latitudeProvider);
+    // double currentlongitudeProvider = ref.watch(longitudeProvider);
 
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
@@ -54,6 +54,24 @@ class SetGoogleMap extends ConsumerWidget {
             pageController.jumpToPage(index);
           },
         )));
+    print("mapビルド");
+
+    CameraPosition initialCameraPosition = selectItemeMakers.isNotEmpty
+        ? CameraPosition(
+            target: LatLng(selectItemeMakers.first.latitude,
+                selectItemeMakers.first.longitude),
+            zoom: 15.0,
+          )
+        : currentPositionFuture.maybeWhen(
+            data: (data) => CameraPosition(
+              target: LatLng(data.latitude, data.longitude),
+              zoom: 15.0,
+            ),
+            orElse: () => const CameraPosition(
+              target: LatLng(0, 0),
+              zoom: 15.0,
+            ),
+          );
 
     List<String> idList = [];
     var uuid = const Uuid();
@@ -77,6 +95,8 @@ class SetGoogleMap extends ConsumerWidget {
             currentPositionFuture.maybeWhen(
               data: (data) => GoogleMap(
                 onMapCreated: (GoogleMapController controller) {
+                  print("mapが作られた");
+                  print(initialCameraPosition);
                   _mapController = controller;
                   ref
                       .read(googleMapControllerProvider.notifier)
@@ -86,10 +106,7 @@ class SetGoogleMap extends ConsumerWidget {
                 },
                 markers: markers,
                 mapType: MapType.normal,
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(data.latitude, data.longitude),
-                  zoom: 15.0,
-                ),
+                initialCameraPosition: initialCameraPosition,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
                 onTap: (LatLng latLang) {
@@ -258,11 +275,8 @@ class SetGoogleMap extends ConsumerWidget {
 }
 
 Future<void> setMarkder(WidgetRef ref) async {
-  // チェックになっている対象のデータをマップ上にマーカーを設置する。
-  // チェックされたPlaceオブジェクトのリストを取得
   final checkedPlaces =
       await ref.read(autoCompleteSearchProvider.notifier).getCheckedPlaces();
-  // チェックされたPlaceオブジェクトからMarkerを作成し、Google Mapに追加
   for (final place in checkedPlaces) {
     await ref.read(autoCompleteSearchTypeProvider.notifier).addMarker(
         place.name!, place.latitude, place.longitude, place.uid, place.check);

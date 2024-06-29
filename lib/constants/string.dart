@@ -1,4 +1,5 @@
 const String memo = "内容を記載して下さい。";
+const String editMemo = "変更する内容を記載して下さい。";
 const String positionSearch = "Search";
 const String registration = "登録";
 const String clear = "Clear";
@@ -10,6 +11,7 @@ const String loginPassword = "Password";
 const String login = "Login";
 const String newRegistration = "新規登録";
 const String addPage = "AddPage";
+const String editPage = "EditPage";
 const String serach = "この条件で検索";
 const String serachPosition = "検索したい場所を入力";
 const String searchPermission =

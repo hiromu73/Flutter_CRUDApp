@@ -23,16 +23,6 @@ class CardSection extends ConsumerWidget {
     final items = ref.watch(autoCompleteSearchTypeProvider);
     final latitude = ref.watch(latitudeProvider);
     final longitude = ref.watch(longitudeProvider);
-
-// 画面が戻った時,cardがあればcardの1番目にする。
-// 画面が戻った時にCardSectionの最初の要素にスクロールする
-    // void scrollToFirstElement() {
-    //   if (items.isNotEmpty) {
-    //     pageController.animateToPage(0,
-    //         duration: const Duration(milliseconds: 500), curve: Curves.ease);
-    //   }
-    // }
-
     List<String?> checkedMarkerNames =
         items.map((marker) => marker.name).toList();
 
@@ -48,6 +38,7 @@ class CardSection extends ConsumerWidget {
         child: PageView(
             onPageChanged: (int index) async {
               final selectedShop = items.elementAt(index);
+              print("pagecontroll");
               if (mapController != null) {
                 final zoomLevel = await mapController.getZoomLevel();
                 mapController.animateCamera(
@@ -73,14 +64,10 @@ class CardSection extends ConsumerWidget {
             ]));
   }
 }
-// マーカーの情報をcardで表示
-// 今後は写真と現在位置からの距離、ルートを実装する。
 
-//カード1枚1枚について
+// カード1枚1枚について
 List<Widget> shopTiles(
     List<Place> items, double currentLatitude, double currentLongitude) {
-  print(currentLatitude);
-  print(currentLongitude);
   List<double> distances = items.map((place) {
     double distanceInMeters = Geolocator.distanceBetween(
       place.latitude,

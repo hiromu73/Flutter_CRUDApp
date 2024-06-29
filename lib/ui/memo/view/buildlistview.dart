@@ -55,11 +55,20 @@ class BuildListView extends HookConsumerWidget {
                     label: 'Delete',
                   ),
                   SlidableAction(
-                    onPressed: (context) async {},
+                    onPressed: (context) async {
+                      try {
+                        print(document.id);
+                        context.push('/editpage', extra: document);
+                      } catch (e) {
+                        if (context.mounted) {
+                          context.pop();
+                        }
+                      }
+                    },
                     backgroundColor: const Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
                     icon: Icons.create,
-                    label: 'Now\nLoding', // Editing
+                    label: 'Edit',
                   ),
                 ],
               ),

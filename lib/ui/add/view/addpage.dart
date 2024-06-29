@@ -6,7 +6,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
-import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -37,7 +36,6 @@ class AddPage extends HookConsumerWidget {
         checkList.map((marker) => marker.longitude).toList();
 
     final textMemo = ref.watch(memoProvider);
-    // final userId = ref.watch(loginUserProvider);
     User? user = FirebaseAuth.instance.currentUser;
     final FocusNode focusNode = useFocusNode();
     bool shouldDisplayContainer = checkedMarkerNames.isNotEmpty &&
@@ -85,13 +83,17 @@ class AddPage extends HookConsumerWidget {
                   onTap: () async {
                     await FirebaseAuth.instance.signOut();
                     // ログイン画面に遷移＋チャット画面を破棄
-                    await context.push('/login');
+                    if (context.mounted) {
+                      await context.push('/login');
+                    }
                   }),
               ListTile(
                   title: const Text('アカウント削除'),
                   onTap: () async {
                     await deleteUser(user!.uid);
-                    await context.push('/login');
+                    if (context.mounted) {
+                      await context.push('/login');
+                    }
                   }),
               ListTile(
                   title: const Text('プライバシーポリシー'),

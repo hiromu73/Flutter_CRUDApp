@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memoplace/ui/add/view/editpage.dart';
 import 'package:memoplace/ui/login/view_model/auth_provider.dart';
 import 'package:memoplace/ui/map/view/set_googlemap.dart';
 import 'package:memoplace/ui/add/view/addpage.dart';
@@ -8,8 +10,6 @@ import 'package:memoplace/ui/memo/view/memoapp.dart';
 import '../ui/login/view/loginpage.dart';
 
 final _key = GlobalKey<NavigatorState>();
-bool _isFirstLaunch = true;
-
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
@@ -17,7 +17,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   CustomTransitionPage<void> buildPageWithAnimation(Widget page) {
     return CustomTransitionPage<void>(
       child: page,
-      // transitionDuration: const Duration(milliseconds: 500),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return SlideTransition(
           position: animation.drive(
@@ -55,13 +54,21 @@ final routerProvider = Provider<GoRouter>((ref) {
           pageBuilder: (context, state) =>
               buildPageWithAnimation(const AddPage())),
       GoRoute(
+        path: EditPage.routeLocation,
+        name: EditPage.routeName,
+        builder: (context, state) {
+          final DocumentSnapshot document = state.extra as DocumentSnapshot;
+          return EditPage(document: document);
+        },
+      ),
+      GoRoute(
           name: 'licensepage',
           path: '/licensepage',
           pageBuilder: (context, state) =>
               buildPageWithAnimation(const LicensePage(
-                applicationName: 'MemoPlace', // アプリの名前
-                applicationVersion: '1.0.2', // バージョン
-                applicationLegalese: 'All rights reserved', // 著作権表示
+                applicationName: 'MemoPlace',
+                applicationVersion: '1.0.2',
+                applicationLegalese: 'All rights reserved',
               ))),
       GoRoute(
           path: SetGoogleMap.routeLocation,
@@ -91,18 +98,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLogingIn) {
         return isAuth ? MemoApp.routeLocation : LoginPage.routeLocation;
       }
-
-      // if (!isLogin && isAuth) {
-      //   return LoginPage.routeLocation;
-      // } else if (!isLogingIn && isAuth) {
-      //   return MemoApp.routeLocation;
-      // }
-      // }
-      // if (isLogin && !isAuth) {
-      //   return LoginPage.routeLocation;
-      // } else if (!isLogingIn && isAuth) {
-      //   return MemoApp.routeLocation;
-      // }
       return null;
     },
   );
