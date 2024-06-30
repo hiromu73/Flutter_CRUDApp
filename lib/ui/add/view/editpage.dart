@@ -6,9 +6,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
+import 'package:memoplace/ui/add/view/infodrawer.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
@@ -23,15 +23,18 @@ class EditPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final TextEditingController editController = useTextEditingController();
+
+    final initialText = "${document['text']}";
+    // ref.read(memoProvider.notifier).state = initialText;
+    final textController = useTextEditingController(text: initialText);
+    final previousLineCount = useRef(1);
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
         .where((marker) => marker.check == true)
         .toList();
-
     final editId = document.id;
     List<String> editText = document['text'].split(RegExp(r'[,\s]+'));
     final editCheckName = document['checkName'];
-    print(editText);
 
     List<String?> checkedMarkerNames =
         checkList.map((marker) => marker.name).toList();
@@ -45,21 +48,41 @@ class EditPage extends HookConsumerWidget {
     final textMemo = ref.watch(memoProvider);
     User? user = FirebaseAuth.instance.currentUser;
     final FocusNode focusNode = useFocusNode();
-    bool shouldDisplayContainer = editCheckName.isNotEmpty &&
-        editCheckName.any((name) => name != null && name.isNotEmpty);
+    bool shouldDisplayContainer = editCheckName != null;
+    // editCheckName.isNotEmpty &&
+    //     editCheckName.any((name) => name != null && name.isNotEmpty);
     Color baseColor = Colors.orange.shade100;
-    final Uri url = Uri.parse(
-        'https://six-entrance-6bc.notion.site/MemoPlace-edb72efeb04e4f478402670048de001e');
-    final Uri googleFromurl = Uri.parse(
-        'https://docs.google.com/forms/d/e/1FAIpQLSfGWcIVLPMoAI-YhooVh5GwOLftMWj9RzHFUwjagB0zkEYlsA/viewform?usp=sf_link');
-    final Uri kiyaku = Uri.parse(
-        'https://six-entrance-6bc.notion.site/bee86251f2614d959c66e7ef2372b306');
+    // final Uri url = Uri.parse(
+    //     'https://six-entrance-6bc.notion.site/MemoPlace-edb72efeb04e4f478402670048de001e');
+    // final Uri googleFromurl = Uri.parse(
+    //     'https://docs.google.com/forms/d/e/1FAIpQLSfGWcIVLPMoAI-YhooVh5GwOLftMWj9RzHFUwjagB0zkEYlsA/viewform?usp=sf_link');
+    // final Uri kiyaku = Uri.parse(
+    //     'https://six-entrance-6bc.notion.site/bee86251f2614d959c66e7ef2372b306');
+
+    final containerHeight = useState<double>(
+        '\n'.allMatches(textController.text).isEmpty
+            ? 60.0
+            : '\n'.allMatches(textController.text).length * 40);
+    useEffect(() {
+      void textListener() {
+        final currentLineCount =
+            '\n'.allMatches(textController.text).length + 1;
+        if (currentLineCount > previousLineCount.value) {
+          containerHeight.value += 20;
+        } else if (currentLineCount < previousLineCount.value) {
+          containerHeight.value -= 20;
+        }
+        previousLineCount.value = currentLineCount; // 現在の行数を保存
+      }
+
+      textController.addListener(textListener);
+      return () => textController.removeListener(textListener);
+    }, [textController]);
 
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      // SingleChildScrollViewさせる？
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -77,70 +100,8 @@ class EditPage extends HookConsumerWidget {
               }),
           backgroundColor: Theme.of(context).colorScheme.background,
         ),
-        endDrawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                ),
-                child: Center(child: Text("アプリについて")),
-              ),
-              ListTile(
-                  title: const Text('ログアウト'),
-                  onTap: () async {
-                    await FirebaseAuth.instance.signOut();
-                    if (context.mounted) {
-                      await context.push('/login');
-                    }
-                  }),
-              ListTile(
-                  title: const Text('アカウント削除'),
-                  onTap: () async {
-                    await deleteUser(user!.uid);
-                    if (context.mounted) {
-                      await context.push('/login');
-                    }
-                  }),
-              ListTile(
-                  title: const Text('プライバシーポリシー'),
-                  onTap: () async {
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
-                    } else {
-                      throw 'Could not Launch $url';
-                    }
-                  }),
-              ListTile(
-                  title: const Text('利用規約'),
-                  onTap: () async {
-                    if (await canLaunchUrl(kiyaku)) {
-                      await launchUrl(kiyaku);
-                    } else {
-                      throw 'Could not Launch $url';
-                    }
-                  }),
-              ListTile(
-                  title: const Text('ライセンス'),
-                  onTap: () async {
-                    await context.push('/licensepage');
-                  }),
-              ListTile(
-                  title: const Text('問い合わせ'),
-                  onTap: () async {
-                    if (await canLaunchUrl(googleFromurl)) {
-                      print("test");
-                      await launchUrl(googleFromurl);
-                    } else {
-                      print("test1");
-                      throw 'Could not Launch $googleFromurl';
-                    }
-                  }),
-              const ListTile(
-                title: Text('バージョン 1.0.2'),
-              ),
-            ],
-          ),
+        endDrawer: const Drawer(
+          child: InfoDrawer(),
         ),
         body: Center(
           child: SingleChildScrollView(
@@ -150,7 +111,7 @@ class EditPage extends HookConsumerWidget {
                 children: <Widget>[
                   SizedBox(height: MediaQuery.of(context).size.height / 12),
                   Container(
-                    height: 60,
+                    height: containerHeight.value,
                     width: 350,
                     decoration: BoxDecoration(
                       color: baseColor,
@@ -172,10 +133,11 @@ class EditPage extends HookConsumerWidget {
                     ),
                     child: TextFormField(
                       focusNode: focusNode,
-                      controller: editController,
+                      controller: textController,
                       maxLength: null,
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
+                      // initialValue:,
                       decoration: InputDecoration(
                         fillColor: Colors.orange.shade100,
                         filled: true,
@@ -193,52 +155,6 @@ class EditPage extends HookConsumerWidget {
                       onChanged: (String value) async {
                         ref.read(memoProvider.notifier).state = value;
                       },
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height / 20),
-                  Center(
-                    child: Column(
-                      children: [
-                        const Text(
-                          "登録されている内容",
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height / 33),
-                        Container(
-                          height: MediaQuery.of(context).size.height / 10,
-                          padding: const EdgeInsets.all(20.0),
-                          decoration: BoxDecoration(
-                            color: baseColor,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.orange.withOpacity(0.4),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(-3, -3),
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.6),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(3, 3),
-                              ),
-                            ],
-                          ),
-                          child: ListView.builder(
-                            itemCount: editText.length,
-                            itemBuilder: (context, index) {
-                              return Text(editText[index]);
-                            },
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                          ),
-                        )
-                      ],
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height / 16),
@@ -349,7 +265,6 @@ class EditPage extends HookConsumerWidget {
                                 child: ListView.builder(
                                   itemCount: editCheckName.length,
                                   itemBuilder: (context, index) {
-                                    // 削除ボタンを作っていく。
                                     return Text("・${editCheckName[index]!}");
                                   },
                                   shrinkWrap: true,
