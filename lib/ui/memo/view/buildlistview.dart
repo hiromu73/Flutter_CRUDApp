@@ -57,7 +57,6 @@ class BuildListView extends HookConsumerWidget {
                   SlidableAction(
                     onPressed: (context) async {
                       try {
-                        print(document.id);
                         context.push('/editpage', extra: document);
                       } catch (e) {
                         if (context.mounted) {

@@ -20,8 +20,7 @@ class AddPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController editController = useTextEditingController();
-    final textController = useTextEditingController();
+    final TextEditingController textController = useTextEditingController();
     final previousLineCount = useRef(1);
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
@@ -43,12 +42,6 @@ class AddPage extends HookConsumerWidget {
     bool shouldDisplayContainer = checkedMarkerNames.isNotEmpty &&
         checkedMarkerNames.any((name) => name != null && name.isNotEmpty);
     Color baseColor = Colors.orange.shade100;
-    final Uri url = Uri.parse(
-        'https://six-entrance-6bc.notion.site/MemoPlace-edb72efeb04e4f478402670048de001e');
-    final Uri googleFromurl = Uri.parse(
-        'https://docs.google.com/forms/d/e/1FAIpQLSfGWcIVLPMoAI-YhooVh5GwOLftMWj9RzHFUwjagB0zkEYlsA/viewform?usp=sf_link');
-    final Uri kiyaku = Uri.parse(
-        'https://six-entrance-6bc.notion.site/bee86251f2614d959c66e7ef2372b306');
 
     final containerHeight = useState<double>(60.0);
     useEffect(() {
@@ -380,7 +373,8 @@ class AddPage extends HookConsumerWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                           onPressed: () async {
-                            editController.clear();
+                            textController.clear();
+                            containerHeight.value = 60;
                             ref
                                 .read(autoCompleteSearchTypeProvider.notifier)
                                 .noneAutoCompleteSearch();

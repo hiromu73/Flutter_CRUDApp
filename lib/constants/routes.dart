@@ -57,6 +57,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: EditPage.routeLocation,
         name: EditPage.routeName,
         builder: (context, state) {
+          
           final DocumentSnapshot document = state.extra as DocumentSnapshot;
           return EditPage(document: document);
         },

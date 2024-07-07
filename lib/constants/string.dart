@@ -1,7 +1,8 @@
 const String memo = "内容を記載して下さい。";
-const String editMemo = "変更する内容を記載して下さい。";
+const String hintText = "変更する内容を記載して下さい。";
 const String positionSearch = "Search";
 const String registration = "登録";
+const String update = "更新";
 const String clear = "Clear";
 const String ok = "OK";
 const String no = "NO";

@@ -22,11 +22,9 @@ class EditPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController editController = useTextEditingController();
-
     final initialText = "${document['text']}";
-    // ref.read(memoProvider.notifier).state = initialText;
-    final textController = useTextEditingController(text: initialText);
+    final TextEditingController textController =
+        useTextEditingController(text: initialText);
     final previousLineCount = useRef(1);
     final checkList = ref
         .watch(autoCompleteSearchTypeProvider)
@@ -35,6 +33,10 @@ class EditPage extends HookConsumerWidget {
     final editId = document.id;
     List<String> editText = document['text'].split(RegExp(r'[,\s]+'));
     final editCheckName = document['checkName'];
+    print(editCheckName);
+    print(document['date']);
+    print(editId);
+    print(document['longitude']);
 
     List<String?> checkedMarkerNames =
         checkList.map((marker) => marker.name).toList();
@@ -49,20 +51,13 @@ class EditPage extends HookConsumerWidget {
     User? user = FirebaseAuth.instance.currentUser;
     final FocusNode focusNode = useFocusNode();
     bool shouldDisplayContainer = editCheckName != null;
-    // editCheckName.isNotEmpty &&
-    //     editCheckName.any((name) => name != null && name.isNotEmpty);
     Color baseColor = Colors.orange.shade100;
-    // final Uri url = Uri.parse(
-    //     'https://six-entrance-6bc.notion.site/MemoPlace-edb72efeb04e4f478402670048de001e');
-    // final Uri googleFromurl = Uri.parse(
-    //     'https://docs.google.com/forms/d/e/1FAIpQLSfGWcIVLPMoAI-YhooVh5GwOLftMWj9RzHFUwjagB0zkEYlsA/viewform?usp=sf_link');
-    // final Uri kiyaku = Uri.parse(
-    //     'https://six-entrance-6bc.notion.site/bee86251f2614d959c66e7ef2372b306');
 
     final containerHeight = useState<double>(
         '\n'.allMatches(textController.text).isEmpty
             ? 60.0
             : '\n'.allMatches(textController.text).length * 40);
+
     useEffect(() {
       void textListener() {
         final currentLineCount =
@@ -72,7 +67,7 @@ class EditPage extends HookConsumerWidget {
         } else if (currentLineCount < previousLineCount.value) {
           containerHeight.value -= 20;
         }
-        previousLineCount.value = currentLineCount; // 現在の行数を保存
+        previousLineCount.value = currentLineCount;
       }
 
       textController.addListener(textListener);
@@ -137,12 +132,11 @@ class EditPage extends HookConsumerWidget {
                       maxLength: null,
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
-                      // initialValue:,
                       decoration: InputDecoration(
                         fillColor: Colors.orange.shade100,
                         filled: true,
                         isDense: true,
-                        hintText: editMemo,
+                        hintText: hintText,
                         hintStyle: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w100),
                         prefixIcon: const Icon(Icons.create),
@@ -158,76 +152,76 @@ class EditPage extends HookConsumerWidget {
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height / 16),
-                  Container(
-                    height: 50,
-                    width: 100,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: baseColor,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.orange.withOpacity(0.4),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(3, 3),
-                        ),
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(-3, -3),
-                        ),
-                      ],
-                    ),
-                    child: TextButton(
-                        style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30))),
-                        child: const Text(
-                          positionSearch,
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onPressed: () async {
-                          final permission = await Geolocator.checkPermission();
-                          if ((permission == LocationPermission.always ||
-                                  permission ==
-                                      LocationPermission.whileInUse) &&
-                              context.mounted) {
-                            context.push('/setgooglemap');
-                          } else {
-                            if (context.mounted) {
-                              return showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      content: const Text(
-                                          "デバイスの位置情報が許可されていません。\n位置情報を許可することでマップを表示でき、プッシュ通知も行えます。"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            openAppSettings();
-                                          },
-                                          child: const Text("Setting"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            if (context.mounted) {
-                                              Navigator.pop(context);
-                                            }
-                                          },
-                                          child: const Text(ok),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            }
-                          }
-                        }),
-                  ),
+                  // Container(
+                  //   height: 50,
+                  //   width: 100,
+                  //   alignment: Alignment.center,
+                  //   decoration: BoxDecoration(
+                  //     color: baseColor,
+                  //     borderRadius: BorderRadius.circular(30),
+                  //     boxShadow: [
+                  //       BoxShadow(
+                  //         color: Colors.orange.withOpacity(0.4),
+                  //         spreadRadius: 5,
+                  //         blurRadius: 7,
+                  //         offset: const Offset(3, 3),
+                  //       ),
+                  //       BoxShadow(
+                  //         color: Colors.white.withOpacity(0.5),
+                  //         spreadRadius: 5,
+                  //         blurRadius: 7,
+                  //         offset: const Offset(-3, -3),
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   child: TextButton(
+                  //       style: ElevatedButton.styleFrom(
+                  //           shape: RoundedRectangleBorder(
+                  //               borderRadius: BorderRadius.circular(30))),
+                  //       child: const Text(
+                  //         positionSearch,
+                  //         style: TextStyle(
+                  //           color: Colors.orange,
+                  //           fontWeight: FontWeight.bold,
+                  //         ),
+                  //       ),
+                  //       onPressed: () async {
+                  //         final permission = await Geolocator.checkPermission();
+                  //         if ((permission == LocationPermission.always ||
+                  //                 permission ==
+                  //                     LocationPermission.whileInUse) &&
+                  //             context.mounted) {
+                  //           context.push('/setgooglemap');
+                  //         } else {
+                  //           if (context.mounted) {
+                  //             return showDialog(
+                  //                 context: context,
+                  //                 builder: (BuildContext context) {
+                  //                   return AlertDialog(
+                  //                     content: const Text(
+                  //                         "デバイスの位置情報が許可されていません。\n位置情報を許可することでマップを表示でき、プッシュ通知も行えます。"),
+                  //                     actions: [
+                  //                       TextButton(
+                  //                         onPressed: () {
+                  //                           openAppSettings();
+                  //                         },
+                  //                         child: const Text("Setting"),
+                  //                       ),
+                  //                       TextButton(
+                  //                         onPressed: () {
+                  //                           if (context.mounted) {
+                  //                             Navigator.pop(context);
+                  //                           }
+                  //                         },
+                  //                         child: const Text(ok),
+                  //                       ),
+                  //                     ],
+                  //                   );
+                  //                 });
+                  //           }
+                  //         }
+                  //       }),
+                  // ),
                   SizedBox(height: MediaQuery.of(context).size.height / 33),
                   Center(
                     child: Column(
@@ -307,7 +301,7 @@ class EditPage extends HookConsumerWidget {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30))),
                             child: const Text(
-                              registration,
+                              update,
                               style: TextStyle(
                                 fontSize: 15,
                                 color: Colors.orange,
@@ -315,31 +309,50 @@ class EditPage extends HookConsumerWidget {
                               ),
                             ),
                             onPressed: () async {
-                              if (textMemo != "") {
+                              if (textMemo != "" && textMemo != initialText) {
                                 final date =
                                     DateTime.now().toLocal().toIso8601String();
                                 await FirebaseFirestore.instance
                                     .collection('post')
                                     .doc(user!.uid)
                                     .collection('documents')
-                                    .add({
+                                    .doc(document.id)
+                                    .update({
                                   'text': textMemo,
-                                  'checkName': checkedMarkerNames.isNotEmpty
-                                      ? checkedMarkerNames
-                                      : null,
-                                  'latitude': checkedMarkerLatitudes.isNotEmpty
-                                      ? checkedMarkerLatitudes
-                                      : null,
-                                  'longitude':
-                                      checkedMarkerLongitudes.isNotEmpty
-                                          ? checkedMarkerLongitudes
-                                          : null,
+                                  //
+                                  // 'checkName': checkedMarkerNames.isNotEmpty
+                                  //     ? checkedMarkerNames
+                                  //     : null,
+                                  // 'latitude': checkedMarkerLatitudes.isNotEmpty
+                                  //     ? checkedMarkerLatitudes
+                                  //     : null,
+                                  // 'longitude':
+                                  //     checkedMarkerLongitudes.isNotEmpty
+                                  //         ? checkedMarkerLongitudes
+                                  //         : null,
                                   'date': date,
-                                  'alert': true,
+                                  // 'alert': true,
                                 });
                                 if (context.mounted) {
                                   context.go('/memolist');
                                 }
+                              } else if (textMemo == initialText ||
+                                  textMemo == "") {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: const Text(hintText),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(ok),
+                                          ),
+                                        ],
+                                      );
+                                    });
                               } else {
                                 showDialog(
                                     context: context,
@@ -386,10 +399,12 @@ class EditPage extends HookConsumerWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                           onPressed: () async {
-                            editController.clear();
-                            ref
-                                .read(autoCompleteSearchTypeProvider.notifier)
-                                .noneAutoCompleteSearch();
+                            containerHeight.value = 60;
+                            ref.read(memoProvider.notifier).state = "";
+                            textController.clear();
+                            // ref
+                            //     .read(autoCompleteSearchTypeProvider.notifier)
+                            //     .noneAutoCompleteSearch();
                           },
                           child: const Text(
                             clear,
@@ -408,24 +423,6 @@ class EditPage extends HookConsumerWidget {
             ),
           ),
         ),
-
-        // 今後つけたい機能？写真？カメラ？
-        // floatingActionButton: Row(
-        //   mainAxisAlignment: MainAxisAlignment.end,
-        //   children: [
-        //     FloatingActionButton(
-        //         heroTag: "hero2",
-        //         child: const Icon(Icons.photo),
-        //         onPressed: () => {}), //写真を選択して保存ができる。
-        //     const SizedBox(
-        //       width: 10,
-        //     ),
-        //     FloatingActionButton(
-        //         heroTag: "hero3",
-        //         child: const Icon(Icons.camera_alt_outlined), //カメラから撮って保存ができる。
-        //         onPressed: () => {}),
-        //   ],
-        // ),
       ),
     );
   }
