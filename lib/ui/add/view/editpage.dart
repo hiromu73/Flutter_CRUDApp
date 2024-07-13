@@ -319,19 +319,7 @@ class EditPage extends HookConsumerWidget {
                                     .doc(document.id)
                                     .update({
                                   'text': textMemo,
-                                  //
-                                  // 'checkName': checkedMarkerNames.isNotEmpty
-                                  //     ? checkedMarkerNames
-                                  //     : null,
-                                  // 'latitude': checkedMarkerLatitudes.isNotEmpty
-                                  //     ? checkedMarkerLatitudes
-                                  //     : null,
-                                  // 'longitude':
-                                  //     checkedMarkerLongitudes.isNotEmpty
-                                  //         ? checkedMarkerLongitudes
-                                  //         : null,
                                   'date': date,
-                                  // 'alert': true,
                                 });
                                 if (context.mounted) {
                                   context.go('/memolist');
@@ -399,12 +387,9 @@ class EditPage extends HookConsumerWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                           onPressed: () async {
+                            textController.clear();
                             containerHeight.value = 60;
                             ref.read(memoProvider.notifier).state = "";
-                            textController.clear();
-                            // ref
-                            //     .read(autoCompleteSearchTypeProvider.notifier)
-                            //     .noneAutoCompleteSearch();
                           },
                           child: const Text(
                             clear,

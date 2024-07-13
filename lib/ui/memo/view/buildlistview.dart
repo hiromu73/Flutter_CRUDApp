@@ -12,14 +12,12 @@ import 'package:permission_handler/permission_handler.dart';
 class BuildListView extends HookConsumerWidget {
   const BuildListView(this.query, BuildContext context, {super.key});
   final QuerySnapshot query;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int index = 0;
-    print("再ビルド確認");
-    // final userId = ref.watch(loginUserProvider);
     Color baseColor = Colors.orange.shade100;
     User? user = FirebaseAuth.instance.currentUser;
-
     return FutureBuilder(
       future: checkPermission(query, context),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -31,7 +29,7 @@ class BuildListView extends HookConsumerWidget {
             return Slidable(
               key: Key(document.id),
               startActionPane: ActionPane(
-                motion: const StretchMotion(),
+                motion: const DrawerMotion(),
                 children: [
                   SlidableAction(
                     onPressed: (BuildContext context) async {
@@ -354,6 +352,7 @@ class BuildListView extends HookConsumerWidget {
   }
 }
 
+// MemoListのアラームが全てOFFになっているかどうか確認
 Future<void> checkPermission(
     QuerySnapshot<Object?> query, BuildContext context) async {
   final permission = await Geolocator.checkPermission();
@@ -366,7 +365,6 @@ Future<void> checkPermission(
     });
 
     if (!hasActiveAlerts) {
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
       return showDialog(
         context: context,
         builder: (BuildContext context) {

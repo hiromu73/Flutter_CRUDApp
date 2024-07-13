@@ -39,6 +39,7 @@ class SetGoogleMap extends ConsumerWidget {
     // double currentLatitude = ref.watch(latitudeProvider);
     // double currentlongitudeProvider = ref.watch(longitudeProvider);
 
+    // 各マーカー情報
     Set<Marker> markers = Set<Marker>.of(selectItemeMakers.map((item) => Marker(
           markerId: MarkerId(item.uid),
           position: LatLng(item.latitude, item.longitude),
@@ -54,8 +55,8 @@ class SetGoogleMap extends ConsumerWidget {
             pageController.jumpToPage(index);
           },
         )));
-    print("mapビルド");
 
+    //
     CameraPosition initialCameraPosition = selectItemeMakers.isNotEmpty
         ? CameraPosition(
             target: LatLng(selectItemeMakers.first.latitude,
@@ -79,7 +80,21 @@ class SetGoogleMap extends ConsumerWidget {
     while (idList.any((id) => id == newId)) {
       newId = uuid.v4();
     }
-    idList.add(newId);
+
+    pageController.addListener(() {
+      int pageIndex = pageController.page!.toInt();
+      if (pageIndex >= 0 && pageIndex < selectItemeMakers.length) {
+        final item = selectItemeMakers[pageIndex];
+        _mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(item.latitude, item.longitude),
+              zoom: 15.0,
+            ),
+          ),
+        );
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
@@ -94,6 +109,7 @@ class SetGoogleMap extends ConsumerWidget {
           children: <Widget>[
             currentPositionFuture.maybeWhen(
               data: (data) => GoogleMap(
+                key: ValueKey(newId),
                 onMapCreated: (GoogleMapController controller) {
                   print("mapが作られた");
                   print(initialCameraPosition);

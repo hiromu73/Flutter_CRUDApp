@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:memoplace/ui/add/view/addpage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// 場所の検索ページ
+// InfoPage
 class InfoDrawer extends StatefulWidget {
   const InfoDrawer({super.key});
 

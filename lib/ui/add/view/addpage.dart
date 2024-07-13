@@ -49,11 +49,11 @@ class AddPage extends HookConsumerWidget {
         final currentLineCount =
             '\n'.allMatches(textController.text).length + 1;
         if (currentLineCount > previousLineCount.value) {
-          containerHeight.value += 20; // 行が増えた場合、高さを増やす
+          containerHeight.value += 20;
         } else if (currentLineCount < previousLineCount.value) {
-          containerHeight.value -= 20; // 行が減った場合、高さを減らす
+          containerHeight.value -= 20;
         }
-        previousLineCount.value = currentLineCount; // 現在の行数を保存
+        previousLineCount.value = currentLineCount;
       }
 
       textController.addListener(textListener);
@@ -115,31 +115,29 @@ class AddPage extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    child: Expanded(
-                      child: TextFormField(
-                        focusNode: focusNode,
-                        controller: textController,
-                        maxLength: null,
-                        maxLines: null,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          fillColor: Colors.orange.shade100,
-                          filled: true,
-                          isDense: true,
-                          hintText: memo,
-                          hintStyle: const TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w100),
-                          prefixIcon: const Icon(Icons.create),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(32),
-                            borderSide: BorderSide.none,
-                          ),
+                    child: TextFormField(
+                      focusNode: focusNode,
+                      controller: textController,
+                      maxLength: null,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        fillColor: Colors.orange.shade100,
+                        filled: true,
+                        isDense: true,
+                        hintText: memo,
+                        hintStyle: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w100),
+                        prefixIcon: const Icon(Icons.create),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(32),
+                          borderSide: BorderSide.none,
                         ),
-                        textAlign: TextAlign.left,
-                        onChanged: (String value) async {
-                          ref.read(memoProvider.notifier).state = value;
-                        },
                       ),
+                      textAlign: TextAlign.left,
+                      onChanged: (String value) async {
+                        ref.read(memoProvider.notifier).state = value;
+                      },
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height / 16),
@@ -441,11 +439,7 @@ Widget checkNames(List<String?> name) {
 
 Future deleteUser(String userId) async {
   final user = FirebaseAuth.instance.currentUser;
-  print(userId);
   await FirebaseFirestore.instance.collection('post').doc(userId).delete();
-
-  // ユーザーを削除
   await user?.delete();
   await FirebaseAuth.instance.signOut();
-  print('ユーザーを削除しました!');
 }
