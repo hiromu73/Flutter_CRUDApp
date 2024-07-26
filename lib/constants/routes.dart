@@ -13,7 +13,6 @@ final _key = GlobalKey<NavigatorState>();
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
-  // 遷移をアニメーションにする。pageBuilder
   CustomTransitionPage<void> buildPageWithAnimation(Widget page) {
     return CustomTransitionPage<void>(
       child: page,
@@ -57,7 +56,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: EditPage.routeLocation,
         name: EditPage.routeName,
         builder: (context, state) {
-          
           final DocumentSnapshot document = state.extra as DocumentSnapshot;
           return EditPage(document: document);
         },

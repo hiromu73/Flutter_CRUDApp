@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memoplace/ui/add/view/addpage.dart';
+import 'package:memoplace/ui/add/view/settingslanguage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // InfoPage
@@ -32,11 +33,19 @@ class _InfoDrawer extends State<InfoDrawer> {
           ),
           child: Center(child: Text("アプリについて")),
         ),
+        const SizedBox(
+            child: Center(
+                child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text("Language"),
+            SettingLanguagePage(),
+          ],
+        ))),
         ListTile(
             title: const Text('ログアウト'),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
-              // ログイン画面に遷移＋チャット画面を破棄
               if (context.mounted) {
                 await context.push('/login');
               }
