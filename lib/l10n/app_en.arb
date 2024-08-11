@@ -34,6 +34,6 @@
   "variety_stores":"Variety Stores",
   "cafe":"Cafe",
   "convenience_store":"Convenience Store",
-  "serachPosition" : "Location you want to search"
+  "serachPosition" : "Location you want to search",
   "push":"Have you forgotten?"
 }

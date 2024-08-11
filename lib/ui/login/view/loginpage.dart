@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/ui/login/view/authentication.dart';
 import 'package:memoplace/ui/login/view_model/anonymous_class.dart';
@@ -37,6 +38,26 @@ class LoginPage extends HookConsumerWidget {
     final h = MediaQuery.sizeOf(context).height;
     final authState = useState<User?>(FirebaseAuth.instance.currentUser);
     final isSignIn = ref.watch(isSignInProvider.notifier);
+    final googleLogin = GoogleSignIn(scopes: [
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ]);
+    // Googleを使ってサインイン
+    Future<UserCredential> signInWithGoogle() async {
+      // 認証フローのトリガー
+      final googleUser = await GoogleSignIn(scopes: [
+        'email',
+      ]).signIn();
+      // リクエストから、認証情報を取得
+      final googleAuth = await googleUser!.authentication;
+      // クレデンシャルを新しく作成
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      // サインインしたら、UserCredentialを返す
+      return FirebaseAuth.instance.signInWithCredential(credential);
+    }
 
     useEffect(() {
       final listener = FirebaseAuth.instance.authStateChanges().listen((user) {
@@ -99,10 +120,15 @@ class LoginPage extends HookConsumerWidget {
                   ),
                   padding: const EdgeInsets.all(10),
                   onPressed: () async {
-                    isSignIn.state = true;
-                    User? user =
-                        await Authentication.signInWithGoogle(context: context);
-                    isSignIn.state = false;
+                    try {
+                      final userCredential = await signInWithGoogle();
+                    } on FirebaseAuthException catch (e) {
+                      print('FirebaseAuthException');
+                      print('${e.code}');
+                    } on Exception catch (e) {
+                      print('Other Exception');
+                      print('${e.toString()}');
+                    }
                     if (context.mounted) {
                       await context.push('/');
                     }

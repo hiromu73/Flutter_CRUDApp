@@ -83,7 +83,7 @@ List<Widget> shopTiles(
       final index = entry.key;
       final place = entry.value;
       return Align(
-        alignment: const Alignment(-3.5, 0.1),
+        alignment: const Alignment(1.0, 1.0),
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),

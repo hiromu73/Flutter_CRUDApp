@@ -18,8 +18,6 @@
 // const String searchPermission =
 //     "デバイスが位置情報の許可がされていません。\n 位置情報を許可することでマップが表示でき、プッシュ通知も行えます。";
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 final Map<String, String> categoryList = {
   'スーパー': 'supermarket',
   'ドラッグストア': 'drugstore',
