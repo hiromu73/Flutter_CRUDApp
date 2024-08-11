@@ -8,6 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BuildListView extends HookConsumerWidget {
   const BuildListView(this.query, BuildContext context, {super.key});
@@ -50,7 +51,7 @@ class BuildListView extends HookConsumerWidget {
                     backgroundColor: const Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
                     icon: Icons.delete,
-                    label: 'Delete',
+                    label: AppLocalizations.of(context)!.delete,
                   ),
                   SlidableAction(
                     onPressed: (context) async {
@@ -65,7 +66,7 @@ class BuildListView extends HookConsumerWidget {
                     backgroundColor: const Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
                     icon: Icons.create,
-                    label: 'Edit',
+                    label: AppLocalizations.of(context)!.edit,
                   ),
                 ],
               ),
@@ -365,20 +366,23 @@ Future<void> checkPermission(
     });
 
     if (!hasActiveAlerts) {
+      final no = AppLocalizations.of(context)!.no;
+      final setting = AppLocalizations.of(context)!.setting;
+      final location_check = AppLocalizations.of(context)!.location_check;
       return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: const Text('通知ONが一件もありません\n位置情報OFFにしますか？'),
+            content: Text(location_check),
             actions: <Widget>[
               TextButton(
-                child: const Text('Setting'),
+                child: Text(setting),
                 onPressed: () {
                   openAppSettings();
                 },
               ),
               TextButton(
-                child: const Text('NO'),
+                child: Text(no),
                 onPressed: () {
                   if (context.mounted) {
                     Navigator.pop(context);

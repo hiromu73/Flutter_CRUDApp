@@ -9,6 +9,7 @@ import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/add/view/infodrawer.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // メモ内容の状態管理
 final memoProvider = StateProvider.autoDispose((ref) => "");
@@ -67,9 +68,9 @@ class AddPage extends HookConsumerWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text(
-            addPage,
-            style: TextStyle(color: Colors.black54),
+          title: Text(
+            AppLocalizations.of(context)!.addpage,
+            style: const TextStyle(color: Colors.black54),
           ),
           leading: IconButton(
               icon: const Icon(
@@ -125,7 +126,7 @@ class AddPage extends HookConsumerWidget {
                         fillColor: Colors.orange.shade100,
                         filled: true,
                         isDense: true,
-                        hintText: memo,
+                        hintText: AppLocalizations.of(context)!.description,
                         hintStyle: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w100),
                         prefixIcon: const Icon(Icons.create),
@@ -167,9 +168,9 @@ class AddPage extends HookConsumerWidget {
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30))),
-                        child: const Text(
-                          positionSearch,
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.search,
+                          style: const TextStyle(
                             color: Colors.orange,
                             fontWeight: FontWeight.bold,
                           ),
@@ -183,18 +184,24 @@ class AddPage extends HookConsumerWidget {
                             context.push('/setgooglemap');
                           } else {
                             if (context.mounted) {
+                              final alertDirlog =
+                                  AppLocalizations.of(context)!.alert_dirlog;
+                              final setting =
+                                  AppLocalizations.of(context)!.setting;
+                              final ok = AppLocalizations.of(context)!.ok;
                               return showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      content: const Text(
-                                          "デバイスの位置情報が許可されていません。\n位置情報を許可することでマップを表示でき、プッシュ通知も行えます。"),
+                                      content: Text(alertDirlog),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             openAppSettings();
                                           },
-                                          child: const Text("Setting"),
+                                          child: Text(
+                                            setting,
+                                          ),
                                         ),
                                         TextButton(
                                           onPressed: () {
@@ -202,7 +209,7 @@ class AddPage extends HookConsumerWidget {
                                               Navigator.pop(context);
                                             }
                                           },
-                                          child: const Text(ok),
+                                          child: Text(ok),
                                         ),
                                       ],
                                     );
@@ -215,9 +222,9 @@ class AddPage extends HookConsumerWidget {
                   Center(
                     child: Column(
                       children: [
-                        const Text(
-                          "選択されている位置情報",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.location_information,
+                          style: const TextStyle(
                             color: Colors.orange,
                             fontWeight: FontWeight.bold,
                           ),
@@ -291,9 +298,9 @@ class AddPage extends HookConsumerWidget {
                             style: TextButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30))),
-                            child: const Text(
-                              registration,
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.register,
+                              style: const TextStyle(
                                 fontSize: 15,
                                 color: Colors.orange,
                                 fontWeight: FontWeight.bold,
@@ -326,17 +333,20 @@ class AddPage extends HookConsumerWidget {
                                   context.go('/memolist');
                                 }
                               } else {
+                                final description =
+                                    AppLocalizations.of(context)!.description;
+                                final ok = AppLocalizations.of(context)!.ok;
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
-                                        content: const Text(memo),
+                                        content: Text(description),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: const Text(ok),
+                                            child: Text(ok),
                                           ),
                                         ],
                                       );
@@ -377,9 +387,9 @@ class AddPage extends HookConsumerWidget {
                                 .read(autoCompleteSearchTypeProvider.notifier)
                                 .noneAutoCompleteSearch();
                           },
-                          child: const Text(
-                            clear,
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.clear,
+                            style: const TextStyle(
                               fontSize: 15,
                               color: Colors.orange,
                               fontWeight: FontWeight.bold,

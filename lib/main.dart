@@ -6,6 +6,8 @@ import 'package:memoplace/constants/routes.dart';
 import 'package:memoplace/ui/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,10 +40,8 @@ class MyApp extends HookConsumerWidget {
       print("locale");
       print(locale);
       if (savedLanguageCode != null) {
-        useEffect(() {
-          locale = Locale(savedLanguageCode);
-          return null;
-        }, []);
+        locale = Locale(savedLanguageCode);
+        return null;
       }
     }
 
@@ -54,6 +54,7 @@ class MyApp extends HookConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
@@ -62,12 +63,9 @@ class MyApp extends HookConsumerWidget {
         Locale('ja', ''),
         Locale('en', ''),
         Locale('zh', ''),
-        Locale('ja', ''),
-        Locale('en', ''),
-        Locale('zh', ''),
-        Locale('ja', ''),
-        Locale('en', ''),
-        Locale('zh', ''),
+        // Locale('fr', ''),
+        // Locale('de', ''),
+        // Locale('ko', ''),
       ],
       title: 'MemoPlace',
       theme: ThemeData(

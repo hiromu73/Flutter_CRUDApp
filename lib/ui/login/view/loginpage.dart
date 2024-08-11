@@ -1,13 +1,20 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:memoplace/ui/login/view/authentication.dart';
 import 'package:memoplace/ui/login/view_model/anonymous_class.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 final userIdProvider = StateProvider<String>((ref) => "");
 final passwordProvider = StateProvider<bool>((ref) => true);
+final isSignInProvider = StateProvider<bool>((ref) => false);
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
@@ -29,6 +36,8 @@ class LoginPage extends HookConsumerWidget {
     final w = MediaQuery.sizeOf(context).width;
     final h = MediaQuery.sizeOf(context).height;
     final authState = useState<User?>(FirebaseAuth.instance.currentUser);
+    final isSignIn = ref.watch(isSignInProvider.notifier);
+
     useEffect(() {
       final listener = FirebaseAuth.instance.authStateChanges().listen((user) {
         authState.value = user;
@@ -80,6 +89,49 @@ class LoginPage extends HookConsumerWidget {
                             ),
                           )))),
               const SizedBox(height: 100),
+              Container(
+                height: 50,
+                child: SignInButton(
+                  Buttons.GoogleDark,
+                  elevation: 8.0,
+                  shape: const StadiumBorder(
+                    side: BorderSide.none,
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  onPressed: () async {
+                    isSignIn.state = true;
+                    User? user =
+                        await Authentication.signInWithGoogle(context: context);
+                    isSignIn.state = false;
+                    if (context.mounted) {
+                      await context.push('/');
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (Platform.isIOS)
+                Container(
+                  height: 50,
+                  child: SignInButton(
+                    Buttons.AppleDark,
+                    elevation: 8.0,
+                    shape: const StadiumBorder(
+                      side: BorderSide.none,
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    onPressed: () async {
+                      isSignIn.state = true;
+                      User? user = await Authentication.signInWithGoogle(
+                          context: context);
+
+                      isSignIn.state = false;
+                      if (context.mounted) {
+                        await context.push('/');
+                      }
+                    },
+                  ),
+                ),
               Form(
                 child: Container(
                   padding: const EdgeInsets.all(24),

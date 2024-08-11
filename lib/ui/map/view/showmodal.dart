@@ -1,20 +1,29 @@
-// 簡易検索モーダル
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+// 簡易検索モーダル
 class ShowModal extends ConsumerWidget {
   const ShowModal({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("簡易選択モーダル");
     final selectItem = ref.watch(selectItemsProvider);
     final currentPositionFuture = ref.watch(currentPositionProvider);
-    print(currentPositionFuture);
+
+    final Map<String, String> categoryList = {
+      AppLocalizations.of(context)!.supermarket: 'supermarket',
+      AppLocalizations.of(context)!.pharmacy: 'drugstore',
+      AppLocalizations.of(context)!.bookstore: 'book_store',
+      AppLocalizations.of(context)!.electronics_store: 'electronics_store',
+      AppLocalizations.of(context)!.variety_stores: 'home_goods_store',
+      AppLocalizations.of(context)!.cafe: 'cafe',
+      AppLocalizations.of(context)!.convenience_store: 'convenience_store',
+    };
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -124,7 +133,7 @@ class ShowModal extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
-                  child: const Text('Clear'),
+                  child: Text(AppLocalizations.of(context)!.clear),
                 ),
               ],
             ),

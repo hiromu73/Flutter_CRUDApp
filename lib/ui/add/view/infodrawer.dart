@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:memoplace/ui/add/view/addpage.dart';
 import 'package:memoplace/ui/add/view/settingslanguage.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // InfoPage
 class InfoDrawer extends StatefulWidget {
@@ -27,23 +28,25 @@ class _InfoDrawer extends State<InfoDrawer> {
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        const DrawerHeader(
-          decoration: BoxDecoration(
+        DrawerHeader(
+          decoration: const BoxDecoration(
             color: Colors.orange,
           ),
-          child: Center(child: Text("アプリについて")),
+          child:
+              Center(child: Text(AppLocalizations.of(context)!.about_this_App)),
         ),
-        const SizedBox(
-            child: Center(
-                child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text("Language"),
-            SettingLanguagePage(),
-          ],
-        ))),
+        // 多言語化対応
+        // SizedBox(
+        //     child: Center(
+        //         child: Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //   children: [
+        //     Text(AppLocalizations.of(context)!.language),
+        //     const SettingLanguagePage(),
+        //   ],
+        // ))),
         ListTile(
-            title: const Text('ログアウト'),
+            title: Text(AppLocalizations.of(context)!.logout),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
               if (context.mounted) {
@@ -51,7 +54,7 @@ class _InfoDrawer extends State<InfoDrawer> {
               }
             }),
         ListTile(
-            title: const Text('アカウント削除'),
+            title: Text(AppLocalizations.of(context)!.account),
             onTap: () async {
               await deleteUser(user!.uid);
               if (context.mounted) {
@@ -59,7 +62,7 @@ class _InfoDrawer extends State<InfoDrawer> {
               }
             }),
         ListTile(
-            title: const Text('プライバシーポリシー'),
+            title: Text(AppLocalizations.of(context)!.privacypolicy),
             onTap: () async {
               if (await canLaunchUrl(url)) {
                 await launchUrl(url);
@@ -68,7 +71,7 @@ class _InfoDrawer extends State<InfoDrawer> {
               }
             }),
         ListTile(
-            title: const Text('利用規約'),
+            title: Text(AppLocalizations.of(context)!.rules),
             onTap: () async {
               if (await canLaunchUrl(kiyaku)) {
                 await launchUrl(kiyaku);
@@ -77,23 +80,21 @@ class _InfoDrawer extends State<InfoDrawer> {
               }
             }),
         ListTile(
-            title: const Text('ライセンス'),
+            title: Text(AppLocalizations.of(context)!.license),
             onTap: () async {
               await context.push('/licensepage');
             }),
         ListTile(
-            title: const Text('問い合わせ'),
+            title: Text(AppLocalizations.of(context)!.inquiry),
             onTap: () async {
               if (await canLaunchUrl(googleFromurl)) {
-                print("test");
                 await launchUrl(googleFromurl);
               } else {
-                print("test1");
                 throw 'Could not Launch $googleFromurl';
               }
             }),
-        const ListTile(
-          title: Text('バージョン 1.0.2'),
+        ListTile(
+          title: Text('${AppLocalizations.of(context)!.version}1.0.2'),
         ),
       ],
     );

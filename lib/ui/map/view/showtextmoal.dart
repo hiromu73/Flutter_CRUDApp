@@ -8,6 +8,7 @@ import 'package:memoplace/ui/map/view_model/autocomplete_search.dart';
 import 'package:memoplace/ui/map/view_model/autocomplete_search_type.dart';
 import 'package:memoplace/ui/map/view_model/latitude.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ShowTextModal extends ConsumerWidget {
   final TextEditingController textController = TextEditingController();
@@ -39,7 +40,7 @@ class ShowTextModal extends ConsumerWidget {
                           color: Colors.grey,
                           size: 20,
                         ),
-                        hintText: "検索したい場所",
+                        hintText: AppLocalizations.of(context)!.location_search,
                         hintStyle: const TextStyle(
                           color: Colors.grey,
                         ),
@@ -133,7 +134,7 @@ class ShowTextModal extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
-                  child: const Text(serach),
+                  child: Text(AppLocalizations.of(context)!.search),
                 ),
                 const SizedBox(width: 50),
                 ElevatedButton(
@@ -146,7 +147,7 @@ class ShowTextModal extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30))),
-                    child: const Text(clear))
+                    child: Text(AppLocalizations.of(context)!.clear))
               ],
             )
           ],

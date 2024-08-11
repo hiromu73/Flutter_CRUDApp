@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/memo/view/memolist.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // メモの一覧を表示
 class MemoApp extends HookConsumerWidget {
@@ -17,14 +18,14 @@ class MemoApp extends HookConsumerWidget {
   static String get routeName => 'memolist';
   static String get routeLocation => '/$routeName';
 
-  Future<void> pushMessage(text) async {
+  Future<void> pushMessage(text,context) async {
     HttpsCallable callable =
         FirebaseFunctions.instanceFor(region: 'asia-northeast1')
             .httpsCallable('pushTalk');
     final fcm = FirebaseMessaging.instance;
     final token = await fcm.getToken();
     final resp = await callable
-        .call({'title': '忘れてないですか？', 'body': '$text', 'token': token});
+        .call({'title': AppLocalizations.of(context)!.supermarket, 'body': '$text', 'token': token});
     final data = resp.data;
     print("result: $data");
   }
@@ -207,8 +208,7 @@ class MemoApp extends HookConsumerWidget {
                 double.parse(latitude[i].toString()),
                 double.parse(longiLang[i].toString()));
             if (distanceInMeters < 100) {
-              print("distanceInMeters < 100になったのでプッシュ通知します。");
-              await pushMessage(text[i]);
+              await pushMessage(text[i],context);
             }
           }
         });

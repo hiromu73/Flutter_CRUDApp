@@ -3,6 +3,7 @@ import 'package:memoplace/api.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:google_place/google_place.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // 場所の検索ページ
 class SerachPage extends StatefulWidget {
@@ -74,7 +75,7 @@ class _SerachPage extends State<SerachPage> with WidgetsBindingObserver {
                                 // Navigator.pop(context);
                               },
                             ),
-                            hintText: serachPosition,
+                            hintText: AppLocalizations.of(context)!.serachPosition,
                             hintStyle: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w100),
                           ),

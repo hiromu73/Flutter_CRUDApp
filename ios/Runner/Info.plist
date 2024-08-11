@@ -64,6 +64,15 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<key>CFBundleTypeRole</key>
+		<string>Editor</string>
+		<key>CFBundleURLSchemes</key>
+		<array>
+			<string>com.googleusercontent.apps.754083471312-hbgrtr90stuq0fsp0rbv4vlokfl56gn9</string>
+		</array>
+	</array>
 	<false/>
 </dict>
 </plist>

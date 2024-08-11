@@ -25,22 +25,22 @@ class SettingLanguagePage extends HookConsumerWidget {
           value: 'zh',
           child: Text('Chinese'),
         ),
-        DropdownMenuItem(
-          value: 'ko',
-          child: Text('Korean'),
-        ),
-        DropdownMenuItem(
-          value: 'de',
-          child: Text('German'),
-        ),
-        DropdownMenuItem(
-          value: 'fr',
-          child: Text('French'),
-        ),
-        DropdownMenuItem(
-          value: 'es',
-          child: Text('Spanish'),
-        ),
+        // DropdownMenuItem(
+        //   value: 'ko',
+        //   child: Text('Korean'),
+        // ),
+        // DropdownMenuItem(
+        //   value: 'de',
+        //   child: Text('German'),
+        // ),
+        // DropdownMenuItem(
+        //   value: 'fr',
+        //   child: Text('French'),
+        // ),
+        // DropdownMenuItem(
+        //   value: 'es',
+        //   child: Text('Spanish'),
+        // ),
       ],
       value: isSelectedValue.value,
       onChanged: (Object? language) {

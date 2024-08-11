@@ -1,6 +1,25 @@
 {
   "@@locale":"fr",
   "title":"MemoPlace",
-  "ratethisapp": "このアプリをレビューする",
-  "privacypolicy": "Politique de confidentialité."
+  "description":"Contenu",
+  "register": "registre",
+  "please_description":"Veuillez décrire le contenu",
+  "search":"Recherche",
+  "location_information":"Informations sur l'emplacement",
+  "about_this_App":"à propos de cette application",
+  "logout":"Déconnexion",
+  "account":"Suppression de compte",
+  "privacypolicy": "Politique de confidentialité",
+  "rules": "Conditions d'utilisation",
+  "license": "License",
+  "inquiry": "enquête",
+  "version": "version1.0.2",
+  "location_search":"Recherche de lieux",
+  "supermarket":"Supermarché",
+  "pharmacy":"Pharmacie",
+  "bookstore":"librairie",
+  "electronics_store":"magasin d'électronique",
+  "sundries":"articles divers",
+  "cafe":"café",
+  "convenience_store":"magasin de proximité"
 }

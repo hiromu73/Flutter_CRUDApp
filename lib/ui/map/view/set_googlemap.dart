@@ -13,6 +13,7 @@ import 'package:memoplace/ui/map/view_model/longitude.dart';
 import 'package:memoplace/ui/map/view_model/select_item.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 final googleMapControllerProvider =
     StateNotifierProvider<GoogleMapControllerNotifier, GoogleMapController?>(
@@ -189,7 +190,7 @@ class SetGoogleMap extends ConsumerWidget {
                         color: Colors.grey,
                         size: 20,
                       ),
-                      hintText: "検索したい場所",
+                      hintText: AppLocalizations.of(context)!.location_search,
                       hintStyle: const TextStyle(
                         color: Colors.grey,
                       ),

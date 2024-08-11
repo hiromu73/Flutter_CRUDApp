@@ -20,7 +20,7 @@ class MemoList extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     User? user = FirebaseAuth.instance.currentUser;
     final AsyncValue<QuerySnapshot> userCollection;
-    
+
     if (user != null) {
       userCollection = ref.watch(userCollectionProvider(user.uid));
     } else {

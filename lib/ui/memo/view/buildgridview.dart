@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/constants/string.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BuildGridView extends HookConsumerWidget {
   const BuildGridView(this.query, BuildContext context, {super.key});
@@ -105,7 +106,9 @@ class BuildGridView extends HookConsumerWidget {
                                       context: context,
                                       builder: (context) {
                                         return CupertinoAlertDialog(
-                                          title: const Text(deleteMemo),
+                                          title: Text(AppLocalizations.of(
+                                                  context)!
+                                              .deleteMemo),
                                           actions: [
                                             CupertinoDialogAction(
                                                 isDefaultAction: true,
@@ -128,9 +131,13 @@ class BuildGridView extends HookConsumerWidget {
                                                     }
                                                   }
                                                 },
-                                                child: const Text(ok)),
+                                                child: Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .ok)),
                                             CupertinoDialogAction(
-                                                child: const Text(no),
+                                                child: Text(AppLocalizations.of(
+                                                            context)!.no),
                                                 onPressed: () {
                                                   Navigator.pop(context);
                                                 }),
