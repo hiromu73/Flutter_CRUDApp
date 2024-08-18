@@ -10,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoplace/ui/login/view/authentication.dart';
 import 'package:memoplace/ui/login/view_model/anonymous_class.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
+import 'package:memoplace/widgets/custom_buttom.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 
@@ -57,6 +58,71 @@ class LoginPage extends HookConsumerWidget {
       );
       // サインインしたら、UserCredentialを返す
       return FirebaseAuth.instance.signInWithCredential(credential);
+    }
+
+    void newGetAcount() async {
+      try {
+        final FirebaseAuth auth = FirebaseAuth.instance;
+        final result = await auth.createUserWithEmailAndPassword(
+          email: email.value,
+          password: password.value,
+        );
+        ref.read(loginUserProvider.notifier).setLoginUser(result.user!.uid);
+        final uid = ref.watch(loginUserProvider);
+        ref.read(userIdProvider.notifier).state = uid;
+        if (context.mounted) {
+          await context.push('/');
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          infoText.value = "passwordは6桁以上にして下さい";
+        } else if (e.code == 'email-already-in-use') {
+          infoText.value = 'このメールアドレスは既に登録されています。';
+        } else {
+          infoText.value = 'e-mailまたはpasswordが誤っています';
+        }
+      } catch (e) {
+        infoText.value = 'アカウント登録できませんでした。';
+      }
+    }
+
+    void login() async {
+      try {
+        final FirebaseAuth auth = FirebaseAuth.instance;
+        final result = await auth.signInWithEmailAndPassword(
+          email: email.value,
+          password: password.value,
+        );
+        await ref
+            .read(loginUserProvider.notifier)
+            .setLoginUser(result.user!.uid);
+        final uid = ref.watch(loginUserProvider);
+        ref.read(userIdProvider.notifier).state = uid;
+        if (context.mounted) {
+          await context.push('/memolist');
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'invalid-email') {
+          infoText.value = 'e-mailが誤っています';
+        } else if (e.code == 'wrong-password') {
+          infoText.value = 'passwordが誤っています';
+        } else if (e.code == 'user-not-found') {
+          infoText.value = 'ユーザーが存在しません';
+        }
+      } catch (e) {
+        infoText.value = 'ログインできませんでした';
+      }
+    }
+
+    void testLogin() async {
+      await ref.read(anonymousClassProvider.notifier).state.signInAnonymous();
+      User? user = FirebaseAuth.instance.currentUser;
+      await ref.read(loginUserProvider.notifier).setLoginUser(user!.uid);
+      final uid = ref.watch(loginUserProvider);
+      ref.read(userIdProvider.notifier).state = uid;
+      if (context.mounted) {
+        await context.push('/memolist');
+      }
     }
 
     useEffect(() {
@@ -303,200 +369,224 @@ class LoginPage extends HookConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
+                          CustomButton(
+                              width: 100,
+                              height: 40,
                               color: baseColor,
-                              child: Center(
-                                  child: Container(
-                                height: 40,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  color: baseColor,
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.orange.withOpacity(0.4),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(3, 3),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.white.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(-3, -3),
-                                    ),
-                                  ],
-                                ),
-                                child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.orange.shade100,
-                                    ),
-                                    child: const Text(
-                                      '登録',
-                                      style: TextStyle(
-                                        color: Colors.orange,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      try {
-                                        final FirebaseAuth auth =
-                                            FirebaseAuth.instance;
-                                        final result = await auth
-                                            .createUserWithEmailAndPassword(
-                                          email: email.value,
-                                          password: password.value,
-                                        );
-                                        ref
-                                            .read(loginUserProvider.notifier)
-                                            .setLoginUser(result.user!.uid);
-                                        final uid =
-                                            ref.watch(loginUserProvider);
-                                        ref
-                                            .read(userIdProvider.notifier)
-                                            .state = uid;
-                                        if (context.mounted) {
-                                          await context.push('/');
-                                        }
-                                      } on FirebaseAuthException catch (e) {
-                                        if (e.code == 'weak-password') {
-                                          infoText.value =
-                                              "passwordは6桁以上にして下さい";
-                                        } else if (e.code ==
-                                            'email-already-in-use') {
-                                          infoText.value =
-                                              'このメールアドレスは既に登録されています。';
-                                        } else {
-                                          infoText.value =
-                                              'e-mailまたはpasswordが誤っています';
-                                        }
-                                      } catch (e) {
-                                        infoText.value = 'アカウント登録できませんでした。';
-                                      }
-                                    }),
-                              ))),
-                          Container(
+                              text: "登録",
+                              onPressd: () async {
+                                newGetAcount();
+                              }),
+                          CustomButton(
+                              width: 100,
+                              height: 40,
                               color: baseColor,
-                              child: Center(
-                                  child: Container(
-                                height: 40,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  color: baseColor,
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.orange.withOpacity(0.4),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(3, 3),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.white.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(-3, -3),
-                                    ),
-                                  ],
-                                ),
-                                child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.orange.shade100,
-                                  ),
-                                  child: const Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    try {
-                                      final FirebaseAuth auth =
-                                          FirebaseAuth.instance;
-                                      final result =
-                                          await auth.signInWithEmailAndPassword(
-                                        email: email.value,
-                                        password: password.value,
-                                      );
-                                      await ref
-                                          .read(loginUserProvider.notifier)
-                                          .setLoginUser(result.user!.uid);
-                                      final uid = ref.watch(loginUserProvider);
-                                      ref.read(userIdProvider.notifier).state =
-                                          uid;
-                                      if (context.mounted) {
-                                        await context.push('/memolist');
-                                      }
-                                    } on FirebaseAuthException catch (e) {
-                                      if (e.code == 'invalid-email') {
-                                        infoText.value = 'e-mailが誤っています';
-                                      } else if (e.code == 'wrong-password') {
-                                        infoText.value = 'passwordが誤っています';
-                                      } else if (e.code == 'user-not-found') {
-                                        infoText.value = 'ユーザーが存在しません';
-                                      }
-                                    } catch (e) {
-                                      infoText.value = 'ログインできませんでした';
-                                    }
-                                  },
-                                ),
-                              ))),
+                              text: "Login",
+                              onPressd: () async {
+                                login();
+                              })
+                          // Container(
+                          //     color: baseColor,
+                          //     child: Center(
+                          //         child: Container(
+                          //       height: 40,
+                          //       width: 100,
+                          //       decoration: BoxDecoration(
+                          //         color: baseColor,
+                          //         borderRadius: BorderRadius.circular(30),
+                          //         boxShadow: [
+                          //           BoxShadow(
+                          //             color: Colors.orange.withOpacity(0.4),
+                          //             spreadRadius: 5,
+                          //             blurRadius: 7,
+                          //             offset: const Offset(3, 3),
+                          //           ),
+                          //           BoxShadow(
+                          //             color: Colors.white.withOpacity(0.5),
+                          //             spreadRadius: 5,
+                          //             blurRadius: 7,
+                          //             offset: const Offset(-3, -3),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //       child: TextButton(
+                          //           style: TextButton.styleFrom(
+                          //             backgroundColor: Colors.orange.shade100,
+                          //           ),
+                          //           child: const Text(
+                          //             '登録',
+                          //             style: TextStyle(
+                          //               color: Colors.orange,
+                          //               fontWeight: FontWeight.bold,
+                          //             ),
+                          //           ),
+                          //           onPressed: () async {
+                          //             try {
+                          //               final FirebaseAuth auth =
+                          //                   FirebaseAuth.instance;
+                          //               final result = await auth
+                          //                   .createUserWithEmailAndPassword(
+                          //                 email: email.value,
+                          //                 password: password.value,
+                          //               );
+                          //               ref
+                          //                   .read(loginUserProvider.notifier)
+                          //                   .setLoginUser(result.user!.uid);
+                          //               final uid =
+                          //                   ref.watch(loginUserProvider);
+                          //               ref
+                          //                   .read(userIdProvider.notifier)
+                          //                   .state = uid;
+                          //               if (context.mounted) {
+                          //                 await context.push('/');
+                          //               }
+                          //             } on FirebaseAuthException catch (e) {
+                          //               if (e.code == 'weak-password') {
+                          //                 infoText.value =
+                          //                     "passwordは6桁以上にして下さい";
+                          //               } else if (e.code ==
+                          //                   'email-already-in-use') {
+                          //                 infoText.value =
+                          //                     'このメールアドレスは既に登録されています。';
+                          //               } else {
+                          //                 infoText.value =
+                          //                     'e-mailまたはpasswordが誤っています';
+                          //               }
+                          //             } catch (e) {
+                          //               infoText.value = 'アカウント登録できませんでした。';
+                          //             }
+                          //           }),
+                          //     ))),
+                          // Container(
+                          //     color: baseColor,
+                          //     child: Center(
+                          //         child: Container(
+                          //       height: 40,
+                          //       width: 100,
+                          //       decoration: BoxDecoration(
+                          //         color: baseColor,
+                          //         borderRadius: BorderRadius.circular(30),
+                          //         boxShadow: [
+                          //           BoxShadow(
+                          //             color: Colors.orange.withOpacity(0.4),
+                          //             spreadRadius: 5,
+                          //             blurRadius: 7,
+                          //             offset: const Offset(3, 3),
+                          //           ),
+                          //           BoxShadow(
+                          //             color: Colors.white.withOpacity(0.5),
+                          //             spreadRadius: 5,
+                          //             blurRadius: 7,
+                          //             offset: const Offset(-3, -3),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //       child: TextButton(
+                          //         style: TextButton.styleFrom(
+                          //           backgroundColor: Colors.orange.shade100,
+                          //         ),
+                          //         child: const Text(
+                          //           'Login',
+                          //           style: TextStyle(
+                          //             color: Colors.orange,
+                          //             fontWeight: FontWeight.bold,
+                          //           ),
+                          //         ),
+                          //         onPressed: () async {
+                          //           try {
+                          //             final FirebaseAuth auth =
+                          //                 FirebaseAuth.instance;
+                          //             final result =
+                          //                 await auth.signInWithEmailAndPassword(
+                          //               email: email.value,
+                          //               password: password.value,
+                          //             );
+                          //             await ref
+                          //                 .read(loginUserProvider.notifier)
+                          //                 .setLoginUser(result.user!.uid);
+                          //             final uid = ref.watch(loginUserProvider);
+                          //             ref.read(userIdProvider.notifier).state =
+                          //                 uid;
+                          //             if (context.mounted) {
+                          //               await context.push('/memolist');
+                          //             }
+                          //           } on FirebaseAuthException catch (e) {
+                          //             if (e.code == 'invalid-email') {
+                          //               infoText.value = 'e-mailが誤っています';
+                          //             } else if (e.code == 'wrong-password') {
+                          //               infoText.value = 'passwordが誤っています';
+                          //             } else if (e.code == 'user-not-found') {
+                          //               infoText.value = 'ユーザーが存在しません';
+                          //             }
+                          //           } catch (e) {
+                          //             infoText.value = 'ログインできませんでした';
+                          //           }
+                          //         },
+                          //       ),
+                          //     ))),
                         ],
                       ),
                       const SizedBox(height: 40),
-                      Container(
+                      CustomButton(
+                          width: 140,
+                          height: 40,
                           color: baseColor,
-                          child: Center(
-                              child: Container(
-                            height: 40,
-                            width: 140,
-                            decoration: BoxDecoration(
-                              color: baseColor,
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.orange.withOpacity(0.4),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(3, 3),
-                                ),
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(-3, -3),
-                                ),
-                              ],
-                            ),
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.orange.shade100,
-                              ),
-                              onPressed: () async {
-                                await ref
-                                    .read(anonymousClassProvider.notifier)
-                                    .state
-                                    .signInAnonymous();
-                                User? user = FirebaseAuth.instance.currentUser;
-                                await ref
-                                    .read(loginUserProvider.notifier)
-                                    .setLoginUser(user!.uid);
-                                final uid = ref.watch(loginUserProvider);
-                                ref.read(userIdProvider.notifier).state = uid;
-                                if (context.mounted) {
-                                  await context.push('/memolist');
-                                }
-                              },
-                              child: const Text(
-                                "登録せずに利用",
-                                style: TextStyle(
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ))),
+                          text: "登録せずに利用",
+                          onPressd: () async {
+                            testLogin();
+                          })
+                      // Container(
+                      //     color: baseColor,
+                      //     child: Center(
+                      //         child: Container(
+                      //       height: 40,
+                      //       width: 140,
+                      //       decoration: BoxDecoration(
+                      //         color: baseColor,
+                      //         borderRadius: BorderRadius.circular(30),
+                      //         boxShadow: [
+                      //           BoxShadow(
+                      //             color: Colors.orange.withOpacity(0.4),
+                      //             spreadRadius: 5,
+                      //             blurRadius: 7,
+                      //             offset: const Offset(3, 3),
+                      //           ),
+                      //           BoxShadow(
+                      //             color: Colors.white.withOpacity(0.5),
+                      //             spreadRadius: 5,
+                      //             blurRadius: 7,
+                      //             offset: const Offset(-3, -3),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       child: TextButton(
+                      //         style: TextButton.styleFrom(
+                      //           backgroundColor: Colors.orange.shade100,
+                      //         ),
+                      //         onPressed: () async {
+                      // await ref
+                      //     .read(anonymousClassProvider.notifier)
+                      //     .state
+                      //     .signInAnonymous();
+                      // User? user = FirebaseAuth.instance.currentUser;
+                      // await ref
+                      //     .read(loginUserProvider.notifier)
+                      //     .setLoginUser(user!.uid);
+                      // final uid = ref.watch(loginUserProvider);
+                      // ref.read(userIdProvider.notifier).state = uid;
+                      // if (context.mounted) {
+                      //   await context.push('/memolist');
+                      // }
+                      //         },
+                      //         child: const Text(
+                      //           "登録せずに利用",
+                      //           style: TextStyle(
+                      //             color: Colors.orange,
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ))),
                     ],
                   ),
                 ),
