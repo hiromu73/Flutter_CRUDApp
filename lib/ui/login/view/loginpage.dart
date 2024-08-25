@@ -1,18 +1,13 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:memoplace/ui/login/view/authentication.dart';
 import 'package:memoplace/ui/login/view_model/anonymous_class.dart';
 import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/widgets/custom_buttom.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 final userIdProvider = StateProvider<String>((ref) => "");
 final passwordProvider = StateProvider<bool>((ref) => true);
@@ -43,6 +38,7 @@ class LoginPage extends HookConsumerWidget {
       'email',
       'https://www.googleapis.com/auth/contacts.readonly',
     ]);
+
     // Googleを使ってサインイン
     Future<UserCredential> signInWithGoogle() async {
       // 認証フローのトリガー
@@ -141,12 +137,12 @@ class LoginPage extends HookConsumerWidget {
         body: Center(
           child: Column(
             children: [
-              const SizedBox(height: 100),
+              SizedBox(height: h * 0.15),
               Container(
                   color: baseColor,
                   child: Center(
                       child: Container(
-                          height: 60,
+                          height: h * 0.06,
                           width: 300,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -175,55 +171,28 @@ class LoginPage extends HookConsumerWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           )))),
-              const SizedBox(height: 100),
-              Container(
-                height: 50,
-                child: SignInButton(
-                  Buttons.GoogleDark,
-                  elevation: 8.0,
-                  shape: const StadiumBorder(
-                    side: BorderSide.none,
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  onPressed: () async {
-                    try {
-                      final userCredential = await signInWithGoogle();
-                    } on FirebaseAuthException catch (e) {
-                      print('FirebaseAuthException');
-                      print('${e.code}');
-                    } on Exception catch (e) {
-                      print('Other Exception');
-                      print('${e.toString()}');
-                    }
-                    if (context.mounted) {
-                      await context.push('/');
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 10),
+              SizedBox(height: h * 0.1),
+              CustomButton(
+                  width: w * 0.7,
+                  height: h * 0.07,
+                  color: baseColor,
+                  text: "Sing in with Google",
+                  iconSVG: 'assets/icon/google_icon.svg',
+                  onPressd: () async {
+                    newGetAcount();
+                  }),
+              SizedBox(height: h * 0.03),
               if (Platform.isIOS)
-                Container(
-                  height: 50,
-                  child: SignInButton(
-                    Buttons.AppleDark,
-                    elevation: 8.0,
-                    shape: const StadiumBorder(
-                      side: BorderSide.none,
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    onPressed: () async {
-                      isSignIn.state = true;
-                      User? user = await Authentication.signInWithGoogle(
-                          context: context);
-
-                      isSignIn.state = false;
-                      if (context.mounted) {
-                        await context.push('/');
-                      }
-                    },
-                  ),
-                ),
+                CustomButton(
+                    width: w * 0.7,
+                    height: h * 0.07,
+                    color: baseColor,
+                    text: "Sing in with Apple",
+                    iconSVG: 'assets/icon/apple_icon.svg',
+                    onPressd: () async {
+                      newGetAcount();
+                    }),
+              SizedBox(height: h * 0.02),
               Form(
                 child: Container(
                   padding: const EdgeInsets.all(24),
@@ -292,7 +261,7 @@ class LoginPage extends HookConsumerWidget {
                               },
                             ),
                           ))),
-                      const SizedBox(height: 30),
+                      SizedBox(height: h * 0.03),
                       Container(
                           color: baseColor,
                           child: Center(
@@ -362,6 +331,7 @@ class LoginPage extends HookConsumerWidget {
                               },
                             ),
                           ))),
+
                       Container(
                         padding: const EdgeInsets.all(20),
                         child: Text(infoText.value),
@@ -370,16 +340,16 @@ class LoginPage extends HookConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           CustomButton(
-                              width: 100,
-                              height: 40,
+                              width: w * 0.3,
+                              height: h * 0.05,
                               color: baseColor,
                               text: "登録",
                               onPressd: () async {
                                 newGetAcount();
                               }),
                           CustomButton(
-                              width: 100,
-                              height: 40,
+                              width: w * 0.3,
+                              height: h * 0.05,
                               color: baseColor,
                               text: "Login",
                               onPressd: () async {
@@ -526,10 +496,10 @@ class LoginPage extends HookConsumerWidget {
                           //     ))),
                         ],
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: h * 0.06),
                       CustomButton(
-                          width: 140,
-                          height: 40,
+                          width: w * 0.4,
+                          height: h * 0.05,
                           color: baseColor,
                           text: "登録せずに利用",
                           onPressd: () async {
