@@ -6,7 +6,7 @@ class CustomButton extends HookConsumerWidget {
   final double width;
   final double height;
   final Color color;
-  final String text;
+  final String? text;
   final double elevation;
   final Function()? onPressd;
   final String? iconSVG;
@@ -15,7 +15,7 @@ class CustomButton extends HookConsumerWidget {
     required this.width,
     required this.height,
     required this.color,
-    required this.text,
+    this.text,
     required this.onPressd,
     this.elevation = 6.0,
     this.iconSVG,
@@ -56,15 +56,23 @@ class CustomButton extends HookConsumerWidget {
                 ),
                 child: Stack(
                   children: [
-                    Center(
-                      child: Text(
-                        text,
-                        style: const TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
+                    if (text != null)
+                      Center(
+                        child: Text(
+                          text!,
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
+                    if (text == null)
+                      const Center(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.orange,
+                        ),
+                      ),
                     if (iconSVG != null)
                       Positioned(
                         left: 30,

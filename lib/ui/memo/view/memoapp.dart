@@ -11,21 +11,24 @@ import 'package:memoplace/ui/login/view_model/loginuser.dart';
 import 'package:memoplace/ui/memo/view/memolist.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memoplace/widgets/custom_buttom.dart';
 
-// メモの一覧を表示
 class MemoApp extends HookConsumerWidget {
   const MemoApp({super.key});
   static String get routeName => 'memolist';
   static String get routeLocation => '/$routeName';
 
-  Future<void> pushMessage(text,context) async {
+  Future<void> pushMessage(text, context) async {
     HttpsCallable callable =
         FirebaseFunctions.instanceFor(region: 'asia-northeast1')
             .httpsCallable('pushTalk');
     final fcm = FirebaseMessaging.instance;
     final token = await fcm.getToken();
-    final resp = await callable
-        .call({'title': AppLocalizations.of(context)!.supermarket, 'body': '$text', 'token': token});
+    final resp = await callable.call({
+      'title': AppLocalizations.of(context)!.supermarket,
+      'body': '$text',
+      'token': token
+    });
     final data = resp.data;
     print("result: $data");
   }
@@ -37,13 +40,10 @@ class MemoApp extends HookConsumerWidget {
       _checkLocationPermission(context, ref);
       return null;
     });
-    // final w = MediaQuery.sizeOf(context).width;
-    // final h = MediaQuery.sizeOf(context).height;
-    // final viewTypes = useState<bool>(true);
-    // void changeView() {
-    //   viewTypes.value = !viewTypes.value;
-    // }
-
+    final w = MediaQuery.sizeOf(context).width;
+    final h = MediaQuery.sizeOf(context).height;
+    print(w);
+    print(h);
     return Scaffold(
       body: const Column(
         children: [
@@ -54,61 +54,15 @@ class MemoApp extends HookConsumerWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Container(
-            decoration: BoxDecoration(
+          CustomButton(
+              width: w * 0.15,
+              height: h * 0.06,
               color: baseColor,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withOpacity(0.4),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(3, 3),
-                ),
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(-3, -3),
-                ),
-              ],
-            ),
-            child: TextButton(
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.orange,
-                ),
-                onPressed: () => context.push('/addpage')),
-          ),
-          // Container(
-          //   decoration: BoxDecoration(
-          //     color: baseColor,
-          //     borderRadius: BorderRadius.circular(30),
-          //     boxShadow: [
-          //       BoxShadow(
-          //         color: Colors.orange.withOpacity(0.4),
-          //         spreadRadius: 5,
-          //         blurRadius: 7,
-          //         offset: const Offset(3, 3),
-          //       ),
-          //       BoxShadow(
-          //         color: Colors.white.withOpacity(0.5),
-          //         spreadRadius: 5,
-          //         blurRadius: 7,
-          //         offset: const Offset(-3, -3),
-          //       ),
-          //     ],
-          //   ),
-          //   child: TextButton(
-          //       // 検討中
-          //       child: const Icon(
-          //         Icons.apps,
-          //         color: Colors.orange,
-          //       ),
-          //       onPressed: () => {}),
-          // ),
-          const SizedBox(
-            height: 20,
+              onPressd: () async {
+                context.push('/addpage');
+              }),
+          SizedBox(
+            height: h * 0.02,
           )
         ],
       ),
@@ -208,7 +162,7 @@ class MemoApp extends HookConsumerWidget {
                 double.parse(latitude[i].toString()),
                 double.parse(longiLang[i].toString()));
             if (distanceInMeters < 100) {
-              await pushMessage(text[i],context);
+              await pushMessage(text[i], context);
             }
           }
         });

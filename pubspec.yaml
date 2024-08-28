@@ -113,6 +113,7 @@ flutter:
   assets:
     - assets/icon/apple_icon.svg
     - assets/icon/google_icon.svg
+    - assets/icon/add-square-svgrepo-com.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
